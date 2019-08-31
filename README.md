@@ -8,7 +8,10 @@ docker run -it --net=host --rm confluentinc/cp-ksql-cli:5.3.0 http://localhost:8
 
 show topics;
 
-print topic;
+print `topic`;
+
+exit ksql cli: CTRL+d
+
 
 start kafka and ksql server
 

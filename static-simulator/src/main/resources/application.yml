@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: static-simulator
+  cloud:
+    stream:
+      bindings:
+        riders:
+          destination: riders
+        cars:
+          destination: cars
+
+      kafka:
+        bindings:
+          riders:
+            producer:
+              configuration:
+                key:
+                  serializer: org.apache.kafka.common.serialization.StringSerializer
+          cars:
+            producer:
+              configuration:
+                key:
+                  serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    endpoints:
+      web:
+        exposure:
+          include: "*"
+

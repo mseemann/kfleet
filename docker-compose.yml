@@ -12,7 +12,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   broker:
-    image: confluentinc/cp-enterprise-kafka
+    image: confluentinc/cp-kafka
     depends_on:
       - zookeeper
     ports:
