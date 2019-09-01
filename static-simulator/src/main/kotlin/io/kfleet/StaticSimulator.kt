@@ -1,4 +1,4 @@
-package io.kfleet.simulation
+package io.kfleet
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

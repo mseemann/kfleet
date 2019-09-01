@@ -5,10 +5,10 @@ spring:
     stream:
       bindings:
         input:
-          destination: riders
-          group: test
-        riders:
-          destination: riders
+          destination: travelers
+          group: read
+        travelers:
+          destination: travelers
         cars:
           destination: cars
 
@@ -18,7 +18,7 @@ spring:
             key:
               serializer: org.apache.kafka.common.serialization.StringSerializer
 #        bindings:
-#          riders:
+#          travelers:
 #            producer:
 #              configuration:
 #                key:

@@ -1,4 +1,4 @@
-package io.kfleet.simulation
+package io.kfleet.configuration
 
 import org.apache.kafka.clients.admin.NewTopic
 import org.apache.kafka.common.config.TopicConfig
@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Configuration
 class Topics {
 
     @Bean
-    fun ridersTopic() =
-        NewTopic("riders", 3, 1)
+    fun travelerTopic() =
+        NewTopic("travelers", 3, 1)
             .configs(
                 mapOf(TopicConfig.CLEANUP_POLICY_CONFIG to TopicConfig.CLEANUP_POLICY_COMPACT)
             )
