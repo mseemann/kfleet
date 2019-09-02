@@ -16,3 +16,8 @@ exit ksql cli: CTRL+d
 start kafka and ksql server
 
 docker-compose up
+
+docker exec -it kfleet_broker_1 bash 
+kafka-topics --zookeeper zookeeper:2181 --list
+kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
+kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
