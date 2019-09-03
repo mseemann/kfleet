@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class DispatcherApplication
 
 fun main(args: Array<String>) {
-	runApplication<DispatcherApplication>(*args)
+    runApplication<DispatcherApplication>(*args)
 }

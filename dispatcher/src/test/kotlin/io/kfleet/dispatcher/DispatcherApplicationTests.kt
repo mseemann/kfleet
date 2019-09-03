@@ -1,4 +1,4 @@
-package io.kfleet.dispatcher
+package io.kfleet.simulation.dispatcher
 
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,8 +9,8 @@ import org.springframework.test.context.junit4.SpringRunner
 @SpringBootTest
 class DispatcherApplicationTests {
 
-	@Test
-	fun contextLoads() {
-	}
+    @Test
+    fun contextLoads() {
+    }
 
 }

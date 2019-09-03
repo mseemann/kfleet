@@ -2,13 +2,10 @@ package io.kfleet.domain
 
 import kotlin.random.Random
 
-enum class CarState {
-    FREE, IN_USE
-}
 
 data class Car(
         val id: String,
-        val state: CarState = CarState.IN_USE,
+        val state: CarStatus = CarStatus.IN_USE,
         val geoPosition: GeoPosition,
         val stateOfCharge: Double
 ) {
@@ -20,7 +17,7 @@ data class Car(
                 id = "$id",
                 geoPosition = GeoPosition.random(),
                 stateOfCharge = randomStateOfCharge(),
-                state = if (Random.nextBoolean()) CarState.IN_USE else CarState.FREE
+                state = if (Random.nextBoolean()) CarStatus.IN_USE else CarStatus.FREE
         )
     }
 

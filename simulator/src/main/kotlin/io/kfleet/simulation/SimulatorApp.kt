@@ -1,14 +1,14 @@
-package io.kfleet
+package io.kfleet.simulation
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 
 @SpringBootApplication
-class StaticSimulator
+class SimulatorApp
 
 fun main(args: Array<String>) {
-    runApplication<StaticSimulator>(*args)
+    runApplication<SimulatorApp>(*args)
 }
 
 

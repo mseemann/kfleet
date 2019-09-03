@@ -2,15 +2,17 @@ server:
   port: 8080
 spring:
   application:
-    name: static-simulator
+    name: simulator
   cloud:
     stream:
       bindings:
         input:
           destination: travelers
-          group: read
+          group: test_listener
         travelers:
           destination: travelers
+        travel-requests:
+          destination: travel_requests
         cars:
           destination: cars
 
