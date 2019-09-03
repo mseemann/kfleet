@@ -1,6 +1,5 @@
 package io.kfleet.simulation.emitter
 
-
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.MessageHeaders
 import reactor.core.publisher.Flux
