@@ -2,11 +2,16 @@ server:
   port: 8081
 spring:
   application:
-    name: dispatcher
+    name: monitoring
 
 spring.cloud.stream.kafka.streams.bindings.cars:
   consumer:
+    applicationId: monitoring-cars
     materializedAs: all-cars
+spring.cloud.stream.kafka.streams.bindings.travelers:
+  consumer:
+    applicationId: monitoring-travelers
+    materializedAs: all-travelers
 
 # needed for interative query if the key is not on this host
 spring.cloud.stream.kafka.streams.binder.configuration.application.server: localhost:${server.port}

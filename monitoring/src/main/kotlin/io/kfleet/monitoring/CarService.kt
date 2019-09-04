@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-class CarsService {
+class CarService {
 
     @Autowired
     lateinit var carRepository: CarRepository
