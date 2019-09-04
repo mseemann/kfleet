@@ -28,6 +28,8 @@ class TravelRequestValidator {
 
     val mapper = jacksonObjectMapper()
 
+    // this is not save. no tx and no exactly once guarantee - should be a stream processor! But is here
+    // for demonstration purposes
     @StreamListener(Processor.INPUT)
     @SendTo(Processor.OUTPUT)
     fun onInput(travelRequest: TravelRequest): Message<TravelRequest> {
@@ -37,6 +39,7 @@ class TravelRequestValidator {
                 .getQueryableStore("all-travelers", QueryableStoreTypes.keyValueStore<String, String>())
 
         val traveler = travelerStore.get(travelRequest.personId)?.let { mapper.readValue<Traveler>(it) }
+
         if (traveler == null) {
             throw Exception("traveler: ${travelRequest.personId} not found")
         }
@@ -45,7 +48,7 @@ class TravelRequestValidator {
         }
 
         // it would be possible to partition this topic by key that is based on the geoLocations
-        return MessageBuilder.createMessage(travelRequest, MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to "${travelRequest.personId}")))
+        return MessageBuilder.createMessage(travelRequest, MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to travelRequest.personId)))
     }
 
     // this listener is required so that spring cloud stream creates the  binder and the store
