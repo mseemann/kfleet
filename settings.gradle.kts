@@ -1,3 +1,3 @@
 rootProject.name = "kfleet"
 
-include("simulator", "dispatcher", "domain")
+include("simulator", "dispatcher", "domain", "travel-request-validator")

@@ -4,7 +4,7 @@ import io.kfleet.domain.Car
 import org.apache.kafka.streams.kstream.KTable
 import org.springframework.cloud.stream.annotation.Input
 
-interface DispatcherBinding {
+interface CarBinding {
     @Input("cars")
     fun inputCars(): KTable<String, Car>
 }

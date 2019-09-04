@@ -2,7 +2,7 @@ package io.kfleet.dispatcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kfleet.dispatcher.configuration.DispatcherBinding
+import io.kfleet.dispatcher.configuration.CarBinding
 import io.kfleet.domain.Car
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KTable
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-@EnableBinding(DispatcherBinding::class)
+@EnableBinding(CarBinding::class)
 class CarsRepository {
 
     @Autowired
@@ -29,12 +29,6 @@ class CarsRepository {
 
     @StreamListener
     fun test(@Input("cars") carTable: KTable<String, String>) {
-        println(carTable.queryableStoreName())
-
-//        carTable.toStream().foreach { s: String, car: String ->
-//            println(s)
-//            println(car)
-//        }
 
         carTable.groupBy { key: String, rawCar: String ->
             val car: Car = mapper.readValue(rawCar)
@@ -62,7 +56,7 @@ class CarsRepository {
 
 
         return carStore.all().use { it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList() }
-        
+
 //        carStore.range("1", "5").use {
 //            it.forEach { rawCarKV ->
 //                val car: Car = mapper.readValue(rawCarKV.value)
