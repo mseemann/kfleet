@@ -4,14 +4,9 @@ spring:
   application:
     name: dispatcher
 
-spring.cloud.stream.bindings.cars:
-  destination: cars
-
 spring.cloud.stream.kafka.streams.bindings.cars:
   consumer:
     materializedAs: all-cars
-    #valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-    #keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
 
 # needed for interative query if the key is not on this host
 spring.cloud.stream.kafka.streams.binder.configuration.application.server: localhost:${server.port}

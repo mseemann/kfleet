@@ -56,14 +56,6 @@ class CarsRepository {
 
 
         return carStore.all().use { it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList() }
-
-//        carStore.range("1", "5").use {
-//            it.forEach { rawCarKV ->
-//                val car: Car = mapper.readValue(rawCarKV.value)
-//                println("${rawCarKV.key} ${car}")
-//            }
-//        }
-
     }
 
     @RequestMapping("/car/{id}")
@@ -80,7 +72,7 @@ class CarsRepository {
         val carStatsStore = interactiveQueryService
                 .getQueryableStore("cars_by_state", QueryableStoreTypes.keyValueStore<String, Long>())
 
-        return carStatsStore.all().use { it.asSequence().map { it.key to it.value }.toMap() }
+        return carStatsStore.all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
 
     }
 }

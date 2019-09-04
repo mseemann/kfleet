@@ -7,21 +7,21 @@ import org.springframework.cloud.stream.reactive.FluxSender
 import org.springframework.cloud.stream.reactive.StreamEmitter
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
+import org.springframework.scheduling.annotation.Async
 
 @EnableBinding(CarBindings::class)
 class CarEmitter {
 
 
+    @Async
     @StreamEmitter
     @Output(CarBindings.CARS)
     fun emitCars(sender: FluxSender) {
-        Thread {
-            sender.send(randomDelayFluxer(CAR_COUNT).map {
-                val car = Car.create(it)
-                println("emit: $car")
-                MessageBuilder.createMessage(car, headers(it))
-            })
-        }.start()
+        sender.send(randomDelayFluxer(CAR_COUNT).map {
+            val car = Car.create(it)
+            println("emit: $car")
+            MessageBuilder.createMessage(car, headers(it))
+        })
     }
 
 }

@@ -40,15 +40,16 @@ class TravelRequestValidator {
 
         val traveler = travelerStore.get(travelRequest.personId)?.let { mapper.readValue<Traveler>(it) }
 
-        if (traveler == null) {
-            throw Exception("traveler: ${travelRequest.personId} not found")
-        }
-        if (traveler.state != TravelerStatus.IS_LIVING) {
-            throw Exception("traveler: ${traveler.id} has the wrong state ${traveler.state}")
+        traveler?.let {
+            if (traveler.state != TravelerStatus.IS_LIVING) {
+                throw Exception("traveler: ${traveler.id} has the wrong state ${traveler.state}")
+            }
+
+            // it would be possible to partition this topic by key that is based on the geoLocations
+            return MessageBuilder.createMessage(travelRequest, MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to travelRequest.personId)))
         }
 
-        // it would be possible to partition this topic by key that is based on the geoLocations
-        return MessageBuilder.createMessage(travelRequest, MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to travelRequest.personId)))
+        throw Exception("traveler: ${travelRequest.personId} not found")
     }
 
     // this listener is required so that spring cloud stream creates the  binder and the store
