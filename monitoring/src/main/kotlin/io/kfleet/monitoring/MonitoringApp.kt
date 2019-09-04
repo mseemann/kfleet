@@ -1,11 +1,11 @@
-package io.kfleet.dispatcher
+package io.kfleet.monitoring
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class DispatcherApplication
+class MonitoringApp
 
 fun main(args: Array<String>) {
-    runApplication<DispatcherApplication>(*args)
+    runApplication<MonitoringApp>(*args)
 }

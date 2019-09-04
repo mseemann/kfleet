@@ -1,4 +1,4 @@
-package io.kfleet.simulation.dispatcher
+package io.kfleet.monitoring
 
 import org.junit.Test
 import org.junit.runner.RunWith
