@@ -22,5 +22,5 @@ data class Car(
     }
 
     // a Tesla with 70kWh is able to go round about 440km
-    fun canReach() = stateOfCharge / 100 * 440;
+    fun canReach() = stateOfCharge / 100 * 440
 }

@@ -1,6 +1,7 @@
 package io.kfleet.simulation.emitter
 
-import TravelRequest
+
+import io.kfleet.domain.TravelRequest
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
 import org.springframework.cloud.stream.reactive.FluxSender

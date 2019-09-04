@@ -1,4 +1,4 @@
-import io.kfleet.domain.GeoPosition
+package io.kfleet.domain
 
 data class TravelRequest(
         val personId: String,

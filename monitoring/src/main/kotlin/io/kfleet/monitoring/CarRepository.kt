@@ -7,6 +7,7 @@ import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.state.QueryableStoreTypes
+import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Input
@@ -14,12 +15,19 @@ import org.springframework.cloud.stream.annotation.StreamListener
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.stereotype.Repository
 
+
+const val CAR_STORE = "all-cars"
+const val CAR_STATE_STORE = "cars_by_state"
+
+interface CarBinding {
+    @Input("cars")
+    fun inputCars(): KTable<String, String>
+}
+
 @Repository
 @EnableBinding(CarBinding::class)
 class CarRepository {
 
-    val CAR_STOR = "all-cars"
-    val CAR_STATE_STORE = "cars_by_state"
 
     @Autowired
     lateinit var interactiveQueryService: InteractiveQueryService
@@ -28,7 +36,7 @@ class CarRepository {
 
     @StreamListener
     fun carStateUpdates(@Input("cars") carTable: KTable<String, String>) {
-        carTable.groupBy { key: String, rawCar: String ->
+        carTable.groupBy { _: String, rawCar: String ->
             val car: Car = mapper.readValue(rawCar)
             KeyValue(car.state.toString(), "")
         }
@@ -39,17 +47,13 @@ class CarRepository {
                 }
     }
 
-    fun allCarsStore() = interactiveQueryService
-            .getQueryableStore(CAR_STOR, QueryableStoreTypes.keyValueStore<String, String>())
+    fun allCarsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
+            .getQueryableStore(CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
 
 
-    fun allCarStateStore() = interactiveQueryService
+    fun allCarStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
             .getQueryableStore(CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
 
 }
 
-interface CarBinding {
-    @Input("cars")
-    fun inputCars(): KTable<String, String>
-}
