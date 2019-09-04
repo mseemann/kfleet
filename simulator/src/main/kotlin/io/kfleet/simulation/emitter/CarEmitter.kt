@@ -16,7 +16,7 @@ class CarEmitter {
     @Output(CarBindings.CARS)
     fun emitCars(sender: FluxSender) {
         Thread {
-            sender.send(fluxer(CAR_COUNT).map {
+            sender.send(randomDelayFluxer(CAR_COUNT).map {
                 val car = Car.create(it)
                 println("emit: $car")
                 MessageBuilder.createMessage(car, headers(it))

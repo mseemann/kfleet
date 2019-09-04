@@ -8,11 +8,9 @@ import kotlin.random.Random
 
 val CAR_COUNT = 10
 val TRAVELER_COUNT = 20
-var infiniteCounter = 0L
 
-fun fluxer(maxId: Int, sleepFrom: Long = 1, sleepUntil: Long = 5) = Flux.generate<Int> { sink ->
-    infiniteCounter++
-    sink.next((infiniteCounter % maxId + 1).toInt())
+fun randomDelayFluxer(maxId: Int, sleepFrom: Long = 1, sleepUntil: Long = 5) = Flux.generate<Int> { sink ->
+    sink.next(Random.nextInt(1, maxId + 1))
     Thread.sleep(Duration.ofSeconds(Random.nextLong(sleepFrom, sleepUntil)).toMillis())
 }
 
