@@ -19,14 +19,14 @@ import org.springframework.stereotype.Repository
 const val CAR_STORE = "all-cars"
 const val CAR_STATE_STORE = "cars_by_state"
 
-interface CarBinding {
+interface CarsBinding {
     @Input("cars")
     fun inputCars(): KTable<String, String>
 }
 
 @Repository
-@EnableBinding(CarBinding::class)
-class CarRepository {
+@EnableBinding(CarsBinding::class)
+class CarsRepository {
 
 
     @Autowired
@@ -36,10 +36,12 @@ class CarRepository {
 
     @StreamListener
     fun carStateUpdates(@Input("cars") carTable: KTable<String, String>) {
-        carTable.groupBy { _: String, rawCar: String ->
-            val car: Car = mapper.readValue(rawCar)
-            KeyValue(car.state.toString(), "")
-        }
+
+        carTable
+                .groupBy { _, rawCar: String ->
+                    val car: Car = mapper.readValue(rawCar)
+                    KeyValue(car.state.toString(), "")
+                }
                 .count(Materialized.`as`(CAR_STATE_STORE))
                 .toStream()
                 .foreach { a: String, c: Long ->
@@ -47,11 +49,11 @@ class CarRepository {
                 }
     }
 
-    fun allCarsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
+    fun carsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
             .getQueryableStore(CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
 
 
-    fun allCarStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
+    fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
             .getQueryableStore(CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
 

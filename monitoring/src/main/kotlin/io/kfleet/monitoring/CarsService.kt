@@ -10,26 +10,27 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-class CarService {
+@RequestMapping("/cars")
+class CarsService {
 
     @Autowired
-    lateinit var carRepository: CarRepository
+    lateinit var carRepository: CarsRepository
 
     val mapper = jacksonObjectMapper()
 
 
-    @RequestMapping("/cars")
+    @RequestMapping("/")
     fun cars(): List<Car> {
-        return carRepository.allCarsStore().all().use { it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList() }
+        return carRepository.carsStore().all().use { it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList() }
     }
 
-    @RequestMapping("/cars/{id}")
+    @RequestMapping("/{id}")
     fun car(@PathVariable("id") id: String): Car? {
-        return carRepository.allCarsStore().get(id)?.let { mapper.readValue<Car>(it) }
+        return carRepository.carsStore().get(id)?.let { mapper.readValue<Car>(it) }
     }
 
-    @RequestMapping("/cars/stats")
+    @RequestMapping("/stats")
     fun carsStats(): Map<String, Long> {
-        return carRepository.allCarStateStore().all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
+        return carRepository.carStateStore().all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
     }
 }

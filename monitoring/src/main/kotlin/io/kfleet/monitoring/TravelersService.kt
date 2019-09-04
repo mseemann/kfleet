@@ -10,26 +10,27 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-class TravelerService {
+@RequestMapping("/travelers")
+class TravelersService {
 
     @Autowired
-    lateinit var travelerRepository: TravelerRepository
+    lateinit var travelerRepository: TravelersRepository
 
     val mapper = jacksonObjectMapper()
 
 
-    @RequestMapping("/travelers")
+    @RequestMapping("/")
     fun travelers(): List<Traveler> {
-        return travelerRepository.allTravelersStore().all().use { it.asSequence().map { kv -> mapper.readValue<Traveler>(kv.value) }.toList() }
+        return travelerRepository.travelersStore().all().use { it.asSequence().map { kv -> mapper.readValue<Traveler>(kv.value) }.toList() }
     }
 
-    @RequestMapping("/travelers/{id}")
+    @RequestMapping("/{id}")
     fun traveler(@PathVariable("id") id: String): Traveler? {
-        return travelerRepository.allTravelersStore().get(id)?.let { mapper.readValue<Traveler>(it) }
+        return travelerRepository.travelersStore().get(id)?.let { mapper.readValue<Traveler>(it) }
     }
 
-    @RequestMapping("/travelers/stats")
+    @RequestMapping("/stats")
     fun travelersStats(): Map<String, Long> {
-        return travelerRepository.allTravelersStateStore().all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
+        return travelerRepository.travelersStateStore().all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
     }
 }

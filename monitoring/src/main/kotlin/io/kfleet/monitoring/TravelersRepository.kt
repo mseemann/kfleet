@@ -19,14 +19,14 @@ import org.springframework.stereotype.Repository
 const val TRAVELER_STORE = "all-travelers"
 const val TRAVELER_STATE_STORE = "travelers_by_state"
 
-interface TravelerBinding {
+interface TravelersBinding {
     @Input("travelers")
     fun inputTravelers(): KTable<String, String>
 }
 
 @Repository
-@EnableBinding(TravelerBinding::class)
-class TravelerRepository {
+@EnableBinding(TravelersBinding::class)
+class TravelersRepository {
 
 
     @Autowired
@@ -36,10 +36,12 @@ class TravelerRepository {
 
     @StreamListener
     fun travelerStateUpdates(@Input("travelers") travelerTable: KTable<String, String>) {
-        travelerTable.groupBy { _: String, rawTraveler: String ->
-            val traveler: Traveler = mapper.readValue(rawTraveler)
-            KeyValue(traveler.state.toString(), "")
-        }
+
+        travelerTable
+                .groupBy { _, rawTraveler: String ->
+                    val traveler: Traveler = mapper.readValue(rawTraveler)
+                    KeyValue(traveler.state.toString(), "")
+                }
                 .count(Materialized.`as`(TRAVELER_STATE_STORE))
                 .toStream()
                 .foreach { a: String, c: Long ->
@@ -47,11 +49,11 @@ class TravelerRepository {
                 }
     }
 
-    fun allTravelersStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
+    fun travelersStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
             .getQueryableStore(TRAVELER_STORE, QueryableStoreTypes.keyValueStore<String, String>())
 
 
-    fun allTravelersStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
+    fun travelersStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
             .getQueryableStore(TRAVELER_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
 
