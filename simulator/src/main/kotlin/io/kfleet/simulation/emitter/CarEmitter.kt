@@ -14,13 +14,12 @@ class CarEmitter {
 
     @StreamEmitter
     @Output(CarBindings.CARS)
-    fun emitCars(): Flux<Message<Car>> {
-        return randomDelayFLuxer(CAR_COUNT).map {
-            val car = Car.create(it)
-            println("emit: $car")
-            MessageBuilder.createMessage(car, headers(it))
-        }
+    fun emitCars(): Flux<Message<Car>> = randomDelayFluxer(CAR_COUNT).map {
+        val car = Car.create(it)
+        println("emit: $car")
+        MessageBuilder.createMessage(car, headers(it))
     }
+    
 
 }
 

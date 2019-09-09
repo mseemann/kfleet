@@ -11,7 +11,7 @@ import kotlin.random.Random
 const val CAR_COUNT = 10
 const val TRAVELER_COUNT = 20
 
-fun randomDelayFLuxer(maxId: Int, sleepFrom: Long = 1, sleepUntil: Long = 5): Flux<Int> {
+fun randomDelayFluxer(maxId: Int, sleepFrom: Long = 1, sleepUntil: Long = 5): Flux<Int> {
     return Flux.generate { sink: SynchronousSink<Int> ->
         sink.next(Random.nextInt(maxId) + 1)
     }.concatMap { id: Int ->

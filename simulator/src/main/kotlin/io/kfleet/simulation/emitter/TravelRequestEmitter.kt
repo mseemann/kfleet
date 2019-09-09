@@ -15,15 +15,13 @@ class TravelRequestEmitter {
 
     @StreamEmitter
     @Output(TravelRequestBindings.TRAVEL_REQUESTS)
-    fun emitTravelRequests(): Flux<Message<TravelRequest>> {
-        return randomDelayFLuxer(TRAVELER_COUNT, sleepFrom = 10, sleepUntil = 30).map {
-            // TODO make a lookup fo a Traveler in State IS_LIVING and create a TravelRequest for him
-            val travelRequest = TravelRequest.create(it)
-            println("emit: $travelRequest")
-            MessageBuilder.createMessage(travelRequest, headers(it))
-        }
+    fun emitTravelRequests(): Flux<Message<TravelRequest>> = randomDelayFluxer(TRAVELER_COUNT, sleepFrom = 10, sleepUntil = 30).map {
+        // TODO make a lookup fo a Traveler in State IS_LIVING and create a TravelRequest for him
+        val travelRequest = TravelRequest.create(it)
+        println("emit: $travelRequest")
+        MessageBuilder.createMessage(travelRequest, headers(it))
     }
-
+    
 }
 
 interface TravelRequestBindings {
