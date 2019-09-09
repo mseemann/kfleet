@@ -21,7 +21,9 @@ class CarsService {
 
     @RequestMapping("/")
     fun cars(): List<Car> {
-        return carRepository.carsStore().all().use { it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList() }
+        return carRepository.carsStore().all().use {
+            it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList()
+        }
     }
 
     @RequestMapping("/{id}")
@@ -31,6 +33,8 @@ class CarsService {
 
     @RequestMapping("/stats")
     fun carsStats(): Map<String, Long> {
-        return carRepository.carStateStore().all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
+        return carRepository.carStateStore().all().use {
+            it.asSequence().map { kv -> kv.key to kv.value }.toMap()
+        }
     }
 }

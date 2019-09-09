@@ -1,11 +1,12 @@
 package io.kfleet.validator
 
-import TravelRequest
+
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.kfleet.domain.Car
+import io.kfleet.domain.TravelRequest
 import io.kfleet.domain.Traveler
 import io.kfleet.domain.TravelerStatus
-import io.kfleet.validator.configuration.TravelerBinding
 import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,16 +46,25 @@ class TravelRequestValidator {
                 throw Exception("traveler: ${traveler.id} has the wrong state ${traveler.state}")
             }
 
-            // it would be possible to partition this topic by key that is based on the geoLocations
             return MessageBuilder.createMessage(travelRequest, MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to travelRequest.personId)))
         }
 
         throw Exception("traveler: ${travelRequest.personId} not found")
     }
 
-    // this listener is required so that spring cloud stream creates the  binder and the store
+    // this listener is required so that spring cloud stream creates the binder and the store
     // with the travelers
     @StreamListener
-    fun test(@Input("travelers") carTable: KTable<String, String>) {
+    fun test(@Input(TravelerBinding.TRAVELERS) carTable: KTable<String, String>) {
     }
+}
+
+interface TravelerBinding {
+
+    companion object {
+        const val TRAVELERS = "travelers"
+    }
+
+    @Input(TRAVELERS)
+    fun inputTravelers(): KTable<String, Car>
 }

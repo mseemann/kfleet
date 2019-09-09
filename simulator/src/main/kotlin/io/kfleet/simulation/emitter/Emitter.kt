@@ -10,7 +10,7 @@ const val CAR_COUNT = 10
 const val TRAVELER_COUNT = 20
 
 fun randomDelayFluxer(maxId: Int, sleepFrom: Long = 1, sleepUntil: Long = 5): Flux<Int> = Flux.generate { sink ->
-    sink.next(Random.nextInt(1, maxId + 1))
+    sink.next(Random.nextInt(maxId) + 1)
     Thread.sleep(Duration.ofSeconds(Random.nextLong(sleepFrom, sleepUntil)).toMillis())
 }
 

@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.Async
 @EnableBinding(CarBindings::class)
 class CarEmitter {
 
-
     @Async
     @StreamEmitter
     @Output(CarBindings.CARS)

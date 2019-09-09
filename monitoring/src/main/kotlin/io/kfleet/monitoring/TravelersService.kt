@@ -20,8 +20,10 @@ class TravelersService {
 
 
     @RequestMapping("/")
-    fun travelers(): List<Traveler> {
-        return travelerRepository.travelersStore().all().use { it.asSequence().map { kv -> mapper.readValue<Traveler>(kv.value) }.toList() }
+    fun travelers() {
+        return travelerRepository.travelersStore().all().use {
+            it.asSequence().map { kv -> mapper.readValue<Traveler>(kv.value) }.toList()
+        }
     }
 
     @RequestMapping("/{id}")
@@ -30,7 +32,9 @@ class TravelersService {
     }
 
     @RequestMapping("/stats")
-    fun travelersStats(): Map<String, Long> {
-        return travelerRepository.travelersStateStore().all().use { it.asSequence().map { kv -> kv.key to kv.value }.toMap() }
+    fun travelersStats() {
+        return travelerRepository.travelersStateStore().all().use {
+            it.asSequence().map { kv -> kv.key to kv.value }.toMap()
+        }
     }
 }
