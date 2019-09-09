@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "1.3.50" apply false
 }
 
+
 allprojects {
 
     group = "org.gradle.kotlin.dsl.samples.multiproject"

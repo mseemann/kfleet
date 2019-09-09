@@ -6,11 +6,10 @@ plugins {
     kotlin("plugin.spring") version "1.3.50"
 }
 
+
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
     jcenter()
 }
 
