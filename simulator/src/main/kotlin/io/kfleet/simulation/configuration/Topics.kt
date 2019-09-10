@@ -12,9 +12,6 @@ class Topics {
     fun travelersTopic() = NewTopic("travelers", 3, 1)
 
     @Bean
-    fun carsTopic() = NewTopic("cars", 3, 1)
-
-    @Bean
     fun travelRequestsTopic() = NewTopic("travel_requests", 3, 1)
 
     @Bean

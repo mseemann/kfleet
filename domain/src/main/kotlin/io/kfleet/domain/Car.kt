@@ -17,7 +17,7 @@ data class Car(
                 id = "$id",
                 geoPosition = GeoPosition.random(),
                 stateOfCharge = randomStateOfCharge(),
-                state = if (Random.nextBoolean()) CarStatus.IN_USE else CarStatus.FREE
+                state = CarStatus.values()[Random.nextInt(CarStatus.values().size)]
         )
     }
 

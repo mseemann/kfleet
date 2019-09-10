@@ -1,0 +1,15 @@
+server.port: 8083
+spring.application.name: car-service
+
+spring.cloud.stream.bindings:
+  cars:
+    destination: cars
+
+spring.cloud.stream.kafka.binder.configuration:
+  key.serializer: org.apache.kafka.common.serialization.StringSerializer
+
+management.endpoints.web.exposure.include: "*"
+
+logging.level.io.kfleet: DEBUG
+
+cars.service.simulation.enabled: true

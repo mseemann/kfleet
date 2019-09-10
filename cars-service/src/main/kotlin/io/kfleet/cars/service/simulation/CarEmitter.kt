@@ -1,7 +1,10 @@
-package io.kfleet.simulation.emitter
+package io.kfleet.cars.service.simulation
 
+import io.kfleet.common.headers
+import io.kfleet.common.randomDelayFluxer
 import io.kfleet.domain.Car
 import mu.KotlinLogging
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
 import org.springframework.cloud.stream.reactive.StreamEmitter
@@ -12,16 +15,21 @@ import reactor.core.publisher.Flux
 
 private val logger = KotlinLogging.logger {}
 
+const val CAR_COUNT = 10
+
 @EnableBinding(CarBindings::class)
 class CarEmitter {
 
+    @Value("\${cars.service.simulation.enabled}")
+    val simulationEnabled: Boolean? = null
+
     @StreamEmitter
     @Output(CarBindings.CARS)
-    fun emitCars(): Flux<Message<Car>> = randomDelayFluxer(CAR_COUNT).map {
+    fun emitCars(): Flux<Message<Car>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT).map {
         val car = Car.create(it)
         logger.debug { "emit: $car" }
         MessageBuilder.createMessage(car, headers(it))
-    }
+    } else Flux.empty()
 
 
 }

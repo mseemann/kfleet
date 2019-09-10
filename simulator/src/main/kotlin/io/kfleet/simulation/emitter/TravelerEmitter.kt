@@ -1,5 +1,6 @@
 package io.kfleet.simulation.emitter
 
+import io.kfleet.common.headers
 import io.kfleet.domain.Traveler
 import mu.KotlinLogging
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -11,6 +12,8 @@ import org.springframework.messaging.support.MessageBuilder
 import reactor.core.publisher.Flux
 
 private val logger = KotlinLogging.logger {}
+
+const val TRAVELER_COUNT = 20
 
 @EnableBinding(TravelerBindings::class)
 class TravelerEmitter {
