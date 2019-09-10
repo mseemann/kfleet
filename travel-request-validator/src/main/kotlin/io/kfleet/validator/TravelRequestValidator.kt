@@ -3,7 +3,6 @@ package io.kfleet.validator
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kfleet.domain.Car
 import io.kfleet.domain.TravelRequest
 import io.kfleet.domain.Traveler
 import io.kfleet.domain.TravelerStatus
@@ -70,5 +69,5 @@ interface TravelerBinding {
     }
 
     @Input(TRAVELERS)
-    fun inputTravelers(): KTable<String, Car>
+    fun inputTravelers(): KTable<String, String>
 }

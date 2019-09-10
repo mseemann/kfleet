@@ -1,4 +1,4 @@
-package io.kfleet.monitoring
+package io.kfleet.cars.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -22,7 +22,11 @@ const val CAR_STORE = "all-cars"
 const val CAR_STATE_STORE = "cars_by_state"
 
 interface CarsBinding {
-    @Input("cars")
+    companion object {
+        const val CARS = "cars"
+    }
+
+    @Input(CARS)
     fun inputCars(): KTable<String, String>
 }
 
@@ -33,12 +37,12 @@ class CarsRepository {
 
     @Autowired
     lateinit var interactiveQueryService: InteractiveQueryService
-    
+
     @Autowired
     lateinit var mapper: ObjectMapper
 
     @StreamListener
-    fun carStateUpdates(@Input("cars") carTable: KTable<String, String>) {
+    fun carStateUpdates(@Input(CarsBinding.CARS) carTable: KTable<String, String>) {
 
         carTable
                 .groupBy { _, rawCar: String ->

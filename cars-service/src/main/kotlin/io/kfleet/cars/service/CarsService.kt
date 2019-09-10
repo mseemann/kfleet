@@ -1,4 +1,4 @@
-package io.kfleet.monitoring
+package io.kfleet.cars.service
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue

@@ -17,30 +17,31 @@ private val logger = KotlinLogging.logger {}
 
 const val CAR_COUNT = 10
 
-@EnableBinding(CarBindings::class)
+interface CarsOutBindings {
+
+    companion object {
+        const val CARS = "cars_out"
+    }
+
+    @Output(CARS)
+    fun cars(): MessageChannel
+
+}
+
+
+@EnableBinding(CarsOutBindings::class)
 class CarEmitter {
 
     @Value("\${cars.service.simulation.enabled}")
     val simulationEnabled: Boolean? = null
 
     @StreamEmitter
-    @Output(CarBindings.CARS)
+    @Output(CarsOutBindings.CARS)
     fun emitCars(): Flux<Message<Car>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT).map {
         val car = Car.create(it)
         logger.debug { "emit: $car" }
         MessageBuilder.createMessage(car, headers(it))
     } else Flux.empty()
 
-
-}
-
-interface CarBindings {
-
-    companion object {
-        const val CARS = "cars"
-    }
-
-    @Output(CARS)
-    fun cars(): MessageChannel
 
 }
