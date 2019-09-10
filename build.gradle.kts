@@ -23,6 +23,7 @@ allprojects {
 }
 
 dependencies {
+    
     // Make the root project archives configuration depend on every subproject
     subprojects.forEach {
         archives(it)

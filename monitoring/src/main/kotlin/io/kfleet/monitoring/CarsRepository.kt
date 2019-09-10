@@ -3,6 +3,7 @@ package io.kfleet.monitoring
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.domain.Car
+import mu.KotlinLogging
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.kstream.Materialized
@@ -15,6 +16,7 @@ import org.springframework.cloud.stream.annotation.StreamListener
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.stereotype.Repository
 
+private val logger = KotlinLogging.logger {}
 
 const val CAR_STORE = "all-cars"
 const val CAR_STATE_STORE = "cars_by_state"
@@ -44,8 +46,8 @@ class CarsRepository {
                 }
                 .count(Materialized.`as`(CAR_STATE_STORE))
                 .toStream()
-                .foreach { a: String, c: Long ->
-                    println("$a -> $c")
+                .foreach { status: String, count: Long ->
+                    logger.debug { "$status -> $count" }
                 }
     }
 
@@ -55,7 +57,6 @@ class CarsRepository {
 
     fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
             .getQueryableStore(CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
-
 
 }
 

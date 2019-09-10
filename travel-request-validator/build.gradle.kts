@@ -27,7 +27,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
     implementation("org.springframework.cloud:spring-cloud-stream-reactive")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
-
+    implementation("io.github.microutils:kotlin-logging:1.7.6")
+    
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.cloud:spring-cloud-stream-test-support")
     testImplementation("org.jetbrains.kotlin:kotlin-test")

@@ -1,20 +1,17 @@
-server:
-  port: 8082
-spring:
-  application:
-    name: validator
-  cloud.stream.bindings:
-    input:
-      destination: travel_requests
-      group: test
-    output:
-      destination: accepted_travel_requests
-  cloud.stream:
-    kafka:
-      binder:
-        configuration:
-          key:
-            serializer: org.apache.kafka.common.serialization.StringSerializer
+server.port: 8082
+spring.application.name: validator
+spring.cloud.stream.bindings:
+  input:
+    destination: travel_requests
+    group: test
+  output:
+    destination: accepted_travel_requests
+spring.cloud.stream:
+  kafka:
+    binder:
+      configuration:
+        key:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
 
 spring.cloud.stream.kafka.streams.bindings.travelers:
   consumer:
@@ -23,10 +20,6 @@ spring.cloud.stream.kafka.streams.bindings.travelers:
 spring.cloud.stream.kafka.streams.binder.configuration.default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 spring.cloud.stream.kafka.streams.binder.configuration.default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+management.endpoints.web.exposure.include: "*"
 
-
+logging.level.io.kfleet: DEBUG

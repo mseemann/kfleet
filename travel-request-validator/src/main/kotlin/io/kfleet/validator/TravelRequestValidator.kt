@@ -7,6 +7,7 @@ import io.kfleet.domain.Car
 import io.kfleet.domain.TravelRequest
 import io.kfleet.domain.Traveler
 import io.kfleet.domain.TravelerStatus
+import mu.KotlinLogging
 import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,8 @@ import org.springframework.messaging.MessageHeaders
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.support.MessageBuilder
 
+private val logger = KotlinLogging.logger {}
+
 @EnableBinding(Processor::class, TravelerBinding::class)
 class TravelRequestValidator {
 
@@ -34,7 +37,8 @@ class TravelRequestValidator {
     @StreamListener(Processor.INPUT)
     @SendTo(Processor.OUTPUT)
     fun onInput(travelRequest: TravelRequest): Message<TravelRequest> {
-        println("TravelRequest: $travelRequest")
+
+        logger.debug { "TravelRequest: $travelRequest" }
 
         val travelerStore = interactiveQueryService
                 .getQueryableStore("all-travelers", QueryableStoreTypes.keyValueStore<String, String>())

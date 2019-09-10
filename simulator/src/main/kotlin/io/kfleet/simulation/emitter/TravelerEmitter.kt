@@ -1,6 +1,7 @@
 package io.kfleet.simulation.emitter
 
 import io.kfleet.domain.Traveler
+import mu.KotlinLogging
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
 import org.springframework.cloud.stream.reactive.StreamEmitter
@@ -9,6 +10,8 @@ import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
 import reactor.core.publisher.Flux
 
+private val logger = KotlinLogging.logger {}
+
 @EnableBinding(TravelerBindings::class)
 class TravelerEmitter {
 
@@ -16,7 +19,7 @@ class TravelerEmitter {
     @Output(TravelerBindings.TRAVELERS)
     fun emitTravelers(): Flux<Message<Traveler>> = Flux.range(1, TRAVELER_COUNT).map {
         val traveler = Traveler.create(it)
-        println("emit: $traveler")
+        logger.debug { "emit: $traveler" }
         MessageBuilder.createMessage(traveler, headers(it))
     }
 }

@@ -1,26 +1,22 @@
-server:
-  port: 8080
-spring:
-  application:
-    name: simulator
-  cloud:
-    stream:
-      bindings:
-        input:
-          destination: travelers
-          group: test_listener
-        travelers:
-          destination: travelers
-        travel-requests:
-          destination: travel_requests
-        cars:
-          destination: cars
+server.port: 8080
+spring.application.name: simulator
+spring.cloud.stream:
+  bindings:
+    input:
+      destination: travelers
+      group: test_listener
+    travelers:
+      destination: travelers
+    travel-requests:
+      destination: travel_requests
+    cars:
+      destination: cars
 
-      kafka:
-        binder:
-          configuration:
-            key:
-              serializer: org.apache.kafka.common.serialization.StringSerializer
+  kafka:
+    binder:
+      configuration:
+        key:
+          serializer: org.apache.kafka.common.serialization.StringSerializer
 #        bindings:
 #          travelers:
 #            producer:
@@ -33,10 +29,7 @@ spring:
 #                key:
 #                  serializer: org.apache.kafka.common.serialization.StringSerializer
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+management.endpoints.web.exposure.include: "*"
 
 
+logging.level.io.kfleet: DEBUG

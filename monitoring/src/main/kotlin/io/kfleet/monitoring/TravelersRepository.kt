@@ -3,6 +3,7 @@ package io.kfleet.monitoring
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.domain.Traveler
+import mu.KotlinLogging
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KTable
 import org.apache.kafka.streams.kstream.Materialized
@@ -15,6 +16,7 @@ import org.springframework.cloud.stream.annotation.StreamListener
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.stereotype.Repository
 
+private val logger = KotlinLogging.logger {}
 
 const val TRAVELER_STORE = "all-travelers"
 const val TRAVELER_STATE_STORE = "travelers_by_state"
@@ -45,7 +47,7 @@ class TravelersRepository {
                 .count(Materialized.`as`(TRAVELER_STATE_STORE))
                 .toStream()
                 .foreach { a: String, c: Long ->
-                    println("$a -> $c")
+                    logger.debug { "$a -> $c" }
                 }
     }
 
