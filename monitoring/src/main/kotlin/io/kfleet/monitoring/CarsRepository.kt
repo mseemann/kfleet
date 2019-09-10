@@ -1,6 +1,6 @@
 package io.kfleet.monitoring
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.domain.Car
 import mu.KotlinLogging
@@ -33,8 +33,9 @@ class CarsRepository {
 
     @Autowired
     lateinit var interactiveQueryService: InteractiveQueryService
-
-    val mapper = jacksonObjectMapper()
+    
+    @Autowired
+    lateinit var mapper: ObjectMapper
 
     @StreamListener
     fun carStateUpdates(@Input("cars") carTable: KTable<String, String>) {

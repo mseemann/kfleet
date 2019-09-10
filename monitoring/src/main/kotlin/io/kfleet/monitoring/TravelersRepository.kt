@@ -1,6 +1,6 @@
 package io.kfleet.monitoring
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.domain.Traveler
 import mu.KotlinLogging
@@ -34,7 +34,8 @@ class TravelersRepository {
     @Autowired
     lateinit var interactiveQueryService: InteractiveQueryService
 
-    val mapper = jacksonObjectMapper()
+    @Autowired
+    lateinit var mapper: ObjectMapper
 
     @StreamListener
     fun travelerStateUpdates(@Input("travelers") travelerTable: KTable<String, String>) {
@@ -46,8 +47,8 @@ class TravelersRepository {
                 }
                 .count(Materialized.`as`(TRAVELER_STATE_STORE))
                 .toStream()
-                .foreach { a: String, c: Long ->
-                    logger.debug { "$a -> $c" }
+                .foreach { status: String, count: Long ->
+                    logger.debug { "$status -> $count" }
                 }
     }
 
