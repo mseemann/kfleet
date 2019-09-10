@@ -1,4 +1,4 @@
-package io.kfleet.domain
+package io.kfleet.cars.service.domain
 
 enum class CarStatus {
     FREE, // is waiting for a traveler

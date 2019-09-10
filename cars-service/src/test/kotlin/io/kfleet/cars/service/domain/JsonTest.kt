@@ -1,7 +1,8 @@
-package io.kfleet.domain
+package io.kfleet.cars.service.domain
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.kfleet.domain.GeoPosition
 import org.junit.Test
 import kotlin.test.assertEquals
 

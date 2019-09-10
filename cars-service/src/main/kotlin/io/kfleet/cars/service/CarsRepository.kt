@@ -2,7 +2,7 @@ package io.kfleet.cars.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kfleet.domain.Car
+import io.kfleet.cars.service.domain.Car
 import mu.KotlinLogging
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KTable
@@ -18,12 +18,13 @@ import org.springframework.stereotype.Repository
 
 private val logger = KotlinLogging.logger {}
 
-const val CAR_STORE = "all-cars"
-const val CAR_STATE_STORE = "cars_by_state"
 
 interface CarsBinding {
+
     companion object {
         const val CARS = "cars"
+        const val CAR_STORE = "all-cars"
+        const val CAR_STATE_STORE = "cars_by_state"
     }
 
     @Input(CARS)
@@ -49,7 +50,7 @@ class CarsRepository {
                     val car: Car = mapper.readValue(rawCar)
                     KeyValue(car.state.toString(), "")
                 }
-                .count(Materialized.`as`(CAR_STATE_STORE))
+                .count(Materialized.`as`(CarsBinding.CAR_STATE_STORE))
                 .toStream()
                 .foreach { status: String, count: Long ->
                     logger.debug { "$status -> $count" }
@@ -57,11 +58,11 @@ class CarsRepository {
     }
 
     fun carsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
-            .getQueryableStore(CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
+            .getQueryableStore(CarsBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
 
 
     fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
-            .getQueryableStore(CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
+            .getQueryableStore(CarsBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
 }
 

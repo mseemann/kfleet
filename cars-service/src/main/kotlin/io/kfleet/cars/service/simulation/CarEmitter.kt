@@ -1,8 +1,8 @@
 package io.kfleet.cars.service.simulation
 
+import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.headers
 import io.kfleet.common.randomDelayFluxer
-import io.kfleet.domain.Car
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.stream.annotation.EnableBinding

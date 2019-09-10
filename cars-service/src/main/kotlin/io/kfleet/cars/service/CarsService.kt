@@ -1,8 +1,8 @@
 package io.kfleet.cars.service
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kfleet.domain.Car
+import io.kfleet.cars.service.domain.Car
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,7 +16,8 @@ class CarsService {
     @Autowired
     lateinit var carRepository: CarsRepository
 
-    val mapper = jacksonObjectMapper()
+    @Autowired
+    lateinit var mapper: ObjectMapper
 
 
     @RequestMapping("/")

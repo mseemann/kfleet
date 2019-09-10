@@ -1,5 +1,6 @@
-package io.kfleet.domain
+package io.kfleet.cars.service.domain
 
+import io.kfleet.domain.GeoPosition
 import kotlin.random.Random
 
 
