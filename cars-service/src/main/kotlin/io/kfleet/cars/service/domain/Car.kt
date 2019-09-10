@@ -12,12 +12,10 @@ data class Car(
 ) {
     companion object {
 
-        private fun randomStateOfCharge() = Random.nextDouble(0.0, 100.0)
-
         fun create(id: Int) = Car(
                 id = "$id",
                 geoPosition = GeoPosition.random(),
-                stateOfCharge = randomStateOfCharge(),
+                stateOfCharge = Random.nextDouble(0.0, 100.0),
                 state = CarStatus.values()[Random.nextInt(CarStatus.values().size)]
         )
     }

@@ -23,6 +23,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.cloud:spring-cloud-stream")
     implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
@@ -39,5 +40,13 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
+}
+
+// enable dev tools the kotlin way
+val developmentOnly by configurations.creating
+configurations {
+    runtimeClasspath {
+        extendsFrom(developmentOnly)
     }
 }

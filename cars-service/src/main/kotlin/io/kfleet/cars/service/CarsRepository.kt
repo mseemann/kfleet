@@ -35,7 +35,6 @@ interface CarsBinding {
 @EnableBinding(CarsBinding::class)
 class CarsRepository {
 
-
     @Autowired
     lateinit var interactiveQueryService: InteractiveQueryService
 

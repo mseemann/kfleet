@@ -14,7 +14,7 @@ spring.cloud.stream.kafka.streams.bindings.cars:
     applicationId: cars-service-repo
     materializedAs: all-cars
 
-# needed for interative query if the key is not on this host
+# needed for interactive queries if the key is not on this host
 spring.cloud.stream.kafka.streams.binder.configuration.application.server: localhost:${server.port}
 spring.cloud.stream.kafka.streams.binder.configuration.commit.interval.ms: 100
 #error if not at least 3 broker: Number of alive brokers '1' does not meet the required replication factor '3' for the transactions state topic

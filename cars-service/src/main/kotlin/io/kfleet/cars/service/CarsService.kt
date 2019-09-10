@@ -19,7 +19,6 @@ class CarsService {
     @Autowired
     lateinit var mapper: ObjectMapper
 
-
     @RequestMapping("/")
     fun cars(): List<Car> {
         return carRepository.carsStore().all().use {

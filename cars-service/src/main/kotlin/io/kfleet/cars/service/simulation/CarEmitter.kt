@@ -28,7 +28,6 @@ interface CarsOutBindings {
 
 }
 
-
 @EnableBinding(CarsOutBindings::class)
 class CarEmitter {
 
