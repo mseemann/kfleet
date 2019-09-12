@@ -5,9 +5,9 @@ import kotlin.random.Random
 
 
 data class Car(
-        val id: String,
-        val state: CarStatus = CarStatus.IN_USE,
-        val geoPosition: GeoPosition,
+        val id: String?,
+        val state: CarState = CarState.OUT_OF_POOL,
+        val geoPosition: GeoPosition?,
         val stateOfCharge: Double
 ) {
     companion object {
@@ -16,7 +16,7 @@ data class Car(
                 id = "$id",
                 geoPosition = GeoPosition.random(),
                 stateOfCharge = Random.nextDouble(0.0, 100.0),
-                state = CarStatus.values()[Random.nextInt(CarStatus.values().size)]
+                state = CarState.values()[Random.nextInt(CarState.values().size)]
         )
     }
 

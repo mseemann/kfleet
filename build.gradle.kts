@@ -17,13 +17,20 @@ allprojects {
     }
 
     tasks.withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
+        }
+    }
+
+    tasks.withType<Test> {
+        useJUnitPlatform()
     }
 
 }
 
 dependencies {
-    
+
     // Make the root project archives configuration depend on every subproject
     subprojects.forEach {
         archives(it)

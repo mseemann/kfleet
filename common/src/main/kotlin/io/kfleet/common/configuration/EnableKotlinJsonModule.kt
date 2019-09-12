@@ -1,4 +1,4 @@
-package io.kfleet.configuration
+package io.kfleet.common.configuration
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import

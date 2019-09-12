@@ -21,3 +21,6 @@ docker exec -it kfleet_broker_1 bash
 kafka-topics --zookeeper zookeeper:2181 --list
 kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
 kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
+
+
+{"id":"1","state":"FREE","geoPosition":{"lat":59.83977184696787,"lng":10.70939965449577},"stateOfCharge":49.76350057919342}

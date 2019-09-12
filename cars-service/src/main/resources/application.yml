@@ -1,9 +1,12 @@
 server.port: 8083
 spring.application.name: car-service
 
+
 spring.cloud.stream.bindings:
   cars_out:
     destination: cars
+  car_events_out:
+    destination: car_events
 
 spring.cloud.stream.kafka.binder.configuration:
   key.serializer: org.apache.kafka.common.serialization.StringSerializer

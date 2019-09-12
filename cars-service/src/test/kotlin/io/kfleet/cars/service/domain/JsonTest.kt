@@ -12,7 +12,7 @@ class JsonTest {
     @Test
     fun tserializeCar() {
         val mapper = jacksonObjectMapper()
-        val car = Car(id = "1", state = CarStatus.FREE, geoPosition = GeoPosition.random(), stateOfCharge = 10.0)
+        val car = Car(id = "1", state = CarState.FREE, geoPosition = GeoPosition.random(), stateOfCharge = 10.0)
 
         val serialized = mapper.writeValueAsString(car)
 
