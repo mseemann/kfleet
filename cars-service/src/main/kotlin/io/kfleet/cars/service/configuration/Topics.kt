@@ -4,6 +4,7 @@ import org.apache.kafka.clients.admin.NewTopic
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+
 @Configuration
 class Topics {
 
@@ -12,4 +13,5 @@ class Topics {
 
     @Bean
     fun carEventTopic() = NewTopic("car_events", 3, 1)
+    
 }

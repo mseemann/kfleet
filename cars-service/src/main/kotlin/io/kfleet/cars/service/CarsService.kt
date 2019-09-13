@@ -20,13 +20,10 @@ private val logger = KotlinLogging.logger {}
 
 @RestController
 @RequestMapping("/cars")
-class CarsService {
+class CarsService(
+        @Autowired val carsRepository: CarsRepository,
+        @Autowired val mapper: ObjectMapper) {
 
-    @Autowired
-    lateinit var carsRepository: CarsRepository
-
-    @Autowired
-    lateinit var mapper: ObjectMapper
 
     @GetMapping("/")
     fun cars(): Flux<Car> {
@@ -46,6 +43,8 @@ class CarsService {
 
     @GetMapping("/stats")
     fun carsStats(): Mono<Map<String, Long>> {
+        carsRepository.printHostForAllStates()
+
         // TODO all is only local all - how to get and mix global all
         return carsRepository.carStateStore().all().use {
             it.asSequence().map { it.key to it.value }.toMap()
