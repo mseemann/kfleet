@@ -1,4 +1,4 @@
-package io.kfleet.cars.service
+package io.kfleet.cars.service.web
 
 import mu.KotlinLogging
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,5 +13,5 @@ class OwnerService {
     // create owner
 
     // get owner
-    
+
 }
