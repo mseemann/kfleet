@@ -21,7 +21,8 @@ private val logger = KotlinLogging.logger {}
 class CarsService(@Autowired val carsRepository: ICarsRepository) {
 
     @GetMapping()
-    fun cars(): Flux<Car> = carsRepository.findAllCars().retryBackoff(5, Duration.ofSeconds(3))
+    fun cars(): Flux<Car> = carsRepository.findAllCars()
+            .retryBackoff(5, Duration.ofSeconds(3))
 
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<ResponseEntity<Car>> = carsRepository
@@ -31,6 +32,7 @@ class CarsService(@Autowired val carsRepository: ICarsRepository) {
 
     @GetMapping("/stats")
     fun carsStateCount(): Mono<Map<String, Long>> = carsRepository.getCarsStateCounts()
+            .retryBackoff(5, Duration.ofSeconds(3))
 
     @PostMapping("/create/{ownerId}")
     fun createCarForOwner(@PathVariable("ownerId") ownerId: String): String {

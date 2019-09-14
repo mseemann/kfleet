@@ -19,4 +19,7 @@ class CarsRpcService(@Autowired val carsRepository: ICarsRepository) {
 
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<Car> = carsRepository.findByIdLocal(id)
+
+    @GetMapping("/stats")
+    fun carsStateCount(): Mono<Map<String, Long>> = carsRepository.getLocalCarsStateCounts()
 }

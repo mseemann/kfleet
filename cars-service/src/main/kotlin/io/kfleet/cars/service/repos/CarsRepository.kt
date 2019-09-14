@@ -35,6 +35,7 @@ interface ICarsRepository {
     fun getCarsStateCounts(): Mono<Map<String, Long>>
     fun findByIdLocal(id: String): Mono<Car>
     fun findAllCarsLocal(): Flux<Car>
+    fun getLocalCarsStateCounts(): Mono<Map<String, Long>>
 }
 
 interface CarsBinding {
@@ -85,7 +86,7 @@ class CarsRepository(
                     logger.debug { "find cars local ${it.port()}" }
                     findAllCarsLocal()
                 } else {
-                    logger.debug { "find cars remove per rpc ${it.port()}" }
+                    logger.debug { "find cars remote per rpc ${it.port()}" }
                     val webClient = WebClient.create("http://${it.host()}:${it.port()}")
                     webClient.get().uri("/$CARS_LOCAL_ONLY/")
                             .retrieve()
@@ -134,8 +135,36 @@ class CarsRepository(
         } ?: Mono.empty()
     }
 
-
     override fun getCarsStateCounts(): Mono<Map<String, Long>> {
+        return Mono.create { sink: MonoSink<Array<StreamsMetadata>> ->
+            val streamMetadata = getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE)
+            sink.success(streamMetadata.toTypedArray())
+        }.map { arrayOfStreamsMetadata: Array<StreamsMetadata> ->
+            arrayOfStreamsMetadata.map {
+                if (it.hostInfo() == interactiveQueryService.currentHostInfo) {
+                    logger.debug { "find cars stats local ${it.port()}" }
+                    getLocalCarsStateCounts()
+                } else {
+                    logger.debug { "find cars stats remote per rpc ${it.port()}" }
+                    val webClient = WebClient.create("http://${it.host()}:${it.port()}")
+                    webClient.get().uri("/$CARS_LOCAL_ONLY/stats")
+                            .retrieve()
+                            .bodyToMono(String::class.java)
+                            .flatMap { rawCars -> mapper.readValue<Map<String, Long>>(rawCars).toMono() }
+                }
+            }
+        }.flatMap {
+            Mono.create { sink: MonoSink<Map<String, Long>> ->
+                val result = mutableMapOf<String, Long>()
+                Flux.concat(it).subscribe(
+                        { result.putAll(it) },
+                        { error -> sink.error(error) },
+                        { sink.success(result) })
+            }
+        }
+    }
+
+    override fun getLocalCarsStateCounts(): Mono<Map<String, Long>> {
         return carStateStore().all().use { allCars ->
             allCars.asSequence().map { it.key to it.value }.toMap()
         }.toMono()
