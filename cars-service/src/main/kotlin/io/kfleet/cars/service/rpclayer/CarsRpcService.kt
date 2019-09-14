@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/cars-local-only")
+@RequestMapping("/cars-rpc")
 class CarsRpcService(@Autowired val carsRepository: ICarsRepository) {
 
     @GetMapping()

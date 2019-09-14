@@ -27,6 +27,7 @@ class CarsService(@Autowired val carsRepository: ICarsRepository) {
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<ResponseEntity<Car>> = carsRepository
             .findById(id)
+            .retryBackoff(5, Duration.ofSeconds(3))
             .map { ResponseEntity(it, HttpStatus.OK) }
             .defaultIfEmpty(ResponseEntity(HttpStatus.NOT_FOUND))
 
@@ -50,7 +51,7 @@ class CarsService(@Autowired val carsRepository: ICarsRepository) {
         // or later if the event is processed?
 
         logger.debug { event }
-        // carsRepository.publishCarEvents(event)
+        //  carsRepository.publishCarEvents(event)
         return event.id
     }
 }

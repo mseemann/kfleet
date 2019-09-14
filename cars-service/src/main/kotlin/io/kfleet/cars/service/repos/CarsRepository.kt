@@ -27,7 +27,7 @@ import reactor.core.publisher.*
 
 private val logger = KotlinLogging.logger {}
 
-private const val CARS_LOCAL_ONLY = "cars-local-only"
+private const val CARS_RPC = "cars-rpc"
 
 interface ICarsRepository {
     fun findAllCars(): Flux<Car>
@@ -58,54 +58,34 @@ class CarsRepository(
         @Autowired val context: ApplicationContext
 ) : ICarsRepository {
 
-
-    private fun carsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
-            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
-
-
-    private fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
-            .getQueryableStore(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
-
-    private fun getKafakStreams(): KafkaStreams {
-        val beanNameCreatedBySpring = "&stream-builder-${CarStateCountProcessor::carStateUpdates.name}"
-        val streamsBuilderFactoryBean = context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class.java)
-
-        logger.debug { "kafak streams wird neu gelesen" }
-        return streamsBuilderFactoryBean.kafkaStreams!!
-    }
-
     override fun findAllCars(): Flux<Car> {
-
-        return Flux.create { sink: FluxSink<Array<StreamsMetadata>> ->
-            val streamMetadata = getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE)
-            sink.next(streamMetadata.toTypedArray())
-            sink.complete()
-        }.map { arrayOfStreamsMetadata: Array<StreamsMetadata> ->
-            arrayOfStreamsMetadata.map {
-                if (it.hostInfo() == interactiveQueryService.currentHostInfo) {
-                    logger.debug { "find cars local ${it.port()}" }
-                    findAllCarsLocal()
-                } else {
-                    logger.debug { "find cars remote per rpc ${it.port()}" }
-                    val webClient = WebClient.create("http://${it.host()}:${it.port()}")
-                    webClient.get().uri("/$CARS_LOCAL_ONLY/")
-                            .retrieve()
-                            .bodyToFlux(String::class.java)
-                            .flatMap { rawCars -> mapper.readValue<List<Car>>(rawCars).toList().toFlux() }
+        return createCurrentStreamsMetadataAsFlux()
+                .map { arrayOfStreamsMetadata: Array<StreamsMetadata> ->
+                    arrayOfStreamsMetadata.map {
+                        if (it.hostInfo() == interactiveQueryService.currentHostInfo) {
+                            logger.debug { "find cars local ${it.port()}" }
+                            findAllCarsLocal()
+                        } else {
+                            logger.debug { "find cars remote per rpc ${it.port()}" }
+                            val webClient = WebClient.create("http://${it.host()}:${it.port()}")
+                            webClient.get().uri("/$CARS_RPC/")
+                                    .retrieve()
+                                    .bodyToFlux(String::class.java)
+                                    .flatMap { rawCars -> mapper.readValue<List<Car>>(rawCars).toList().toFlux() }
+                        }
+                    }
+                }.flatMap {
+                    Flux.create<Car> { sink ->
+                        val result = mutableListOf<Car>()
+                        Flux.concat(it).subscribe(
+                                { result.add(it) },
+                                { error -> sink.error(error) },
+                                {
+                                    result.forEach { sink.next(it) }
+                                    sink.complete()
+                                })
+                    }
                 }
-            }
-        }.flatMap {
-            Flux.create<Car> { sink ->
-                val result = mutableListOf<Car>()
-                Flux.concat(it).subscribe(
-                        { result.add(it) },
-                        { error -> sink.error(error) },
-                        {
-                            result.forEach { sink.next(it) }
-                            sink.complete()
-                        })
-            }
-        }
     }
 
     override fun findAllCarsLocal(): Flux<Car> {
@@ -122,7 +102,7 @@ class CarsRepository(
         }
 
         val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
-        return webClient.get().uri("/$CARS_LOCAL_ONLY/$id")
+        return webClient.get().uri("/$CARS_RPC/$id")
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .map { mapper.readValue<Car>(it) }
@@ -136,32 +116,30 @@ class CarsRepository(
     }
 
     override fun getCarsStateCounts(): Mono<Map<String, Long>> {
-        return Mono.create { sink: MonoSink<Array<StreamsMetadata>> ->
-            val streamMetadata = getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE)
-            sink.success(streamMetadata.toTypedArray())
-        }.map { arrayOfStreamsMetadata: Array<StreamsMetadata> ->
-            arrayOfStreamsMetadata.map {
-                if (it.hostInfo() == interactiveQueryService.currentHostInfo) {
-                    logger.debug { "find cars stats local ${it.port()}" }
-                    getLocalCarsStateCounts()
-                } else {
-                    logger.debug { "find cars stats remote per rpc ${it.port()}" }
-                    val webClient = WebClient.create("http://${it.host()}:${it.port()}")
-                    webClient.get().uri("/$CARS_LOCAL_ONLY/stats")
-                            .retrieve()
-                            .bodyToMono(String::class.java)
-                            .flatMap { rawCars -> mapper.readValue<Map<String, Long>>(rawCars).toMono() }
-                }
-            }
-        }.flatMap {
-            Mono.create { sink: MonoSink<Map<String, Long>> ->
-                val result = mutableMapOf<String, Long>()
-                Flux.concat(it).subscribe(
-                        { result.putAll(it) },
-                        { error -> sink.error(error) },
-                        { sink.success(result) })
-            }
-        }
+        return createCurrentStreamsMetadataAsFlux()
+                .map { arrayOfStreamsMetadata: Array<StreamsMetadata> ->
+                    arrayOfStreamsMetadata.map {
+                        if (it.hostInfo() == interactiveQueryService.currentHostInfo) {
+                            logger.debug { "find cars stats local ${it.port()}" }
+                            getLocalCarsStateCounts()
+                        } else {
+                            logger.debug { "find cars stats remote per rpc ${it.port()}" }
+                            val webClient = WebClient.create("http://${it.host()}:${it.port()}")
+                            webClient.get().uri("/$CARS_RPC/stats")
+                                    .retrieve()
+                                    .bodyToMono(String::class.java)
+                                    .flatMap { rawCars -> mapper.readValue<Map<String, Long>>(rawCars).toMono() }
+                        }
+                    }
+                }.flatMap {
+                    Mono.create { sink: MonoSink<Map<String, Long>> ->
+                        val result = mutableMapOf<String, Long>()
+                        Flux.concat(it).subscribe(
+                                { result.putAll(it) },
+                                { error -> sink.error(error) },
+                                { sink.success(result) })
+                    }
+                }.next()
     }
 
     override fun getLocalCarsStateCounts(): Mono<Map<String, Long>> {
@@ -169,6 +147,25 @@ class CarsRepository(
             allCars.asSequence().map { it.key to it.value }.toMap()
         }.toMono()
     }
+
+    private fun getKafakStreams(): KafkaStreams {
+        val beanNameCreatedBySpring = "&stream-builder-${CarStateCountProcessor::carStateUpdates.name}"
+        val streamsBuilderFactoryBean = context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class.java)
+        return streamsBuilderFactoryBean.kafkaStreams!!
+    }
+
+    private fun createCurrentStreamsMetadataAsFlux() = Flux.create { sink: FluxSink<Array<StreamsMetadata>> ->
+        val streamMetadata = getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE)
+        sink.next(streamMetadata.toTypedArray())
+        sink.complete()
+    }
+
+    private fun carsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
+            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
+
+
+    private fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
+            .getQueryableStore(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
     fun publishCarEvents(event: Event) {
         val msg = MessageBuilder.createMessage(event, headers(event.id))
