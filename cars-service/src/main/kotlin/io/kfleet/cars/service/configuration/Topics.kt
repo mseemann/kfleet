@@ -12,6 +12,9 @@ class Topics {
     fun carsTopic() = NewTopic("cars", 3, 1)
 
     @Bean
+    fun carCommandTopic() = NewTopic("car_commands", 3, 1)
+
+    @Bean
     fun carEventTopic() = NewTopic("car_events", 3, 1)
-    
+
 }

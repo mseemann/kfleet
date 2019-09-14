@@ -28,6 +28,7 @@ spring.cloud.stream.kafka.streams.binder.configuration.default.value.serde: org.
 
 management.endpoints.web.exposure.include: "*"
 
+logging.level.org: WARN
 logging.level.io.kfleet: DEBUG
 
-cars.service.simulation.enabled: true
+cars.service.simulation.enabled: false

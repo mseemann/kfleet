@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.time.Duration
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -18,9 +19,9 @@ private val logger = KotlinLogging.logger {}
 @RestController
 @RequestMapping("/cars")
 class CarsService(@Autowired val carsRepository: ICarsRepository) {
-    
-    @GetMapping("/")
-    fun cars(): Flux<Car> = carsRepository.findAllCars()
+
+    @GetMapping()
+    fun cars(): Flux<Car> = carsRepository.findAllCars().retryBackoff(5, Duration.ofSeconds(3))
 
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<ResponseEntity<Car>> = carsRepository

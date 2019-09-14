@@ -3,17 +3,16 @@ package io.kfleet.cars.service.repos
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.domain.CarState
 import io.kfleet.cars.service.events.Event
 import io.kfleet.cars.service.processors.CarStateCountProcessor
 import io.kfleet.cars.service.processors.CarStateCountProcessorBinding
 import io.kfleet.common.headers
-import org.apache.kafka.common.serialization.Serdes
+import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
-import org.apache.kafka.common.utils.Utils
 import org.apache.kafka.streams.KafkaStreams
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
+import org.apache.kafka.streams.state.StreamsMetadata
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
@@ -25,15 +24,20 @@ import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Repository
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
+import reactor.core.publisher.FluxSink
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 
+private val logger = KotlinLogging.logger {}
+
+private const val CARS_LOCAL_ONLY = "cars-local-only"
 
 interface ICarsRepository {
     fun findAllCars(): Flux<Car>
     fun findById(id: String): Mono<Car>
     fun getCarsStateCounts(): Mono<Map<String, Long>>
+    fun findByIdLocal(id: String): Mono<Car>
+    fun findAllCarsLocal(): Mono<List<Car>>
 }
 
 interface CarsBinding {
@@ -64,27 +68,51 @@ class CarsRepository(
     private fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
             .getQueryableStore(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
-    private fun printHostForAllStates() {
+    private fun getKafakStreams(): KafkaStreams {
         val beanNameCreatedBySpring = "&stream-builder-${CarStateCountProcessor::carStateUpdates.name}"
         val streamsBuilderFactoryBean = context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class.java)
 
-        val kafkaStreams: KafkaStreams = streamsBuilderFactoryBean.kafkaStreams
-        println(kafkaStreams.metrics())
-        println(kafkaStreams.allMetadata())
-
-        CarState.values().iterator().forEach {
-            val metadata = kafkaStreams.metadataForKey(CarStateCountProcessorBinding.CAR_STATE_STORE, it.name, Serdes.String().serializer())
-            println("${it.name} is stored in the app statestore on port: ${metadata.port()}")
-
-            println("partition: ${Utils.toPositive(Utils.murmur2(it.name.toByteArray())) % 3}")
-        }
-
+        logger.debug { "kafak streams wird neu gelesen" }
+        return streamsBuilderFactoryBean.kafkaStreams!!
     }
 
-
     override fun findAllCars(): Flux<Car> {
+
+        return Flux.create { sink: FluxSink<Array<StreamsMetadata>> ->
+            val streamMetadata = getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE)
+            sink.next(streamMetadata.toTypedArray())
+            sink.complete()
+        }.map { arrayOfStreamsMetadata: Array<StreamsMetadata> ->
+            arrayOfStreamsMetadata.map {
+                if (it.hostInfo() == interactiveQueryService.currentHostInfo) {
+                    logger.debug { "find cars local ${it.port()}" }
+                    findAllCarsLocal()
+                } else {
+                    logger.debug { "find cars remove per rpc ${it.port()}" }
+                    val webClient = WebClient.create("http://${it.host()}:${it.port()}")
+                    webClient.get().uri("/$CARS_LOCAL_ONLY/")
+                            .retrieve()
+                            .bodyToMono(String::class.java)
+                            .flatMap { rawCars -> mapper.readValue<List<Car>>(rawCars).toList().toMono() }
+                }
+            }
+        }.flatMap {
+            Flux.create<Car> { sink ->
+                val result = mutableListOf<Car>()
+                Flux.concat(it).subscribe(
+                        { cars -> cars.forEach { result.add(it) } },
+                        { error -> sink.error(error) },
+                        {
+                            result.forEach { sink.next(it) }
+                            sink.complete()
+                        })
+            }
+        }
+    }
+
+    override fun findAllCarsLocal(): Mono<List<Car>> {
         return carsStore().all().use {
-            it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList().toFlux()
+            it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList().toMono()
         }
     }
 
@@ -92,25 +120,27 @@ class CarsRepository(
         val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
 
         if (hostInfo == interactiveQueryService.currentHostInfo) {
-            return carsStore().get(id)?.let {
-                mapper.readValue<Car>(it).toMono()
-            } ?: Mono.empty()
+            return findByIdLocal(id)
         }
 
         val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
-        return webClient.get().uri("/cars/$id")
+        return webClient.get().uri("/$CARS_LOCAL_ONLY/$id")
                 .retrieve()
                 .bodyToMono(String::class.java)
                 .map { mapper.readValue<Car>(it) }
                 .log()
     }
 
+    override fun findByIdLocal(id: String): Mono<Car> {
+        return carsStore().get(id)?.let {
+            mapper.readValue<Car>(it).toMono()
+        } ?: Mono.empty()
+    }
+
 
     override fun getCarsStateCounts(): Mono<Map<String, Long>> {
-        printHostForAllStates()
-
-        return carStateStore().all().use {
-            it.asSequence().map { it.key to it.value }.toMap()
+        return carStateStore().all().use { allCars ->
+            allCars.asSequence().map { it.key to it.value }.toMap()
         }.toMono()
     }
 
