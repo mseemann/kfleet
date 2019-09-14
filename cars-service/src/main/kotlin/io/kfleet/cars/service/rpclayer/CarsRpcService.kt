@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @RestController
@@ -14,7 +15,7 @@ import reactor.core.publisher.Mono
 class CarsRpcService(@Autowired val carsRepository: ICarsRepository) {
 
     @GetMapping()
-    fun cars(): Mono<List<Car>> = carsRepository.findAllCarsLocal()
+    fun cars(): Flux<Car> = carsRepository.findAllCarsLocal()
 
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<Car> = carsRepository.findByIdLocal(id)

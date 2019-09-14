@@ -23,10 +23,7 @@ import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Repository
 import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
-import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
+import reactor.core.publisher.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -37,7 +34,7 @@ interface ICarsRepository {
     fun findById(id: String): Mono<Car>
     fun getCarsStateCounts(): Mono<Map<String, Long>>
     fun findByIdLocal(id: String): Mono<Car>
-    fun findAllCarsLocal(): Mono<List<Car>>
+    fun findAllCarsLocal(): Flux<Car>
 }
 
 interface CarsBinding {
@@ -92,15 +89,15 @@ class CarsRepository(
                     val webClient = WebClient.create("http://${it.host()}:${it.port()}")
                     webClient.get().uri("/$CARS_LOCAL_ONLY/")
                             .retrieve()
-                            .bodyToMono(String::class.java)
-                            .flatMap { rawCars -> mapper.readValue<List<Car>>(rawCars).toList().toMono() }
+                            .bodyToFlux(String::class.java)
+                            .flatMap { rawCars -> mapper.readValue<List<Car>>(rawCars).toList().toFlux() }
                 }
             }
         }.flatMap {
             Flux.create<Car> { sink ->
                 val result = mutableListOf<Car>()
                 Flux.concat(it).subscribe(
-                        { cars -> cars.forEach { result.add(it) } },
+                        { result.add(it) },
                         { error -> sink.error(error) },
                         {
                             result.forEach { sink.next(it) }
@@ -110,9 +107,9 @@ class CarsRepository(
         }
     }
 
-    override fun findAllCarsLocal(): Mono<List<Car>> {
+    override fun findAllCarsLocal(): Flux<Car> {
         return carsStore().all().use {
-            it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList().toMono()
+            it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList().toFlux()
         }
     }
 
