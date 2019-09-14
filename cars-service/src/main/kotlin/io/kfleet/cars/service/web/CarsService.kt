@@ -27,9 +27,9 @@ class CarsService(@Autowired val carsRepository: ICarsRepository) {
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<ResponseEntity<Car>> = carsRepository
             .findById(id)
-            .retryBackoff(5, Duration.ofSeconds(3))
+            .retryBackoff(5, Duration.ofSeconds(1), Duration.ofSeconds(3))
             .map { ResponseEntity(it, HttpStatus.OK) }
-            .defaultIfEmpty(ResponseEntity(HttpStatus.NOT_FOUND))
+            .onErrorResume { Mono.just(ResponseEntity(HttpStatus.NOT_FOUND)) }
 
     @GetMapping("/stats")
     fun carsStateCount(): Mono<Map<String, Long>> = carsRepository.getCarsStateCounts()

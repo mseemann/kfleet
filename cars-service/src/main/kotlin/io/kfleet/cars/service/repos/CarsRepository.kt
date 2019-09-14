@@ -112,7 +112,7 @@ class CarsRepository(
     override fun findByIdLocal(id: String): Mono<Car> {
         return carsStore().get(id)?.let {
             mapper.readValue<Car>(it).toMono()
-        } ?: Mono.empty()
+        } ?: Mono.error(Exception("car with id: $id not found"))
     }
 
     override fun getCarsStateCounts(): Mono<Map<String, Long>> {
