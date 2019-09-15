@@ -17,4 +17,6 @@ class Topics {
     @Bean
     fun carEventTopic() = NewTopic("car_events", 3, 1)
 
+    @Bean
+    fun ownerCommandsTopic() = NewTopic("owner_commands", 3, 1)
 }

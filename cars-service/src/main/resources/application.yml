@@ -7,6 +7,13 @@ spring.cloud.stream.bindings:
     destination: cars
   car_events_out:
     destination: car_events
+  owner_commands_out:
+    destination: owner_commands
+
+
+spring.cloud.stream.kafka.bindings.owner_commands_out:
+  producer:
+    sync: true
 
 spring.cloud.stream.kafka.binder.configuration:
   key.serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -16,6 +23,11 @@ spring.cloud.stream.kafka.streams.bindings.cars:
   consumer:
     applicationId: cars-service-repo
     materializedAs: all-cars
+
+spring.cloud.stream.kafka.streams.bindings.owner_commands:
+  consumer:
+    applicationId: cars-service-owner-commands
+
 
 # needed for interactive queries if the key is not on this host
 spring.cloud.stream.kafka.streams.binder.configuration.application.server: localhost:${server.port}

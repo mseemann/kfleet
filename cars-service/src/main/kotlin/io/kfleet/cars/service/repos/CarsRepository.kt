@@ -3,7 +3,7 @@ package io.kfleet.cars.service.repos
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.events.Event
+import io.kfleet.cars.service.events.CarEvent
 import io.kfleet.cars.service.processors.CarStateCountProcessor
 import io.kfleet.cars.service.processors.CarStateCountProcessorBinding
 import io.kfleet.common.headers
@@ -167,7 +167,7 @@ class CarsRepository(
     private fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
             .getQueryableStore(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
-    fun publishCarEvents(event: Event) {
+    fun publishCarEvents(event: CarEvent) {
         val msg = MessageBuilder.createMessage(event, headers(event.id))
         outputCarEvents.send(msg)
     }
