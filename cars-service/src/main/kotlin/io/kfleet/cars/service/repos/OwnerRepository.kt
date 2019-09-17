@@ -37,14 +37,13 @@ class OwnerRepository(@Autowired @Output(OwnersBindings.OWNER_COMMANDS) val outp
 
     override fun submitCreateOwnerCommand(ownerId: String, ownerName: String): Mono<Boolean> {
         val command = CreateOwnerCommand(id = ownerId, name = ownerName)
-        //val headers = headers(command.id)
-        //headers.put("type", CreateOwnerCommand::class.java.name)
-        //val msg = MessageBuilder.createMessage(command, headers)
+
         val msg = MessageBuilder
                 .withPayload(command)
                 .setHeader(KafkaHeaders.MESSAGE_KEY, command.id)
                 .setHeader("kfleet.type", CreateOwnerCommand::class.java.name)
                 .build()
+
         return Mono.just(
                 try {
                     // this works because cloud stream is configured sync for this topic
@@ -52,7 +51,8 @@ class OwnerRepository(@Autowired @Output(OwnersBindings.OWNER_COMMANDS) val outp
                 } catch (e: RuntimeException) {
                     logger.warn(e) { e }
                     false
-                })
+                }
+        )
     }
 
     override fun findOwnerByid(ownerId: String): Mono<Owner> {

@@ -9,32 +9,53 @@ spring.cloud.stream.bindings:
     destination: car_events
   owner_commands_out:
     destination: owner_commands
+  cars:
+    group: test_group_cars
+    destination: cars
+  owner_commands:
+    group: test_group_owner_commands
+    destination: owner_commands
 
-
-spring.cloud.stream.kafka.bindings.owner_commands_out:
-  producer:
-    sync: true
-
-spring.cloud.stream.kafka.binder.configuration:
-  key.serializer: org.apache.kafka.common.serialization.StringSerializer
+spring.cloud.stream.kafka.bindings:
+  owner_commands_out:
+    producer:
+      sync: true
+      configuration:
+        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+  cars_out:
+    producer:
+      configuration:
+        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+  cars:
+    consumer:
+      configuration:
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 
 spring.cloud.stream.kafka.streams.bindings.cars:
   consumer:
     applicationId: cars-service-repo
     materializedAs: all-cars
+    #value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+    key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+
 
 spring.cloud.stream.kafka.streams.bindings.owner_commands:
   consumer:
+    #enableDlq: true
     applicationId: cars-service-owner-commands
+    #value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+    key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 
+
+spring.cloud.stream.kafka.streams.binder.serdeError: sendToDlq
 
 # needed for interactive queries if the key is not on this host
 spring.cloud.stream.kafka.streams.binder.configuration.application.server: localhost:${server.port}
 spring.cloud.stream.kafka.streams.binder.configuration.commit.interval.ms: 100
 #error if not at least 3 broker: Number of alive brokers '1' does not meet the required replication factor '3' for the transactions state topic
 #spring.cloud.stream.kafka.streams.binder.configuration.processing.guarantee: exactly_once
-spring.cloud.stream.kafka.streams.binder.configuration.default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+#spring.cloud.stream.kafka.streams.binder.configuration.default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 spring.cloud.stream.kafka.streams.binder.configuration.default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 
 
@@ -42,5 +63,6 @@ management.endpoints.web.exposure.include: "*"
 
 logging.level.org: WARN
 logging.level.io.kfleet: DEBUG
+logging.level.org.springframework.cloud.stream.binding: DEBUG
 
-cars.service.simulation.enabled: false
+cars.service.simulation.enabled: true

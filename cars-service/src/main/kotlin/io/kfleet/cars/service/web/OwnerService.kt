@@ -20,7 +20,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
     // create a create owner command - with id
     // wait for en event for the id - the event is either created or not created
     // because the id is the key, the processor that is responsible
-    // for the creation can check wether the is exists or not
+    // for the creation can check wether the key exists or not
     @PostMapping("/{ownerId}/{ownerName}")
     fun createOwner(
             @PathVariable("ownerId") ownerId: String?,
@@ -30,7 +30,9 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
         if (ownerName == null || ownerName == "") return Mono.just(ResponseEntity(HttpStatus.BAD_REQUEST))
 
         return ownerRepository.submitCreateOwnerCommand(ownerId, ownerName).flatMap {
-            if (it) ownerById(ownerId) else Mono.just(ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR))
+            if (it) ownerById(ownerId)
+                    .flatMap { Mono.just(ResponseEntity(it.body, HttpStatus.CREATED)) }
+            else Mono.just(ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR))
         }
     }
 
