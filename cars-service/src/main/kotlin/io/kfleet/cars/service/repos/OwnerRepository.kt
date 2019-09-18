@@ -36,12 +36,11 @@ class OwnerRepository(@Autowired @Output(OwnersBindings.OWNER_COMMANDS) val outp
 
 
     override fun submitCreateOwnerCommand(ownerId: String, ownerName: String): Mono<Boolean> {
-        val command = CreateOwnerCommand(id = ownerId, name = ownerName)
+        val command = CreateOwnerCommand(ownerId, ownerName)
 
         val msg = MessageBuilder
                 .withPayload(command)
-                .setHeader(KafkaHeaders.MESSAGE_KEY, command.id)
-                .setHeader("kfleet.type", CreateOwnerCommand::class.java.name)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, command.getId())
                 .build()
 
         return Mono.just(

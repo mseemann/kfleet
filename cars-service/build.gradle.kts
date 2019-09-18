@@ -4,12 +4,14 @@ plugins {
     id("org.springframework.boot") version "2.1.7.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
+    id("com.commercehub.gradle.plugin.avro") version "0.17.0"
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     jcenter()
+    maven(url = "http://packages.confluent.io/maven/")
 }
 
 extra["springCloudVersion"] = "Greenwich.SR2"
@@ -23,13 +25,17 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.cloud:spring-cloud-stream")
-    implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
+    implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka")
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
     implementation("org.springframework.cloud:spring-cloud-stream-reactive")
+    //implementation("org.springframework.cloud:spring-cloud-stream-schema")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
     implementation("io.github.microutils:kotlin-logging:1.7.6")
+    implementation("org.apache.avro:avro:1.9.1")
+    implementation("io.confluent:kafka-avro-serializer:5.2.2")
+    implementation("io.confluent:kafka-streams-avro-serde:5.2.1")
+    implementation("io.confluent:kafka-schema-registry-client:5.2.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")
@@ -47,10 +53,5 @@ dependencyManagement {
     }
 }
 
-// enable dev tools the kotlin way
-val developmentOnly by configurations.creating
-configurations {
-    runtimeClasspath {
-        extendsFrom(developmentOnly)
-    }
+avro {
 }
