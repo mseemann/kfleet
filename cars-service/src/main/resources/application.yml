@@ -8,6 +8,8 @@ spring.cloud.stream:
 spring.cloud.stream.bindings:
   cars_out:
     destination: cars
+    producer:
+      useNativeEncoding: true
   car_events_out:
     destination: car_events
   owner_commands_out:
@@ -16,6 +18,10 @@ spring.cloud.stream.bindings:
       useNativeEncoding: true
   cars:
     destination: cars
+    producer:
+      useNativeEncoding: true
+    consumer:
+      useNativeDecoding: true
   owner_commands:
     destination: owner_commands
     consumer:
@@ -43,14 +49,14 @@ spring.cloud.stream.kafka.bindings:
     producer:
       sync: true
 
-  cars_out:
-    producer:
-      configuration:
-        key.serializer: org.apache.kafka.common.serialization.StringSerializer
-  cars:
-    consumer:
-      configuration:
-        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#  cars_out:
+#    producer:
+#      configuration:
+#        key.serializer: org.apache.kafka.common.serialization.StringSerializer
+#  cars:
+#    consumer:
+#      configuration:
+#        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 
 spring.cloud.stream.kafka.streams.bindings.cars:
@@ -58,7 +64,7 @@ spring.cloud.stream.kafka.streams.bindings.cars:
     applicationId: cars-service-repo
     materializedAs: all-cars
     #value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-    key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+    #key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
 
 
 spring.cloud.stream.kafka.streams.bindings.owner_commands:

@@ -55,6 +55,6 @@ class OwnerRepository(@Autowired @Output(OwnersBindings.OWNER_COMMANDS) val outp
     }
 
     override fun findOwnerByid(ownerId: String): Mono<Owner> {
-        return Mono.just(Owner(id = ownerId, name = "hallo", cars = listOf()))
+        return Mono.just(Owner(ownerId, "hallo", listOf()))
     }
 }

@@ -1,0 +1,6 @@
+{
+    "name": "CarState",
+    "namespace": "io.kfleet.cars.service.domain",
+    "type": "enum",
+    "symbols" : ["FREE", "IN_USE", "OUT_OF_POOL"]
+}

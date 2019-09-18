@@ -1,0 +1,10 @@
+{
+  "namespace" : "io.kfleet.cars.service.domain",
+  "type" : "record",
+  "name" : "Owner",
+  "fields" : [
+    {"name":"id", "type":"string"},
+    {"name":"name", "type":"string"},
+    {"name":"cars", "type": {"type":"array", "items":"Car"}}
+  ]
+}

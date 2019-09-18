@@ -1,6 +1,7 @@
 package io.kfleet.cars.service.simulation
 
 import io.kfleet.cars.service.domain.Car
+import io.kfleet.cars.service.domain.CarCreator
 import io.kfleet.common.headers
 import io.kfleet.common.randomDelayFluxer
 import mu.KotlinLogging
@@ -37,7 +38,7 @@ class CarEmitter {
     @StreamEmitter
     @Output(CarsOutBindings.CARS)
     fun emitCars(): Flux<Message<Car>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT).map {
-        val car = Car.create(it)
+        val car = CarCreator.create(it)
         logger.debug { "emit: $car" }
         MessageBuilder.createMessage(car, headers(it))
     } else Flux.empty()
