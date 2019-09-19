@@ -6,7 +6,6 @@ import org.springframework.boot.runApplication
 
 
 @SpringBootApplication
-//@EnableKotlinJsonModule
 class CarServiceApp
 
 fun main(args: Array<String>) {

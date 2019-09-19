@@ -36,6 +36,20 @@ docker run --tty \
                   Headers: %h\n'
 ```
 
+```
+docker run --tty \
+           --network kfleet_default \
+           edenhill/kafkacat:1.5.0 \
+           kafkacat -b broker:29092 \
+                    -t cars -C -s value=avro -r http://registry:8081\
+  -f '\nKey (%K bytes): %k
+  Value (%S bytes): %s
+  Timestamp: %T
+  Partition: %p
+  Offset: %o
+  Headers: %h\n'
+```
+
 {"id":"1","state":"FREE","geoPosition":{"lat":59.83977184696787,"lng":10.70939965449577},"stateOfCharge":49.76350057919342}
 
 ###Sources

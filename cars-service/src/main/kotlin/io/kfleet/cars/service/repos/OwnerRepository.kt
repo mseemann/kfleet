@@ -1,6 +1,7 @@
 package io.kfleet.cars.service.repos
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
+import io.kfleet.cars.service.commands.OwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,11 +37,12 @@ class OwnerRepository(@Autowired @Output(OwnersBindings.OWNER_COMMANDS) val outp
 
 
     override fun submitCreateOwnerCommand(ownerId: String, ownerName: String): Mono<Boolean> {
-        val command = CreateOwnerCommand(ownerId, ownerName)
+
+        val ownerCommand = OwnerCommand(ownerId, CreateOwnerCommand(ownerName))
 
         val msg = MessageBuilder
-                .withPayload(command)
-                .setHeader(KafkaHeaders.MESSAGE_KEY, command.getId())
+                .withPayload(ownerCommand)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, ownerCommand.getId())
                 .build()
 
         return Mono.just(

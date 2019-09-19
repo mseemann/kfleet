@@ -49,27 +49,14 @@ spring.cloud.stream.kafka.bindings:
     producer:
       sync: true
 
-#  cars_out:
-#    producer:
-#      configuration:
-#        key.serializer: org.apache.kafka.common.serialization.StringSerializer
-#  cars:
-#    consumer:
-#      configuration:
-#        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-
-
-spring.cloud.stream.kafka.streams.bindings.cars:
-  consumer:
-    applicationId: cars-service-repo
-    materializedAs: all-cars
-    #value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-    #key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-
-
-spring.cloud.stream.kafka.streams.bindings.owner_commands:
-  consumer:
-    applicationId: cars-service-owner-commands
+spring.cloud.stream.kafka.streams.bindings:
+  cars:
+    consumer:
+      applicationId: cars-service-repo
+      materializedAs: all-cars
+  owner_commands:
+    consumer:
+      applicationId: cars-service-owner-commands
 
 
 
@@ -84,4 +71,4 @@ management.endpoints.web.exposure.include: "*"
 logging.level.io.kfleet: DEBUG
 #logging.level.org.springframework.cloud.stream.binding: DEBUG
 
-cars.service.simulation.enabled: false
+cars.service.simulation.enabled: true

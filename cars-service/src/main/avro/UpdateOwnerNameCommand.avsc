@@ -1,7 +1,7 @@
 {
   "namespace" : "io.kfleet.cars.service.commands",
   "type" : "record",
-  "name" : "CreateOwnerCommand",
+  "name" : "UpdateOwnernameCommand",
   "fields" : [
     {"name":"name","type":"string"}
   ]

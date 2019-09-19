@@ -1,8 +1,8 @@
 package io.kfleet.cars.service.processors
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
+import io.kfleet.cars.service.commands.OwnerCommand
 import mu.KotlinLogging
-import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -12,6 +12,7 @@ import org.springframework.cloud.stream.annotation.StreamListener
 
 private val logger = KotlinLogging.logger {}
 
+
 interface OwnerCommandsProcessorBinding {
 
     companion object {
@@ -20,7 +21,7 @@ interface OwnerCommandsProcessorBinding {
     }
 
     @Input(OWNER_COMMANDS)
-    fun inputOwnerCommands(): KStream<String, SpecificRecord>
+    fun inputOwnerCommands(): KStream<String, OwnerCommand>
 
 }
 
@@ -30,23 +31,23 @@ class OwnerCommandsProcessor {
 
 
     @StreamListener(OwnerCommandsProcessorBinding.OWNER_COMMANDS)
-    fun processCommands(commandStream: KStream<String, SpecificRecord>) {
+    fun processCommands(commandStream: KStream<String, OwnerCommand>) {
 
         val stream = commandStream
                 .peek { key, value -> println("cool: $key -> $value -> ${value.javaClass}") }
 
 
-        val branches: Array<out KStream<String, SpecificRecord?>> = stream
+        val branches: Array<out KStream<String, OwnerCommand?>> = stream
                 .mapValues { key, value ->
-                    println("map $key -> $value")
+                    println("map $key -> $value ${value.getCommand().javaClass}")
                     // command 2 event
                     value
                 }.branch(
-                        Predicate<String, SpecificRecord?> { key, value ->
+                        Predicate<String, OwnerCommand?> { key, value ->
                             println("check1 $key $value")
-                            value is CreateOwnerCommand
+                            value?.getCommand() is CreateOwnerCommand
                         },
-                        Predicate<String, SpecificRecord?> { key, value ->
+                        Predicate<String, OwnerCommand?> { key, value ->
                             println("check2 $key $value")
                             true
                         }

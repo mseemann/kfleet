@@ -90,7 +90,7 @@ class CarsRepository(
 
     override fun findAllCarsLocal(): Flux<Car> {
         return carsStore().all().use {
-            it.asSequence().map { kv -> mapper.readValue<Car>(kv.value) }.toList().toFlux()
+            it.asSequence().map { kv -> kv.value }.toList().toFlux()
         }
     }
 
@@ -110,9 +110,7 @@ class CarsRepository(
     }
 
     override fun findByIdLocal(id: String): Mono<Car> {
-        return carsStore().get(id)?.let {
-            mapper.readValue<Car>(it).toMono()
-        } ?: Mono.error(Exception("car with id: $id not found"))
+        return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))
     }
 
     override fun getCarsStateCounts(): Mono<Map<String, Long>> {
@@ -160,8 +158,8 @@ class CarsRepository(
         sink.complete()
     }
 
-    private fun carsStore(): ReadOnlyKeyValueStore<String, String> = interactiveQueryService
-            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, String>())
+    private fun carsStore(): ReadOnlyKeyValueStore<String, Car> = interactiveQueryService
+            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
 
 
     private fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
