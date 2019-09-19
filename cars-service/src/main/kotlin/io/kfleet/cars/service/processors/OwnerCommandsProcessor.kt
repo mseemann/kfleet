@@ -2,6 +2,7 @@ package io.kfleet.cars.service.processors
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.commands.OwnerCommand
+import io.kfleet.cars.service.events.OwnerEvent
 import mu.KotlinLogging
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
@@ -68,6 +69,7 @@ class OwnerCommandsProcessor {
         // created - for example find the reason why a owner could not be created
 
 
+        val oe = OwnerEvent("hola!", "test")
     }
 }
 
