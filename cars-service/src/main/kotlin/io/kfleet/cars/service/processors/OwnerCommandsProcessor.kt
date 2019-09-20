@@ -63,17 +63,9 @@ class OwnerCommandsProcessor {
                         Predicate<String, OwnerCommand> { key, value -> true }
                 )
 
-        val (createOwnerStream, createOwnerStreamError) = createOwnerCommands
+        val (createOwnerStream, ownerNotCreatedStream) = createOwnerCommands
                 //.selectKey { k, v -> v.getId() } not necessary - because the command id is the owner id - TODO needs to be changed
-                .leftJoin(
-                        ownerTable,
-                        { event, owner ->
-                            println("event: $event owner: $owner")
-                            Pair(event, owner)
-                        },
-                        Joined
-                                .keySerde<String, OwnerCommand, Owner>(Serdes.String())
-                                .withValueSerde(SpecificAvroSerde()))
+                .leftJoin(ownerTable) { event, owner -> Pair(event, owner) }
                 .peek { key, value ->
                     println("joined: key: $key ->  event: ${value.first} owner: ${value.second}")
                 }
@@ -85,23 +77,20 @@ class OwnerCommandsProcessor {
         createOwnerStream
                 .peek { key, value -> println("create a new owner") }
                 .map { key, value -> KeyValue(key, Owner(key, (value.first.getCommand() as CreateOwnerCommand).getName(), listOf())) }
-                .to(OwnerCommandsProcessorBinding.OWNSERS, Produced.with(Serdes.String(), ownerSerde))
+                .to(OwnerCommandsProcessorBinding.OWNSERS)
 
         createOwnerStream
                 .peek { key, value -> println("create a new owner created event, and create a positive command response") }
 
-        createOwnerStreamError.peek { key, value -> println("reject create owner and create a negative command response") }
+        ownerNotCreatedStream.peek { key, value -> println("reject create owner and create a negative command response") }
 
         unknownOwnerCommands.to("unknown_commands")
-
-
     }
 
     /**
-     * In the Car-Domain this is done by Spring Boot Cloud materializedAs Feature
+     * In the Car-Domain this is done with the Spring Boot Cloud materializedAs Feature
      */
     private fun createOwnerKTable(ownersStream: KStream<String, Owner>): KTable<String, Owner> {
-
 
         val ownerStateStore: Materialized<String, Owner, KeyValueStore<Bytes, ByteArray>> =
                 Materialized.`as`<String, Owner, KeyValueStore<Bytes, ByteArray>>("owner-store")
