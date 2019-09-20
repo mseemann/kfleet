@@ -22,6 +22,12 @@ spring.cloud.stream.bindings:
       useNativeEncoding: true
     consumer:
       useNativeDecoding: true
+  owners:
+    destination: owners
+    producer:
+      useNativeEncoding: true
+    consumer:
+      useNativeDecoding: true
   owner_commands:
     destination: owner_commands
     consumer:
@@ -57,7 +63,9 @@ spring.cloud.stream.kafka.streams.bindings:
   owner_commands:
     consumer:
       applicationId: cars-service-owner-commands
-
+  owners:
+    consumer:
+      applicationId: cars-service-owners
 
 
 

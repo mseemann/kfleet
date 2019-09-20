@@ -20,4 +20,6 @@ class Topics {
     @Bean
     fun ownerCommandsTopic() = NewTopic("owner_commands", 3, 1)
 
+    @Bean
+    fun ownersTopic() = NewTopic("owners", 3, 1)
 }
