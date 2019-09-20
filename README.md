@@ -52,5 +52,15 @@ docker run --tty \
 
 {"id":"1","state":"FREE","geoPosition":{"lat":59.83977184696787,"lng":10.70939965449577},"stateOfCharge":49.76350057919342}
 
-###Sources
+### Resources and readings
+
 [1] [Should You Put Several Event Types in the Same Kafka Topic?](https://www.confluent.io/blog/put-several-event-types-kafka-topic/)
+
+[2] [1 Year of Event Sourcing and CQRS](https://medium.com/hackernoon/1-year-of-event-sourcing-and-cqrs-fb9033ccd1c6)
+
+[3] [A CQRS and ES deep dive](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591577(v=pandp.10)?redirectedfrom=MSDN)
+
+### Thoughts and findings
+- *In domain-driven design (DDD), an aggregate defines a consistency boundary" [3]
+- "Both the sender and the receiver of a command should be in the same bounded context. You should not send a command to another bounded context because you would be instructing that other bounded context, which has separate responsibilities in another consistency boundary, to perform some work for you." [3]
+- "Commands should be processed once, by a single recipient." [3]

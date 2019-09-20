@@ -4,6 +4,6 @@
   "name" : "OwnerEvent",
   "fields" : [
     {"name":"id","type":"string"},
-    {"name":"event","type":"string"}
+    {"name":"event","type":["OwnerCreatedEvent"]}
   ]
 }

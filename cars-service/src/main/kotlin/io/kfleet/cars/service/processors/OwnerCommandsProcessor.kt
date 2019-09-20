@@ -2,8 +2,10 @@ package io.kfleet.cars.service.processors
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.commands.OwnerCommand
+import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.cars.service.events.OwnerEvent
 import mu.KotlinLogging
+import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -38,25 +40,28 @@ class OwnerCommandsProcessor {
                 .peek { key, value -> println("cool: $key -> $value -> ${value.javaClass}") }
 
 
-        val branches: Array<out KStream<String, OwnerCommand?>> = stream
-                .mapValues { key, value ->
-                    println("map $key -> $value ${value.getCommand().javaClass}")
-                    // command 2 event
-                    value
-                }.branch(
-                        Predicate<String, OwnerCommand?> { key, value ->
-                            println("check1 $key $value")
-                            value?.getCommand() is CreateOwnerCommand
-                        },
-                        Predicate<String, OwnerCommand?> { key, value ->
-                            println("check2 $key $value")
-                            true
-                        }
+        val branches: Array<out KStream<String, OwnerCommand>> = stream
+                .branch(
+                        Predicate<String, OwnerCommand?> { key, value -> value?.getCommand() is CreateOwnerCommand },
+                        Predicate<String, OwnerCommand?> { key, value -> true }
                 )
+
+        val createOwnerCommands = branches[0]
+        val unknownOwnerCommands = branches[1]
+
+        createOwnerCommands
+                .map { k, ownerCreatedCommand ->
+                    val name = (ownerCreatedCommand.getCommand() as CreateOwnerCommand).getName()
+                    KeyValue(k, OwnerEvent(k, OwnerCreatedEvent(name)))
+                }
+                .to("owner_events")
+
+        unknownOwnerCommands.to("unknown_commands")
+
         // error stream -> forward to dlq and windowed events stream
-        branches[0].peek { key, value -> println("cool1: $key -> $value") }
+        //branches[0].peek { key, value -> println("cool1: $key -> $value") }
         // event stream -> forward to owner_events;  materialue stream to owner topic and windowed events stream
-        branches[1].peek { key, value -> println("cool2: $key -> $value") }
+        //branches[1].peek { key, value -> println("cool2: $key -> $value") }
 //                .through("owner_events")
 //                // map to owner - e.g. create or read and modifiy
 //                .through("owner")
@@ -68,8 +73,6 @@ class OwnerCommandsProcessor {
         // every event must contain the source command id - so we can find the events that a command
         // created - for example find the reason why a owner could not be created
 
-
-        val oe = OwnerEvent("hola!", "test")
     }
 }
 
