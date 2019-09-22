@@ -3,14 +3,18 @@ package io.kfleet.cars.service.processors
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import io.kfleet.cars.service.commands.CreateOwnerCommand
-import io.kfleet.cars.service.commands.OwnerCommand
 import io.kfleet.cars.service.domain.Owner
+import io.kfleet.cars.service.events.OwnerCreatedEvent
+import io.kfleet.commands.CommandRejected
+import io.kfleet.commands.CommandSucceeded
 import mu.KotlinLogging
+import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.*
 import org.apache.kafka.streams.state.KeyValueStore
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Input
 import org.springframework.cloud.stream.annotation.StreamListener
@@ -23,12 +27,14 @@ interface OwnerCommandsProcessorBinding {
 
     companion object {
         const val OWNER_COMMANDS = "owner_commands"
+        const val OWNER_COMMANDS_RESPONSE = "owner_commands_response"
         const val OWNER_EVENTS = "owner_events"
         const val OWNSERS = "owners"
+        const val UNKNOW_COMMANDS = "unknown_owner_commands"
     }
 
     @Input(OWNER_COMMANDS)
-    fun inputOwnerCommands(): KStream<String, OwnerCommand>
+    fun inputOwnerCommands(): KStream<String, SpecificRecord>
 
     @Input(OWNSERS)
     fun inpuOwners(): KStream<String, Owner>
@@ -36,21 +42,21 @@ interface OwnerCommandsProcessorBinding {
 
 
 @EnableBinding(OwnerCommandsProcessorBinding::class)
-class OwnerCommandsProcessor {
+class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-client.endpoint}") val endpoint: String) {
 
-    val serdeConfig = mapOf(
-            AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to "http://localhost:8081")
-    final val ownerSerde = SpecificAvroSerde<Owner>()
+    private val ownerSerde = SpecificAvroSerde<Owner>()
 
     init {
+        val serdeConfig = mapOf(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to endpoint)
+
         ownerSerde.configure(serdeConfig, false)
     }
 
 
-    @StreamListener()
+    @StreamListener
     fun processCommands(
             @Input(OwnerCommandsProcessorBinding.OWNSERS) ownersStream: KStream<String, Owner>,
-            @Input(OwnerCommandsProcessorBinding.OWNER_COMMANDS) commandStream: KStream<String, OwnerCommand>) {
+            @Input(OwnerCommandsProcessorBinding.OWNER_COMMANDS) commandStream: KStream<String, SpecificRecord>) {
 
         val ownerTable: KTable<String, Owner> = createOwnerKTable(ownersStream)
 
@@ -59,36 +65,62 @@ class OwnerCommandsProcessor {
 
         val (createOwnerCommands, unknownOwnerCommands) = stream
                 .branch(
-                        Predicate<String, OwnerCommand> { key, value -> value.getCommand() is CreateOwnerCommand },
-                        Predicate<String, OwnerCommand> { key, value -> true }
+                        Predicate<String, SpecificRecord> { _, value -> value is CreateOwnerCommand },
+                        Predicate<String, SpecificRecord> { _, _ -> true }
                 )
 
+        unknownOwnerCommands.to(OwnerCommandsProcessorBinding.UNKNOW_COMMANDS)
+
         val (createOwnerStream, ownerNotCreatedStream) = createOwnerCommands
-                //.selectKey { k, v -> v.getId() } not necessary - because the command id is the owner id - TODO needs to be changed
                 .leftJoin(ownerTable) { event, owner -> Pair(event, owner) }
                 .peek { key, value ->
                     println("joined: key: $key ->  event: ${value.first} owner: ${value.second}")
                 }
                 .branch(
-                        Predicate<String, Pair<OwnerCommand, Owner?>> { _, value -> value.second == null },
-                        Predicate<String, Pair<OwnerCommand, Owner?>> { _, value -> value.second !== null }
+                        Predicate<String, Pair<SpecificRecord, Owner?>> { _, value -> value.second == null },
+                        Predicate<String, Pair<SpecificRecord, Owner?>> { _, value -> value.second !== null }
                 )
 
         createOwnerStream
-                .peek { key, value -> println("create a new owner") }
-                .map { key, value -> KeyValue(key, Owner(key, (value.first.getCommand() as CreateOwnerCommand).getName(), listOf())) }
+                .peek { _, _ -> println("create a new owner") }
+                .map { key, value ->
+                    val event = value.first as CreateOwnerCommand
+                    val owner = Owner.newBuilder().apply {
+                        id = key
+                        name = event.getName()
+                    }.build()
+                    KeyValue(key, owner)
+                }
                 .to(OwnerCommandsProcessorBinding.OWNSERS)
 
         createOwnerStream
-                .peek { key, value -> println("create a new owner created event, and create a positive command response") }
+                .peek { _, _ -> println("create a new owner created event") }
+                .map { key, value ->
+                    val event = value.first as CreateOwnerCommand
+                    KeyValue(key, OwnerCreatedEvent(event.getOwnerId(), event.getName()))
+                }
+                .to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
 
-        ownerNotCreatedStream.peek { key, value -> println("reject create owner and create a negative command response") }
+        createOwnerStream
+                .peek { _, _ -> println("create a positive command response") }
+                .map { key, value ->
+                    val event = value.first as CreateOwnerCommand
+                    KeyValue(key, CommandSucceeded(event.getCommandId()))
+                }
+                .to(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE)
 
-        unknownOwnerCommands.to("unknown_commands")
+        ownerNotCreatedStream
+                .peek { _, _ -> println("reject create owner: create a negative command response") }
+                .map { key, value ->
+                    val event = value.first as CreateOwnerCommand
+                    KeyValue(key, CommandRejected(event.getCommandId(), "Owner with id $key already exists"))
+                }
+                .to(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE)
+
     }
 
     /**
-     * In the Car-Domain this is done with the Spring Boot Cloud materializedAs Feature
+     * In the Car-Domain this is done with the Spring Boot Cloud Streams materializedAs Feature
      */
     private fun createOwnerKTable(ownersStream: KStream<String, Owner>): KTable<String, Owner> {
 

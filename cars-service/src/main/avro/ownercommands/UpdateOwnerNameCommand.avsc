@@ -3,6 +3,8 @@
   "type" : "record",
   "name" : "UpdateOwnernameCommand",
   "fields" : [
+    {"name":"commandId","type":"string"},
+    {"name":"ownerId","type":"string"},
     {"name":"name","type":"string"}
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "namespace" : "io.kfleet.commands",
+  "type" : "record",
+  "name" : "CommandRejected",
+  "fields" : [
+    {"name":"commandId","type":"string"},
+    {"name":"reason","type":"string"}
+  ]
+}

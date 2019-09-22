@@ -3,6 +3,8 @@
   "type" : "record",
   "name" : "CreateOwnerCommand",
   "fields" : [
+    {"name":"commandId","type":"string"},
+    {"name":"ownerId","type":"string"},
     {"name":"name","type":"string"}
   ]
 }

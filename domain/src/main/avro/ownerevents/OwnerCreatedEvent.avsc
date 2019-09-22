@@ -3,6 +3,7 @@
   "type" : "record",
   "name" : "OwnerCreatedEvent",
   "fields" : [
+    {"name":"ownerId","type":"string"},
     {"name":"name","type":"string"}
   ]
 }

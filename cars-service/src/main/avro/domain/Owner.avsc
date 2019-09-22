@@ -5,6 +5,6 @@
   "fields" : [
     {"name":"id", "type":"string"},
     {"name":"name", "type":"string"},
-    {"name":"cars", "type": {"type":"array", "items":"Car"}}
+    {"name":"cars", "type": {"type":"array", "items":"Car"}, "default": []}
   ]
 }
