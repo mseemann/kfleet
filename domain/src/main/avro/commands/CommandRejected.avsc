@@ -1,8 +1,0 @@
-{
-  "namespace" : "io.kfleet.commands",
-  "type" : "record",
-  "name" : "CommandSucceeded",
-  "fields" : [
-    {"name":"commandId","type":"string"}
-  ]
-}

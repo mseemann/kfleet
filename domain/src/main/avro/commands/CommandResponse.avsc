@@ -1,0 +1,10 @@
+{
+  "namespace" : "io.kfleet.commands",
+  "type" : "record",
+  "name" : "CommandResponse",
+  "fields" : [
+    {"name": "commandId", "type": "string"},
+    {"name": "status", "type": {"name": "CommandStatus", "type": "enum", "symbols": ["SUCCEEDED", "REJECTED"]}},
+    {"name": "reason", "type": ["null", "string"], "default": null}
+  ]
+}

@@ -32,6 +32,12 @@ spring.cloud.stream.bindings:
     destination: owner_commands
     consumer:
       useNativeDecoding: true
+  owner_commands_response:
+    destination: owner_commands_response
+    producer:
+      useNativeEncoding: true
+    consumer:
+      useNativeDecoding: true
 
 spring.cloud.stream.kafka.streams.binder.configuration:
   schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
@@ -72,7 +78,8 @@ spring.cloud.stream.kafka.streams.bindings:
 
 management.endpoints.web.exposure.include: "*"
 
-#logging.level.org: WARN
+logging.level.org: WARN
+logging.level.io.confluent: WARN
 logging.level.io.kfleet: DEBUG
 #logging.level.org.springframework.cloud.stream.binding: DEBUG
 
