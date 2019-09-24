@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
+import retryKfleet
 import java.time.Duration
 
 private val log = KotlinLogging.logger {}
@@ -35,7 +36,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
                     log.debug { "submitted command: $command" }
                     ownerRepository
                             .findCommandResponse(command.getCommandId())
-                            .retryBackoff(5, Duration.ofSeconds(1), Duration.ofSeconds(3))
+                            .retryKfleet()
                 }
                 .flatMap { commandResponse ->
                     log.debug { "commandResponse: $commandResponse" }
@@ -44,7 +45,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
                     } else {
                         ownerRepository
                                 .findOwnerByid(ownerId)
-                                .retryBackoff(5, Duration.ofSeconds(1), Duration.ofSeconds(3))
+                                .retryKfleet()
                                 .flatMap {
                                     log.debug { "response form find ownerbyid: $it" }
                                     Mono.just(ResponseEntity(it, HttpStatus.CREATED))
@@ -56,7 +57,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
     @GetMapping("/{id}")
     fun ownerById(@PathVariable("id") id: String): Mono<ResponseEntity<Owner>> = ownerRepository
             .findOwnerByid(id)
-            .retryBackoff(5, Duration.ofSeconds(1), Duration.ofSeconds(3))
+            .retryKfleet()
             .map { ResponseEntity(it, HttpStatus.OK) }
             .onErrorResume { Mono.just(ResponseEntity(HttpStatus.NOT_FOUND)) }
 

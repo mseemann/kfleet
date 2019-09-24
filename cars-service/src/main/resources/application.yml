@@ -44,7 +44,10 @@ spring.cloud.stream.kafka.streams.binder.configuration:
   value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
   specific.avro.reader: true
   application.server: localhost:${server.port}
+  # a shorter commit interval results in more accurate statistics
   commit.interval.ms: 100
+  # a shorter session timeout results in a shorter reablancing time if a streaming processor goes down
+  session.timeout.ms: 6000
   default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
   default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
   default.deserialization.exception.handler: io.kfleet.cars.service.configuration.CustomDeserializationExceptionHandler
@@ -74,7 +77,11 @@ spring.cloud.stream.kafka.streams.bindings:
 
 #error if not at least 3 broker: Number of alive brokers '1' does not meet the required replication factor '3' for the transactions state topic
 #spring.cloud.stream.kafka.streams.binder.configuration.processing.guarantee: exactly_once
-
+# is there any effect configure this property?
+spring.cloud.stream.kafka.streams.binder.configuration.num.standby.replicas: 2
+spring.cloud.stream.kafka.streams.binder.configuration.num.stream.threads: 2
+# make sure every streaming app has it's own state store folder
+spring.cloud.stream.kafka.streams.binder.configuration.state.dir: "/tmp/kafka-streams/${server.port}"
 
 management.endpoints.web.exposure.include: "*"
 
@@ -83,4 +90,4 @@ logging.level.io.confluent: WARN
 logging.level.io.kfleet: DEBUG
 #logging.level.org.springframework.cloud.stream.binding: DEBUG
 
-cars.service.simulation.enabled: false
+cars.service.simulation.enabled: true

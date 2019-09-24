@@ -107,11 +107,9 @@ class OwnerRepository(
 
 
     fun findCommandResponseLocal(commandId: String): Mono<CommandResponse> {
-
-
+        
         val timeTo = Instant.now()
         val timeFrom = timeTo.minusMillis(Duration.ofHours(1).toMillis())
-        println("timeFrom $timeFrom timeTo $timeTo")
 
         commandResponseStore().fetch(commandId, timeFrom.toEpochMilli(), timeTo.toEpochMilli()).use {
             it.asSequence().forEach { kv ->

@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.Duration.ofSeconds
+import retryKfleet
 import java.util.*
 
 private val logger = KotlinLogging.logger {}
@@ -21,19 +21,18 @@ private val logger = KotlinLogging.logger {}
 class CarsService(@Autowired val carsRepository: ICarsRepository) {
 
     @GetMapping()
-    fun cars(): Flux<Car> = carsRepository.findAllCars()
-            .retryBackoff(5, ofSeconds(3))
+    fun cars(): Flux<Car> = carsRepository.findAllCars().retryKfleet()
 
     @GetMapping("/{id}")
     fun carById(@PathVariable("id") id: String): Mono<ResponseEntity<Car>> = carsRepository
             .findById(id)
-            .retryBackoff(5, ofSeconds(1), ofSeconds(3))
+            .retryKfleet()
             .map { ResponseEntity(it, HttpStatus.OK) }
             .onErrorResume { Mono.just(ResponseEntity(HttpStatus.NOT_FOUND)) }
 
     @GetMapping("/stats")
     fun carsStateCount(): Mono<Map<String, Long>> = carsRepository.getCarsStateCounts()
-            .retryBackoff(5, ofSeconds(3))
+            .retryKfleet()
 
     @PostMapping("/create/{ownerId}")
     fun createCarForOwner(@PathVariable("ownerId") ownerId: String): String {

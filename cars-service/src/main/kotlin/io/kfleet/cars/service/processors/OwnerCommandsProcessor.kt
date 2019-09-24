@@ -85,8 +85,10 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
 
         unknownOwnerCommands.to(OwnerCommandsProcessorBinding.UNKNOW_COMMANDS)
 
-        val (createOwnerStream, ownerNotCreatedStream) = createOwnerCommands
+        val joinedStream = createOwnerCommands
                 .leftJoin(ownerTable) { event, owner -> Pair(event, owner) }
+
+        val (createOwnerStream, ownerNotCreatedStream) = joinedStream
                 .branch(
                         Predicate<String, Pair<SpecificRecord, Owner?>> { _, value -> value.second == null },
                         Predicate<String, Pair<SpecificRecord, Owner?>> { _, value -> value.second !== null }
@@ -118,7 +120,7 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
 
         createOwnerStream
                 .peek { _, _ -> log.debug { "owner created succees command created" } }
-                .map { key, value ->
+                .map { _, value ->
                     val event = value.first as CreateOwnerCommand
                     val response = CommandResponse.newBuilder().apply {
                         commandId = event.getCommandId()
@@ -148,7 +150,7 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
      */
     private fun createOwnerKTable(ownersStream: KStream<String, Owner>): KTable<String, Owner> {
 
-        val ownerStateStore: Materialized<String, Owner, KeyValueStore<Bytes, ByteArray>> =
+        val ownerStateStore =
                 Materialized.`as`<String, Owner, KeyValueStore<Bytes, ByteArray>>(OwnerCommandsProcessorBinding.OWNER_STORE)
                         .withKeySerde(Serdes.String())
                         .withValueSerde(ownerSerde)
@@ -169,10 +171,12 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
 
     private fun createOwnerCommandResponseWindowedTable(commandResponseStream: KStream<String, CommandResponse>) {
 
-        val commandResponseWindwedStateStore: Materialized<String, CommandResponse, WindowStore<Bytes, ByteArray>> =
+        val commandResponseWindwedStateStore =
                 Materialized.`as`<String, CommandResponse, WindowStore<Bytes, ByteArray>>(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
                         .withKeySerde(Serdes.String())
                         .withValueSerde(commandResponseSerde)
+                        .withLoggingEnabled(emptyMap())
+                        .withCachingEnabled()
 
         val responseTable: KTable<Windowed<String>, CommandResponse> = commandResponseStream
                 .groupByKey()
