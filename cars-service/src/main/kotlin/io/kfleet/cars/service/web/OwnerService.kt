@@ -1,6 +1,7 @@
 package io.kfleet.cars.service.web
 
 import io.kfleet.cars.service.domain.Owner
+import io.kfleet.cars.service.repos.ICommandsResponseRepositroy
 import io.kfleet.cars.service.repos.IOwnerRepository
 import io.kfleet.commands.CommandStatus
 import mu.KotlinLogging
@@ -16,7 +17,9 @@ private val log = KotlinLogging.logger {}
 
 @RestController
 @RequestMapping("/owners")
-class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
+class OwnerService(
+        @Autowired val ownerRepository: IOwnerRepository,
+        @Autowired val commandsResponseRepository: ICommandsResponseRepositroy) {
 
 
     @PostMapping("/{ownerId}/{ownerName}")
@@ -34,7 +37,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
                 .delayElement(Duration.ofMillis(100))
                 .flatMap { command ->
                     log.debug { "submitted command: $command" }
-                    ownerRepository
+                    commandsResponseRepository
                             .findCommandResponse(command.getCommandId())
                             .retryKfleet()
                 }
