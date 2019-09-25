@@ -22,7 +22,7 @@ kafka-topics --zookeeper zookeeper:2181 --list
 kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
 kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
 
-```
+``` bash
 docker run --tty \
            --network kfleet_default \
            edenhill/kafkacat:1.5.0 \ 
@@ -36,7 +36,7 @@ docker run --tty \
                   Headers: %h\n'
 ```
 
-```
+``` bash
 docker run --tty \
            --network kfleet_default \
            edenhill/kafkacat:1.5.0 \
