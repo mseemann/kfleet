@@ -37,7 +37,7 @@ class CarEmitter {
 
     @StreamEmitter
     @Output(CarsOutBindings.CARS)
-    fun emitCars(): Flux<Message<Car>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT).map {
+    fun emitCars(): Flux<Message<Car>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepUntil = 2).map {
         val car = CarCreator.create(it)
         logger.debug { "emit: $car" }
         MessageBuilder.createMessage(car, headers(it))

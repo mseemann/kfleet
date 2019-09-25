@@ -19,7 +19,7 @@ private val logger = KotlinLogging.logger {}
 @RestController
 @RequestMapping("/cars")
 class CarsService(@Autowired val carsRepository: ICarsRepository) {
-
+    
     @GetMapping()
     fun cars(): Flux<Car> = carsRepository.findAllCars().retryKfleet()
 
