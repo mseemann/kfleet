@@ -79,34 +79,34 @@ hosts that are part of our streaming app cluster or we can determin the host a g
 
 To conclude: if we hav only one streaming application instance we can query a record by key in the 
 easiest possible way:
-```
-    override fun findByIdLocal(id: String): Mono<Car> {
-        return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))
-    }
+``` kotlin
+override fun findByIdLocal(id: String): Mono<Car> {
+    return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))
+}
 
-   private fun carsStore(): ReadOnlyKeyValueStore<String, Car> = interactiveQueryService
-            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
+private fun carsStore(): ReadOnlyKeyValueStore<String, Car> = interactiveQueryService
+        .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
 
 ```
 If we have more than one instance of our streaming application running we need to decide wether the
 record is stored locally or can only be queries from another application instance. If the key is stored
 locally we query the local store if not we need a remote call to query the reocord:
 
-```
-    override fun findById(id: String): Mono<Car> {
-        val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
+``` kotlin
+override fun findById(id: String): Mono<Car> {
+    val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
 
-        if (hostInfo == interactiveQueryService.currentHostInfo) {
-            log.debug { "find car by id local: $id" }
-            return findByIdLocal(id)
-        }
-
-        log.debug { "find car by id remote: $id" }
-        val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
-        return webClient.get().uri("/$CARS_RPC/$id")
-                .retrieve()
-                .bodyToMono(Car::class.java)
+    if (hostInfo == interactiveQueryService.currentHostInfo) {
+        log.debug { "find car by id local: $id" }
+        return findByIdLocal(id)
     }
+
+    log.debug { "find car by id remote: $id" }
+    val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
+    return webClient.get().uri("/$CARS_RPC/$id")
+            .retrieve()
+            .bodyToMono(Car::class.java)
+}
 ```
 
 The WebClient uses a special rest endpoint that queires the local store directly. The provided solution is the
@@ -125,11 +125,11 @@ Another way would be to run the remote call in any case. E.g. a http call is nec
 is a more readable code:
 
 ``` kotlin
-    override fun findById(id: String): Mono<Car> {
-        val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
-        val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
-        return webClient.get().uri("/$CARS_RPC/$id")
-                .retrieve()
-                .bodyToMono(Car::class.java)
-    }
+override fun findById(id: String): Mono<Car> {
+    val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
+    val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
+    return webClient.get().uri("/$CARS_RPC/$id")
+            .retrieve()
+            .bodyToMono(Car::class.java)
+}
 ```
