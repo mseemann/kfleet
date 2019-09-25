@@ -3,11 +3,11 @@ package io.kfleet.cars.service.repos
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
+import io.kfleet.cars.service.rpclayer.OWNER_RPC
 import io.kfleet.commands.CommandResponse
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.state.QueryableStoreTypes
-import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.apache.kafka.streams.state.ReadOnlyWindowStore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -17,8 +17,8 @@ import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Repository
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 import java.time.Duration
 import java.time.Instant
 import java.util.*
@@ -29,7 +29,7 @@ private val log = KotlinLogging.logger {}
 interface IOwnerRepository {
     fun submitCreateOwnerCommand(ownerId: String, ownerName: String): Mono<CreateOwnerCommand>
     fun findCommandResponse(commandId: String): Mono<CommandResponse>
-    fun findOwnerByid(ownerId: String): Mono<Owner>
+    fun findById(ownerId: String): Mono<Owner>
 }
 
 interface OwnersBindings {
@@ -61,7 +61,7 @@ class OwnerRepository(
                 .build()
 
         return try {
-            // this works because cloud stream is configured sync for this topic
+            // this works because cloud stream is configured as sync for this topic
             if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("CreateOwnerCommand coud not be send."))
         } catch (e: RuntimeException) {
             Mono.error(e)
@@ -83,31 +83,14 @@ class OwnerRepository(
         }
     }
 
-    override fun findOwnerByid(ownerId: String): Mono<Owner> {
+    override fun findById(ownerId: String): Mono<Owner> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
-        log.debug { "findOwnerByid $ownerId -> hostInfo: $hostInfo" }
-
-        return Mono.defer {
-            if (hostInfo == interactiveQueryService.currentHostInfo) {
-                findByIdLocal(ownerId)
-            } else {
-                // FIXME remote call
-                log.debug { "search remote for owner with id $ownerId" }
-                Mono.empty<Owner>()
-            }
-        }
+        val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
+        return webClient.get().uri("/$OWNER_RPC/$ownerId").retrieve().bodyToMono(Owner::class.java)
     }
-
-    fun findByIdLocal(ownerId: String): Mono<Owner> {
-        return ownerStore().get(ownerId)?.toMono() ?: Mono.error(Exception("owner with id: $ownerId not found"))
-    }
-
-    private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> = interactiveQueryService
-            .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
-
-
+    
     fun findCommandResponseLocal(commandId: String): Mono<CommandResponse> {
-        
+
         val timeTo = Instant.now()
         val timeFrom = timeTo.minusMillis(Duration.ofHours(1).toMillis())
 

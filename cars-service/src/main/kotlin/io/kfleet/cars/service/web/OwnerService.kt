@@ -44,7 +44,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
                         Mono.just(ResponseEntity(commandResponse.getReason(), HttpStatus.BAD_REQUEST))
                     } else {
                         ownerRepository
-                                .findOwnerByid(ownerId)
+                                .findById(ownerId)
                                 .retryKfleet()
                                 .flatMap {
                                     log.debug { "response form find ownerbyid: $it" }
@@ -56,7 +56,7 @@ class OwnerService(@Autowired val ownerRepository: IOwnerRepository) {
 
     @GetMapping("/{id}")
     fun ownerById(@PathVariable("id") id: String): Mono<ResponseEntity<Owner>> = ownerRepository
-            .findOwnerByid(id)
+            .findById(id)
             .retryKfleet()
             .map { ResponseEntity(it, HttpStatus.OK) }
             .onErrorResume { Mono.just(ResponseEntity(HttpStatus.NOT_FOUND)) }
