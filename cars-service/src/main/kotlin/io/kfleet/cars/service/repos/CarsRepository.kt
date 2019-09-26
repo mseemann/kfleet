@@ -3,22 +3,16 @@ package io.kfleet.cars.service.repos
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.events.CarEvent
 import io.kfleet.cars.service.processors.CarStateCountProcessor
 import io.kfleet.cars.service.processors.CarStateCountProcessorBinding
 import io.kfleet.cars.service.rpclayer.CARS_RPC
-import io.kfleet.common.headers
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KafkaStreams
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.cloud.stream.annotation.EnableBinding
-import org.springframework.cloud.stream.annotation.Output
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.context.ApplicationContext
 import org.springframework.kafka.config.StreamsBuilderFactoryBean
-import org.springframework.messaging.MessageChannel
-import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Repository
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
@@ -35,22 +29,10 @@ interface ICarsRepository {
     fun getCarsStateCounts(): Mono<Map<String, Long>>
 }
 
-interface CarsBinding {
-
-    companion object {
-        const val CAR_EVENTS = "car_events_out"
-    }
-
-    @Output(CAR_EVENTS)
-    fun carEvents(): MessageChannel
-
-}
 
 @Repository
-@EnableBinding(CarsBinding::class)
 class CarsRepository(
         @Autowired val interactiveQueryService: InteractiveQueryService,
-        @Autowired @Output(CarsBinding.CAR_EVENTS) val outputCarEvents: MessageChannel,
         @Autowired val mapper: ObjectMapper,
         @Autowired val context: ApplicationContext
 ) : ICarsRepository {
@@ -58,7 +40,6 @@ class CarsRepository(
     override fun findAllCars(): Flux<Car> {
         return getStreamMetaData()
                 .map {
-                    log.debug { "find cars remote per rpc ${it.port()}" }
                     val webClient = WebClient.create("http://${it.host()}:${it.port()}")
                     webClient.get().uri("/$CARS_RPC/").retrieve().bodyToFlux(Car::class.java)
                 }
@@ -97,9 +78,5 @@ class CarsRepository(
         getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE).toList().toFlux()
     }
 
-    fun publishCarEvents(event: CarEvent) {
-        val msg = MessageBuilder.createMessage(event, headers(event.id))
-        outputCarEvents.send(msg)
-    }
 }
 
