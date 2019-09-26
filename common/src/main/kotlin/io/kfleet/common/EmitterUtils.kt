@@ -19,4 +19,3 @@ fun randomDelayFluxer(maxId: Int, sleepFrom: Long = 1, sleepUntil: Long = 5): Fl
 }
 
 fun headers(id: Int) = MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to "$id"))
-fun headers(id: String) = MessageHeaders(mapOf(KafkaHeaders.MESSAGE_KEY to id))

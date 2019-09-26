@@ -1,10 +1,11 @@
 package io.kfleet.cars.service.web
 
-import customRetry
 import io.kfleet.cars.service.domain.Owner
+import io.kfleet.cars.service.repos.CreateOwnerParams
 import io.kfleet.cars.service.repos.ICommandsResponseRepositroy
 import io.kfleet.cars.service.repos.IOwnerRepository
 import io.kfleet.commands.CommandStatus
+import io.kfleet.common.customRetry
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -15,6 +16,7 @@ import java.time.Duration
 
 private val log = KotlinLogging.logger {}
 
+
 @RestController
 @RequestMapping("/owners")
 class OwnerService(
@@ -24,37 +26,35 @@ class OwnerService(
 
     @PostMapping("/{ownerId}/{ownerName}")
     fun createOwner(
-            @PathVariable("ownerId") ownerId: String?,
-            @PathVariable("ownerName") ownerName: String?): Mono<ResponseEntity<out Any>> {
+            @PathVariable("ownerId") ownerId: String,
+            @PathVariable("ownerName") ownerName: String): Mono<ResponseEntity<out Any>> {
 
-        if (ownerId == null || ownerId == "") return Mono.just(ResponseEntity(HttpStatus.BAD_REQUEST))
-        if (ownerName == null || ownerName == "") return Mono.just(ResponseEntity(HttpStatus.BAD_REQUEST))
-
-        return ownerRepository.submitCreateOwnerCommand(ownerId, ownerName)
-                // a delay is required (or at least a retry) because the submitCreateOwnerCommand
-                // results in an async operation by the stream  processor.
-                // the delay time depends on the system performance
+        return Mono.just(CreateOwnerParams(ownerId = ownerId.trim(), ownerName = ownerName.trim()))
+                .flatMap { validate(it) }
+                .flatMap { ownerRepository.submitCreateOwnerCommand(it) }
                 .delayElement(Duration.ofMillis(100))
-                .flatMap { command ->
-                    log.debug { "submitted command: $command" }
+                .flatMap {
                     commandsResponseRepository
-                            .findCommandResponse(command.getCommandId())
+                            .findCommandResponse(it.getCommandId())
                             .customRetry()
                 }
-                .flatMap { commandResponse ->
-                    log.debug { "commandResponse: $commandResponse" }
-                    if (commandResponse.getStatus() == CommandStatus.REJECTED) {
-                        Mono.just(ResponseEntity(commandResponse.getReason(), HttpStatus.BAD_REQUEST))
+                .flatMap {
+                    if (it.getStatus() == CommandStatus.REJECTED) {
+                        Mono.just(ResponseEntity(it.getReason(), HttpStatus.BAD_REQUEST))
                     } else {
                         ownerRepository
                                 .findById(ownerId)
                                 .customRetry()
                                 .flatMap {
-                                    log.debug { "response form find ownerbyid: $it" }
                                     Mono.just(ResponseEntity(it, HttpStatus.CREATED))
                                 }
                     }
                 }
+                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
+                    e.message?.let { Mono.just(ResponseEntity(it, HttpStatus.BAD_REQUEST)) }
+                            ?: Mono.just(ResponseEntity("unknown", HttpStatus.BAD_REQUEST))
+                }
+
     }
 
     @GetMapping("/{id}")

@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("org.springframework.boot") version "2.1.7.RELEASE" apply false
+    id("org.springframework.boot") version "2.1.7.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
 }
@@ -19,6 +19,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
     implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
+    implementation("org.apache.kafka:kafka-streams")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")

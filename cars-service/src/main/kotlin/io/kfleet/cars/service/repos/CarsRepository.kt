@@ -6,7 +6,7 @@ import io.kfleet.cars.service.domain.Car
 import io.kfleet.cars.service.processors.CarStateCountProcessor
 import io.kfleet.cars.service.processors.CarStateCountProcessorBinding
 import io.kfleet.cars.service.rpclayer.CARS_RPC
-import mu.KotlinLogging
+import io.kfleet.common.createWebClient
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KafkaStreams
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,14 +14,10 @@ import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQuerySer
 import org.springframework.context.ApplicationContext
 import org.springframework.kafka.config.StreamsBuilderFactoryBean
 import org.springframework.stereotype.Repository
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
-
-private val log = KotlinLogging.logger {}
-
 
 interface ICarsRepository {
     fun findAllCars(): Flux<Car>
@@ -40,8 +36,7 @@ class CarsRepository(
     override fun findAllCars(): Flux<Car> {
         return getStreamMetaData()
                 .map {
-                    val webClient = WebClient.create("http://${it.host()}:${it.port()}")
-                    webClient.get().uri("/$CARS_RPC/").retrieve().bodyToFlux(Car::class.java)
+                    createWebClient(it.hostInfo()).get().uri("/$CARS_RPC/").retrieve().bodyToFlux(Car::class.java)
                 }
                 .flatMap { Flux.concat(it) }
     }
@@ -49,16 +44,14 @@ class CarsRepository(
 
     override fun findById(id: String): Mono<Car> {
         val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
-        val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
-        return webClient.get().uri("/$CARS_RPC/$id").retrieve().bodyToMono(Car::class.java)
+        return createWebClient(hostInfo).get().uri("/$CARS_RPC/$id").retrieve().bodyToMono(Car::class.java)
     }
 
 
     override fun getCarsStateCounts(): Mono<Map<String, Long>> {
         return getStreamMetaData()
                 .map {
-                    val webClient = WebClient.create("http://${it.host()}:${it.port()}")
-                    webClient.get().uri("/$CARS_RPC/stats")
+                    createWebClient(it.hostInfo()).get().uri("/$CARS_RPC/stats")
                             .retrieve()
                             .bodyToMono(String::class.java)
                             .flatMap { rawStats -> mapper.readValue<Map<String, Long>>(rawStats).toMono() }

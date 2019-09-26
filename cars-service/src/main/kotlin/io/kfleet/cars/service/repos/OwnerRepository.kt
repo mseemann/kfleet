@@ -4,7 +4,7 @@ import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.cars.service.rpclayer.OWNER_RPC
-import mu.KotlinLogging
+import io.kfleet.common.createWebClient
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -14,15 +14,13 @@ import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Repository
-import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
 import java.util.*
 
-
-private val log = KotlinLogging.logger {}
+data class CreateOwnerParams(val ownerId: String, val ownerName: String)
 
 interface IOwnerRepository {
-    fun submitCreateOwnerCommand(ownerId: String, ownerName: String): Mono<CreateOwnerCommand>
+    fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand>
     fun findById(ownerId: String): Mono<Owner>
 }
 
@@ -44,10 +42,10 @@ class OwnerRepository(
         @Autowired val interactiveQueryService: InteractiveQueryService) : IOwnerRepository {
 
 
-    override fun submitCreateOwnerCommand(ownerId: String, ownerName: String): Mono<CreateOwnerCommand> {
+    override fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {
 
         val commandId = UUID.randomUUID().toString()
-        val ownerCommand = CreateOwnerCommand(commandId, ownerId, ownerName)
+        val ownerCommand = CreateOwnerCommand(commandId, createOwnerParams.ownerId, createOwnerParams.ownerName)
 
         val msg = MessageBuilder
                 .withPayload(ownerCommand)
@@ -64,9 +62,7 @@ class OwnerRepository(
 
     override fun findById(ownerId: String): Mono<Owner> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
-        val webClient = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
-        return webClient.get().uri("/$OWNER_RPC/$ownerId").retrieve().bodyToMono(Owner::class.java)
+        return createWebClient(hostInfo).get().uri("/$OWNER_RPC/$ownerId").retrieve().bodyToMono(Owner::class.java)
     }
-
-
+    
 }

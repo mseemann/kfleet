@@ -1,8 +1,8 @@
 package io.kfleet.cars.service.web
 
-import customRetry
 import io.kfleet.cars.service.domain.Car
 import io.kfleet.cars.service.repos.ICarsRepository
+import io.kfleet.common.customRetry
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
