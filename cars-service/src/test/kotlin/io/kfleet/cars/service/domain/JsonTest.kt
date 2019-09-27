@@ -2,17 +2,19 @@ package io.kfleet.cars.service.domain
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kfleet.domain.GeoPosition
 import org.junit.Test
+import kotlin.random.Random
 import kotlin.test.assertEquals
 
 
 class JsonTest {
 
     @Test
-    fun tserializeCar() {
+    fun testSerializeACar() {
         val mapper = jacksonObjectMapper()
-        val car = Car(id = "1", state = CarState.FREE, geoPosition = GeoPosition.random(), stateOfCharge = 10.0)
+
+
+        val car = Car("1", Random.nextDouble(0.0, 100.0), CarState.FREE, GeoPositionCreator.create())
 
         val serialized = mapper.writeValueAsString(car)
 

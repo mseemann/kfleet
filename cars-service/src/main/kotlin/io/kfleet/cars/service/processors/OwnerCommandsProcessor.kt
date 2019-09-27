@@ -1,12 +1,12 @@
 package io.kfleet.cars.service.processors
 
-import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
+import io.kfleet.common.createSerdeWithAvroRegistry
 import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Serdes
@@ -22,6 +22,7 @@ import org.springframework.cloud.stream.annotation.StreamListener
 import java.time.Duration
 
 private val log = KotlinLogging.logger {}
+
 
 interface OwnerCommandsProcessorBinding {
 
@@ -49,23 +50,8 @@ interface OwnerCommandsProcessorBinding {
 @EnableBinding(OwnerCommandsProcessorBinding::class)
 class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-client.endpoint}") val endpoint: String) {
 
-    private val ownerSerde: SpecificAvroSerde<Owner> by lazy {
-
-        val serdeConfig = mapOf(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to endpoint)
-
-        val serde = SpecificAvroSerde<Owner>()
-        serde.configure(serdeConfig, false)
-        serde
-    }
-
-    private val commandResponseSerde: SpecificAvroSerde<CommandResponse> by lazy {
-
-        val serdeConfig = mapOf(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG to endpoint)
-
-        val serde = SpecificAvroSerde<CommandResponse>()
-        serde.configure(serdeConfig, false)
-        serde
-    }
+    private val ownerSerde: SpecificAvroSerde<Owner> by lazy(createSerdeWithAvroRegistry(endpoint))
+    private val commandResponseSerde: SpecificAvroSerde<CommandResponse> by lazy(createSerdeWithAvroRegistry(endpoint))
 
     @StreamListener
     fun processCommands(
