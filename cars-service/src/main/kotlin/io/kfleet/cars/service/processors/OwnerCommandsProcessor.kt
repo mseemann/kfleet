@@ -1,13 +1,11 @@
 package io.kfleet.cars.service.processors
 
-import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.createSerdeWithAvroRegistry
-import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.common.utils.Bytes
@@ -21,8 +19,7 @@ import org.springframework.cloud.stream.annotation.Input
 import org.springframework.cloud.stream.annotation.StreamListener
 import java.time.Duration
 
-private val log = KotlinLogging.logger {}
-
+data class CommandAndOwner(val command: CreateOwnerCommand, val owner: Owner?)
 
 interface OwnerCommandsProcessorBinding {
 
@@ -50,8 +47,8 @@ interface OwnerCommandsProcessorBinding {
 @EnableBinding(OwnerCommandsProcessorBinding::class)
 class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-client.endpoint}") val endpoint: String) {
 
-    private val ownerSerde: SpecificAvroSerde<Owner> by lazy(createSerdeWithAvroRegistry(endpoint))
-    private val commandResponseSerde: SpecificAvroSerde<CommandResponse> by lazy(createSerdeWithAvroRegistry(endpoint))
+    private val ownerSerde by lazy { createSerdeWithAvroRegistry<Owner>(endpoint)() }
+    private val commandResponseSerde by lazy { createSerdeWithAvroRegistry<CommandResponse>(endpoint)() }
 
     @StreamListener
     fun processCommands(
@@ -72,60 +69,52 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
         unknownOwnerCommands.to(OwnerCommandsProcessorBinding.UNKNOW_COMMANDS)
 
         val joinedStream = createOwnerCommands
-                .leftJoin(ownerTable) { event, owner -> Pair(event, owner) }
+                .leftJoin(ownerTable) { command, owner -> CommandAndOwner(command = command as CreateOwnerCommand, owner = owner) }
 
         val (createOwnerStream, ownerNotCreatedStream) = joinedStream
                 .branch(
-                        Predicate<String, Pair<SpecificRecord, Owner?>> { _, value -> value.second == null },
-                        Predicate<String, Pair<SpecificRecord, Owner?>> { _, value -> value.second !== null }
+                        Predicate<String, CommandAndOwner> { _, value -> value.owner == null },
+                        Predicate<String, CommandAndOwner> { _, value -> value.owner !== null }
                 )
 
         createOwnerStream
-                .peek { _, _ -> log.debug { "create a new owner" } }
                 .map { key, value ->
-                    val event = value.first as CreateOwnerCommand
                     val owner = Owner.newBuilder().apply {
                         id = key
-                        name = event.getName()
+                        name = value.command.getName()
                     }.build()
                     KeyValue(key, owner)
                 }
                 .to(OwnerCommandsProcessorBinding.OWNSERS)
 
         createOwnerStream
-                .peek { _, _ -> log.debug { "owner created event created" } }
                 .map { key, value ->
-                    val event = value.first as CreateOwnerCommand
                     val ownerCreatedEvents = OwnerCreatedEvent.newBuilder().apply {
-                        ownerId = event.getOwnerId()
-                        name = event.getName()
+                        ownerId = value.command.getOwnerId()
+                        name = value.command.getName()
                     }.build()
                     KeyValue(key, ownerCreatedEvents)
                 }
                 .to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
 
         createOwnerStream
-                .peek { _, _ -> log.debug { "owner created succees command created" } }
                 .map { _, value ->
-                    val event = value.first as CreateOwnerCommand
                     val response = CommandResponse.newBuilder().apply {
-                        commandId = event.getCommandId()
+                        commandId = value.command.getCommandId()
                         status = CommandStatus.SUCCEEDED
                     }.build()
-                    KeyValue(event.getCommandId(), response)
+                    KeyValue(value.command.getCommandId(), response)
                 }
                 .to(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE)
 
         ownerNotCreatedStream
-                .peek { _, _ -> log.debug { "owner created reject command created" } }
                 .map { key, value ->
-                    val event = value.first as CreateOwnerCommand
                     val response = CommandResponse.newBuilder().apply {
-                        commandId = event.getCommandId()
+                        commandId = value.command.getCommandId()
                         status = CommandStatus.REJECTED
                         reason = "Owner with id $key already exists"
                     }.build()
-                    KeyValue(event.getCommandId(), response)
+                    KeyValue(value.command.getCommandId(), response)
                 }
                 .to(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE)
 
@@ -141,18 +130,9 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
                         .withKeySerde(Serdes.String())
                         .withValueSerde(ownerSerde)
 
-        val ownerTable: KTable<String, Owner> = ownersStream
-                .peek { key, value ->
-                    log.debug { "process owner from ownerstream: $key -> $value -> ${value.javaClass}" }
-                }
+        return ownersStream
                 .groupByKey(Serialized.with(Serdes.String(), ownerSerde))
                 .reduce({ _, y -> y }, ownerStateStore)
-
-        ownerTable.toStream().peek { key, value ->
-            log.debug { "owner-table steam: $key -> $value -> ${value.javaClass}" }
-        }
-
-        return ownerTable
     }
 
     private fun createOwnerCommandResponseWindowedTable(commandResponseStream: KStream<String, CommandResponse>) {
@@ -164,14 +144,10 @@ class OwnerCommandsProcessor(@Value("\${spring.cloud.stream.schema-registry-clie
                         .withLoggingEnabled(emptyMap())
                         .withCachingEnabled()
 
-        val responseTable: KTable<Windowed<String>, CommandResponse> = commandResponseStream
+        commandResponseStream
                 .groupByKey()
                 .windowedBy(TimeWindows.of(Duration.ofMinutes(60).toMillis()))
                 .reduce({ _, y -> y }, commandResponseWindwedStateStore)
-
-        responseTable.toStream().peek { key, value ->
-            log.debug { "responseTable steam: $key -> $value -> ${value.javaClass}" }
-        }
     }
 }
 
