@@ -13,7 +13,7 @@ const val COMMAND_RESPONSE_RPC = "command-response-rpc"
 
 @RestController
 @RequestMapping("/$COMMAND_RESPONSE_RPC")
-class CommandsResponseLocalRpcService(@Autowired val commandResponseRepository: ICommandResponseLocalRepository) {
+class CommandsResponseLocalRpcService(@Autowired private val commandResponseRepository: ICommandResponseLocalRepository) {
 
     @GetMapping("/{commandId}")
     fun ownerById(@PathVariable("commandId") commandId: String) = commandResponseRepository

@@ -5,7 +5,7 @@ import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.cars.service.processors.CommandAndOwner
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.expect
@@ -18,7 +18,6 @@ class OwnerPorcessorTest {
 
     @Test
     fun createOwnerRejectedTest() {
-
         val ownerId = "1"
 
         val command = CreateOwnerCommand.newBuilder().apply {

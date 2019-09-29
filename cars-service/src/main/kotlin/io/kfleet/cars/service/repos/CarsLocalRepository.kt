@@ -19,7 +19,7 @@ interface ICarsLocalRepository {
 }
 
 @Repository
-class CarsLocalRepository(@Autowired val interactiveQueryService: InteractiveQueryService) : ICarsLocalRepository {
+class CarsLocalRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) : ICarsLocalRepository {
 
     override fun findByIdLocal(id: String): Mono<Car> {
         return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))

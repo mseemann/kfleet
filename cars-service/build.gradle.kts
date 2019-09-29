@@ -38,11 +38,12 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")
     }
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("org.springframework.cloud:spring-cloud-stream-test-support")
+    testImplementation("org.springframework.cloud:spring-cloud-stream-test-support") {
+        exclude(module = "junit")
+    }
     testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.1")
 }
 
 dependencyManagement {
@@ -54,4 +55,3 @@ dependencyManagement {
 avro {
 
 }
-

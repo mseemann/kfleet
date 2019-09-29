@@ -17,7 +17,7 @@ interface ICommandResponseLocalRepository {
 
 @Repository
 class CommandResponseLocalRepository(
-        @Autowired val interactiveQueryService: InteractiveQueryService) : ICommandResponseLocalRepository {
+        @Autowired private val interactiveQueryService: InteractiveQueryService) : ICommandResponseLocalRepository {
 
 
     override fun findByIdLocal(commandId: String): Mono<CommandResponse> {

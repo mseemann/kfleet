@@ -38,8 +38,8 @@ interface OwnersBindings {
 @Repository
 @EnableBinding(OwnersBindings::class)
 class OwnerRepository(
-        @Autowired @Output(OwnersBindings.OWNER_COMMANDS) val outputOwnerCommands: MessageChannel,
-        @Autowired val interactiveQueryService: InteractiveQueryService) : IOwnerRepository {
+        @Autowired @Output(OwnersBindings.OWNER_COMMANDS) private val outputOwnerCommands: MessageChannel,
+        @Autowired private val interactiveQueryService: InteractiveQueryService) : IOwnerRepository {
 
 
     override fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {

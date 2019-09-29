@@ -16,7 +16,7 @@ const val CARS_RPC = "cars-rpc"
 
 @RestController
 @RequestMapping("/$CARS_RPC")
-class CarsLocalRpcService(@Autowired val carsRepository: ICarsLocalRepository) {
+class CarsLocalRpcService(@Autowired private val carsRepository: ICarsLocalRepository) {
 
     @GetMapping()
     fun cars(): Flux<Car> = carsRepository

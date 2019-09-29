@@ -16,7 +16,7 @@ interface ICommandsResponseRepositroy {
 }
 
 @Repository
-class CommandsResponseRepository(@Autowired val interactiveQueryService: InteractiveQueryService) : ICommandsResponseRepositroy {
+class CommandsResponseRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) : ICommandsResponseRepositroy {
 
     override fun findCommandResponse(commandId: String): Mono<CommandResponse> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE, commandId, StringSerializer())

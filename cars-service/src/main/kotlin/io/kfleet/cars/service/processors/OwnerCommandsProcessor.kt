@@ -50,8 +50,8 @@ interface OwnerCommandsProcessorBinding {
 
 @EnableBinding(OwnerCommandsProcessorBinding::class)
 class OwnerCommandsProcessor(
-        @Value("\${spring.cloud.stream.schema-registry-client.endpoint}") val endpoint: String,
-        @Autowired val ownerProcessor: OwnerProcessor) {
+        @Value("\${spring.cloud.stream.schema-registry-client.endpoint}") private val endpoint: String,
+        @Autowired private val ownerProcessor: OwnerProcessor) {
 
     private val ownerSerde by lazy { createSerdeWithAvroRegistry<Owner>(endpoint)() }
     private val commandResponseSerde by lazy { createSerdeWithAvroRegistry<CommandResponse>(endpoint)() }

@@ -16,7 +16,7 @@ interface IOwnerLocalRepository {
 
 @Repository
 class OwnerLocalRepository(
-        @Autowired val interactiveQueryService: InteractiveQueryService) : IOwnerLocalRepository {
+        @Autowired private val interactiveQueryService: InteractiveQueryService) : IOwnerLocalRepository {
 
     override fun findByIdLocal(ownerId: String): Mono<Owner> {
         return ownerStore().get(ownerId)?.toMono() ?: Mono.error(Exception("owner with id: $ownerId not found"))

@@ -28,9 +28,9 @@ interface ICarsRepository {
 
 @Repository
 class CarsRepository(
-        @Autowired val interactiveQueryService: InteractiveQueryService,
-        @Autowired val mapper: ObjectMapper,
-        @Autowired val context: ApplicationContext
+        @Autowired private val interactiveQueryService: InteractiveQueryService,
+        @Autowired private val mapper: ObjectMapper,
+        @Autowired private val context: ApplicationContext
 ) : ICarsRepository {
 
     override fun findAllCars(): Flux<Car> {

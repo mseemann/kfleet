@@ -1,6 +1,5 @@
 package io.kfleet.cars.service.web
 
-import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.repos.CreateOwnerParams
 import io.kfleet.cars.service.repos.ICommandsResponseRepositroy
 import io.kfleet.cars.service.repos.IOwnerRepository
@@ -9,30 +8,30 @@ import io.kfleet.common.customRetry
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.http.MediaType
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import java.time.Duration
 
 private val log = KotlinLogging.logger {}
 
-
-@RestController
-@RequestMapping("/owners")
+@Component
 class OwnerService(
-        @Autowired val ownerRepository: IOwnerRepository,
-        @Autowired val commandsResponseRepository: ICommandsResponseRepositroy) {
+        @Autowired private val ownerRepository: IOwnerRepository,
+        @Autowired private val commandsResponseRepository: ICommandsResponseRepositroy) {
 
 
     // The client is responsible to create a globally unique id (for example a uuid).
     // Post is used to state that this operation is not idempotent. If something
-    // goes wrong the client can query for the owneid later and check if the owner
+    // goes wrong the client can query for the ownerid later and check if the owner
     // is created or not. In most cases this call will return the created owner.
-    @PostMapping("/{ownerId}/{ownerName}")
-    fun createOwner(
-            @PathVariable("ownerId") ownerId: String,
-            @PathVariable("ownerName") ownerName: String): Mono<ResponseEntity<out Any>> {
+    fun createOwner(request: ServerRequest): Mono<ServerResponse> {
+        val ownerId = request.pathVariable("ownerId")
+        val ownerName = request.pathVariable("ownerName")
 
         return Mono.just(CreateOwnerParams(ownerId.trim(), ownerName.trim()))
                 .flatMap { validate(it) }
@@ -45,37 +44,45 @@ class OwnerService(
                 }
                 .flatMap {
                     if (it.getStatus() == CommandStatus.REJECTED) {
-                        Mono.just(ResponseEntity(it.getReason(), HttpStatus.BAD_REQUEST))
+                        ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
                     } else {
                         ownerRepository
                                 .findById(it.getRessourceId())
                                 .customRetry()
                                 .flatMap {
-                                    Mono.just(ResponseEntity(it, HttpStatus.CREATED))
+                                    ServerResponse
+                                            .status(HttpStatus.CREATED)
+                                            .contentType(MediaType.APPLICATION_JSON)
+                                            .body(BodyInserters.fromObject(it))
                                 }
                     }
                 }
                 .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
-                    e.message?.let { Mono.just(ResponseEntity(it, HttpStatus.BAD_REQUEST)) }
-                            ?: Mono.just(ResponseEntity("unknown", HttpStatus.BAD_REQUEST))
+                    ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
                 }
                 .subscribeOn(Schedulers.elastic())
-
     }
 
     // The update ownerName is idempotent - so PUT is used. There is no optimistic locking
     // the owner is cahnged in any case. The last received update command "winns" the game.
-    @PutMapping("/{ownerId}/{ownerName}")
-    fun updateOwnersName(@PathVariable ownerId: String, @PathVariable ownerName: String) {
+    fun updateOwnersName(request: ServerRequest): Mono<ServerResponse> {
 
+        return ServerResponse.noContent().build()
     }
 
-    @GetMapping("/{id}")
-    fun ownerById(@PathVariable("id") id: String): Mono<ResponseEntity<Owner>> = ownerRepository
-            .findById(id)
-            .customRetry()
-            .map { ResponseEntity(it, HttpStatus.OK) }
-            .onErrorResume { Mono.just(ResponseEntity(HttpStatus.NOT_FOUND)) }
-            .subscribeOn(Schedulers.elastic())
+    fun ownerById(request: ServerRequest): Mono<ServerResponse> {
+        val id = request.pathVariable("id")
 
+        return ownerRepository
+                .findById(id)
+                .customRetry()
+                .flatMap {
+                    ServerResponse
+                            .ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(BodyInserters.fromObject(it))
+                }
+                .onErrorResume { ServerResponse.notFound().build() }
+                .subscribeOn(Schedulers.elastic())
+    }
 }
