@@ -4,6 +4,7 @@
   "name" : "CommandResponse",
   "fields" : [
     {"name": "commandId", "type": "string"},
+    {"name": "ressourceId", "type": ["null", "string"]},
     {"name": "status", "type": {"name": "CommandStatus", "type": "enum", "symbols": ["SUCCEEDED", "REJECTED"]}},
     {"name": "reason", "type": ["null", "string"], "default": null}
   ]

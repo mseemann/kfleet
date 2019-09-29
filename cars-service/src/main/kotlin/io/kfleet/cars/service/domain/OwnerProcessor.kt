@@ -25,6 +25,7 @@ class OwnerProcessor {
 
             val response = CommandResponse.newBuilder().apply {
                 commandId = command.getCommandId()
+                ressourceId = null
                 status = CommandStatus.REJECTED
                 reason = "Owner with id $ownerId already exists"
             }.build()
@@ -46,6 +47,7 @@ class OwnerProcessor {
 
             val response = CommandResponse.newBuilder().apply {
                 commandId = command.getCommandId()
+                ressourceId = ownerId
                 status = CommandStatus.SUCCEEDED
             }.build()
             result.add(KeyValue(command.getCommandId(), response))

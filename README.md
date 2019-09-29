@@ -61,6 +61,7 @@ docker run --tty \
 
 [3] [A CQRS and ES deep dive](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591577(v=pandp.10)?redirectedfrom=MSDN)
 
+[4] [Every Company is Becoming ~~a~~ Software ~~Company~~](https://www.confluent.io/blog/every-company-is-becoming-software)
 ### Thoughts and findings
 - *In domain-driven design (DDD), an aggregate defines a consistency boundary" [3]
 - "Both the sender and the receiver of a command should be in the same bounded context. You should not send a command to another bounded context because you would be instructing that other bounded context, which has separate responsibilities in another consistency boundary, to perform some work for you." [3]

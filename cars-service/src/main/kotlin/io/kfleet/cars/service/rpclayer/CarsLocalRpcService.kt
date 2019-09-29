@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 
 
 const val CARS_RPC = "cars-rpc"
@@ -18,11 +19,17 @@ const val CARS_RPC = "cars-rpc"
 class CarsLocalRpcService(@Autowired val carsRepository: ICarsLocalRepository) {
 
     @GetMapping()
-    fun cars(): Flux<Car> = carsRepository.findAllCarsLocal()
+    fun cars(): Flux<Car> = carsRepository
+            .findAllCarsLocal()
+            .subscribeOn(Schedulers.elastic())
 
     @GetMapping("/{id}")
-    fun carById(@PathVariable("id") id: String): Mono<Car> = carsRepository.findByIdLocal(id)
+    fun carById(@PathVariable("id") id: String): Mono<Car> = carsRepository
+            .findByIdLocal(id)
+            .subscribeOn(Schedulers.elastic())
 
     @GetMapping("/stats")
-    fun carsStateCount(): Mono<Map<String, Long>> = carsRepository.getLocalCarsStateCounts()
+    fun carsStateCount(): Mono<Map<String, Long>> = carsRepository
+            .getLocalCarsStateCounts()
+            .subscribeOn(Schedulers.elastic())
 }

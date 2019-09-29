@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.scheduler.Schedulers
 
 
 const val COMMAND_RESPONSE_RPC = "command-response-rpc"
@@ -15,7 +16,8 @@ const val COMMAND_RESPONSE_RPC = "command-response-rpc"
 class CommandsResponseLocalRpcService(@Autowired val commandResponseRepository: ICommandResponseLocalRepository) {
 
     @GetMapping("/{commandId}")
-    fun ownerById(@PathVariable("commandId") commandId: String) = commandResponseRepository.findByIdLocal(commandId)
-
+    fun ownerById(@PathVariable("commandId") commandId: String) = commandResponseRepository
+            .findByIdLocal(commandId)
+            .subscribeOn(Schedulers.elastic())
 
 }

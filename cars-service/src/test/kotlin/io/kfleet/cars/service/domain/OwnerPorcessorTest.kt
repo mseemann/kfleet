@@ -37,6 +37,7 @@ class OwnerPorcessorTest {
         expect(1, { result.count() })
         expect(ownerId, { result[0].key })
         expect(CommandStatus.REJECTED, { (result[0].value as CommandResponse).getStatus() })
+        assertNull((result[0].value as CommandResponse).getRessourceId())
         expect("Owner with id $ownerId already exists", { (result[0].value as CommandResponse).getReason() })
     }
 
@@ -67,6 +68,7 @@ class OwnerPorcessorTest {
         val commandKv = result.filter { it.value is CommandResponse }
         assertNotEquals(ownerId, commandKv[0].key)
         expect(CommandStatus.SUCCEEDED, { (commandKv[0].value as CommandResponse).getStatus() })
+        expect(ownerId, { (commandKv[0].value as CommandResponse).getRessourceId() })
         assertNull((commandKv[0].value as CommandResponse).getReason())
 
         val eventKv = result.filter { it.value is OwnerCreatedEvent }

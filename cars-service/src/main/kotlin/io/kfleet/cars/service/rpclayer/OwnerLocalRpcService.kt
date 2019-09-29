@@ -15,7 +15,8 @@ const val OWNER_RPC = "owner-rpc"
 class OwnerLocalRpcService(@Autowired val ownerRepository: IOwnerLocalRepository) {
 
     @GetMapping("/{ownerId}")
-    fun ownerById(@PathVariable("ownerId") ownerId: String) = ownerRepository.findByIdLocal(ownerId)
+    fun ownerById(@PathVariable("ownerId") ownerId: String) = ownerRepository
+            .findByIdLocal(ownerId)
 
 
 }

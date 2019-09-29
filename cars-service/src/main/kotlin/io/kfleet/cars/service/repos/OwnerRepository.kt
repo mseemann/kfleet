@@ -64,5 +64,5 @@ class OwnerRepository(
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
         return createWebClient(hostInfo).get().uri("/$OWNER_RPC/$ownerId").retrieve().bodyToMono(Owner::class.java)
     }
-    
+
 }
