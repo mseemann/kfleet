@@ -1,6 +1,7 @@
 # kfleet
 A technology preview how to manage a fleet of autonomous vehicles with Kafka
 
+[![CircleCI](https://circleci.com/gh/mseemann/kfleet/tree/master.svg?style=shield)](https://circleci.com/gh/mseemann/kfleet/tree/master)
 
 get insights from kafka:
 
