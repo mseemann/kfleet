@@ -32,7 +32,7 @@ class OwnerService(
         return Mono.just(CreateOwnerParams(ownerId = ownerId.trim(), ownerName = ownerName.trim()))
                 .flatMap { validate(it) }
                 .flatMap { ownerRepository.submitCreateOwnerCommand(it) }
-                .delayElement(Duration.ofMillis(100))
+                .delayElement(Duration.ofMillis(200))
                 .flatMap {
                     commandsResponseRepository
                             .findCommandResponse(it.getCommandId())
