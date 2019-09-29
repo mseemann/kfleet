@@ -12,7 +12,6 @@ extra["springCloudVersion"] = "Greenwich.SR2"
 
 repositories {
     jcenter()
-    maven(url = "http://packages.confluent.io/maven/")
 }
 
 dependencies {

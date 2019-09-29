@@ -14,6 +14,7 @@ allprojects {
 
     repositories {
         jcenter()
+        maven(url = "http://packages.confluent.io/maven/")
     }
 
     tasks.withType<KotlinCompile> {

@@ -11,7 +11,6 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     jcenter()
-    maven(url = "http://packages.confluent.io/maven/")
 }
 
 extra["springCloudVersion"] = "Greenwich.SR2"
