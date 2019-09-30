@@ -1,6 +1,4 @@
 plugins {
-    // Apply the Kotlin JVM plugin to add support for Kotlin on the JVM.
-    kotlin("jvm")
     id("org.springframework.boot") version "2.1.7.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
@@ -8,10 +6,6 @@ plugins {
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
-
-repositories {
-    jcenter()
-}
 
 extra["springCloudVersion"] = "Greenwich.SR2"
 
@@ -41,9 +35,7 @@ dependencies {
     testImplementation("org.springframework.cloud:spring-cloud-stream-test-support") {
         exclude(module = "junit")
     }
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.1")
+
 }
 
 dependencyManagement {

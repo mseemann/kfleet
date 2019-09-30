@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     base
-    kotlin("jvm") version "1.3.50" apply false
+    kotlin("jvm") version "1.3.50"
 }
 
 
@@ -24,13 +24,24 @@ allprojects {
         }
     }
 
+}
+
+subprojects {
+
+    apply(plugin = "kotlin")
+    
+    dependencies {
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.1")
+    }
+
     tasks.withType<Test> {
         useJUnitPlatform()
         testLogging {
             events("passed", "skipped", "failed")
         }
     }
-
 }
 
 dependencies {
