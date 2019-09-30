@@ -3,10 +3,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     base
     kotlin("jvm") version "1.3.50"
+    jacoco
 }
 
 
 allprojects {
+
+    apply(plugin = "jacoco")
 
     group = "org.gradle.kotlin.dsl.samples.multiproject"
 
@@ -42,6 +45,16 @@ subprojects {
             events("passed", "skipped", "failed")
         }
     }
+
+    tasks.jacocoTestReport {
+        reports {
+            xml.isEnabled = false
+            csv.isEnabled = false
+            html.isEnabled = true
+            html.destination = file("$buildDir/reports/coverage")
+        }
+    }
+
 }
 
 dependencies {

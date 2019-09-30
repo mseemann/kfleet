@@ -3,6 +3,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
     id("com.commercehub.gradle.plugin.avro") version "0.17.0"
+    jacoco
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
@@ -47,3 +48,4 @@ dependencyManagement {
 avro {
 
 }
+

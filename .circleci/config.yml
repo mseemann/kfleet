@@ -25,4 +25,4 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
-      - run: gradle test
+      - run: gradle test jacocoTestReport
