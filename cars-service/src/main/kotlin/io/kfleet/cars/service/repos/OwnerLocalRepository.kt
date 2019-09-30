@@ -10,15 +10,12 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 
-interface IOwnerLocalRepository {
-    fun findByIdLocal(ownerId: String): Mono<Owner>
-}
 
 @Repository
 class OwnerLocalRepository(
-        @Autowired private val interactiveQueryService: InteractiveQueryService) : IOwnerLocalRepository {
+        @Autowired private val interactiveQueryService: InteractiveQueryService) {
 
-    override fun findByIdLocal(ownerId: String): Mono<Owner> {
+    fun findByIdLocal(ownerId: String): Mono<Owner> {
         return ownerStore().get(ownerId)?.toMono() ?: Mono.error(Exception("owner with id: $ownerId not found"))
     }
 

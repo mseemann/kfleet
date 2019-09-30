@@ -1,7 +1,7 @@
 package io.kfleet.cars.service.web
 
 import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.repos.ICarsRepository
+import io.kfleet.cars.service.repos.CarsRepository
 import io.kfleet.common.customRetry
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +19,7 @@ private val log = KotlinLogging.logger {}
 
 @RestController
 @RequestMapping("/cars")
-class CarsService(@Autowired private val carsRepository: ICarsRepository) {
+class CarsService(@Autowired private val carsRepository: CarsRepository) {
 
     @GetMapping()
     fun cars(): Flux<Car> = carsRepository

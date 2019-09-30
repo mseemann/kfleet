@@ -19,21 +19,15 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 
-interface ICarsRepository {
-    fun findAllCars(): Flux<Car>
-    fun findById(id: String): Mono<Car>
-    fun getCarsStateCounts(): Mono<Map<String, Long>>
-}
-
 
 @Repository
 class CarsRepository(
         @Autowired private val interactiveQueryService: InteractiveQueryService,
         @Autowired private val mapper: ObjectMapper,
         @Autowired private val context: ApplicationContext
-) : ICarsRepository {
+) {
 
-    override fun findAllCars(): Flux<Car> {
+    fun findAllCars(): Flux<Car> {
         return getStreamMetaData()
                 .map {
                     createWebClient(it.hostInfo()).get().uri("/$CARS_RPC/").retrieve().bodyToFlux(Car::class.java)
@@ -42,13 +36,13 @@ class CarsRepository(
     }
 
 
-    override fun findById(id: String): Mono<Car> {
+    fun findById(id: String): Mono<Car> {
         val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
         return createWebClient(hostInfo).get().uri("/$CARS_RPC/$id").retrieve().bodyToMono(Car::class.java)
     }
 
 
-    override fun getCarsStateCounts(): Mono<Map<String, Long>> {
+    fun getCarsStateCounts(): Mono<Map<String, Long>> {
         return getStreamMetaData()
                 .map {
                     createWebClient(it.hostInfo()).get().uri("/$CARS_RPC/stats")

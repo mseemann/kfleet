@@ -12,26 +12,20 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 
-interface ICarsLocalRepository {
-    fun findByIdLocal(id: String): Mono<Car>
-    fun findAllCarsLocal(): Flux<Car>
-    fun getLocalCarsStateCounts(): Mono<Map<String, Long>>
-}
-
 @Repository
-class CarsLocalRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) : ICarsLocalRepository {
+class CarsLocalRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) {
 
-    override fun findByIdLocal(id: String): Mono<Car> {
+    fun findByIdLocal(id: String): Mono<Car> {
         return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))
     }
 
-    override fun findAllCarsLocal(): Flux<Car> {
+    fun findAllCarsLocal(): Flux<Car> {
         return carsStore().all().use {
             it.asSequence().map { kv -> kv.value }.toList().toFlux()
         }
     }
 
-    override fun getLocalCarsStateCounts(): Mono<Map<String, Long>> {
+    fun getLocalCarsStateCounts(): Mono<Map<String, Long>> {
         return carStateStore().all().use { allCars ->
             allCars.asSequence().map { it.key to it.value }.toMap()
         }.toMono()

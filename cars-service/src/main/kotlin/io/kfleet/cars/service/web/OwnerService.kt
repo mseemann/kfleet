@@ -1,8 +1,8 @@
 package io.kfleet.cars.service.web
 
+import io.kfleet.cars.service.repos.CommandsResponseRepository
 import io.kfleet.cars.service.repos.CreateOwnerParams
-import io.kfleet.cars.service.repos.ICommandsResponseRepositroy
-import io.kfleet.cars.service.repos.IOwnerRepository
+import io.kfleet.cars.service.repos.OwnerRepository
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import mu.KotlinLogging
@@ -21,13 +21,13 @@ private val log = KotlinLogging.logger {}
 
 @Component
 class OwnerService(
-        @Autowired private val ownerRepository: IOwnerRepository,
-        @Autowired private val commandsResponseRepository: ICommandsResponseRepositroy) {
+        @Autowired private val ownerRepository: OwnerRepository,
+        @Autowired private val commandsResponseRepository: CommandsResponseRepository) {
 
 
     // The client is responsible to create a globally unique id (for example a uuid).
     // Post is used to state that this operation is not idempotent. If something
-    // goes wrong the client can query for the ownerid later and check if the owner
+    // goes wrong the client can query for the ownerid late and check if the owner
     // is created or not. In most cases this call will return the created owner.
     fun createOwner(request: ServerRequest): Mono<ServerResponse> {
         val ownerId = request.pathVariable("ownerId")

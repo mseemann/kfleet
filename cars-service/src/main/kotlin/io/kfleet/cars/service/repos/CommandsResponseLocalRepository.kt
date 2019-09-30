@@ -11,16 +11,13 @@ import reactor.core.publisher.Mono
 import java.time.Duration
 import java.time.Instant
 
-interface ICommandResponseLocalRepository {
-    fun findByIdLocal(commandId: String): Mono<CommandResponse>
-}
 
 @Repository
 class CommandResponseLocalRepository(
-        @Autowired private val interactiveQueryService: InteractiveQueryService) : ICommandResponseLocalRepository {
+        @Autowired private val interactiveQueryService: InteractiveQueryService) {
 
 
-    override fun findByIdLocal(commandId: String): Mono<CommandResponse> {
+    fun findByIdLocal(commandId: String): Mono<CommandResponse> {
 
         val timeTo = Instant.now()
         val timeFrom = timeTo.minusMillis(Duration.ofHours(1).toMillis())

@@ -1,6 +1,7 @@
 package io.kfleet.cars.service.rpclayer
 
-import io.kfleet.cars.service.repos.IOwnerLocalRepository
+
+import io.kfleet.cars.service.repos.OwnerLocalRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
@@ -13,7 +14,7 @@ import reactor.core.scheduler.Schedulers
 const val OWNER_RPC = "owner-rpc"
 
 @Component
-class OwnerLocalRpcService(@Autowired private val ownerRepository: IOwnerLocalRepository) {
+class OwnerLocalRpcService(@Autowired private val ownerRepository: OwnerLocalRepository) {
 
     fun ownerById(request: ServerRequest): Mono<ServerResponse> {
         val ownerId = request.pathVariable("ownerId")

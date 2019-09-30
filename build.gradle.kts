@@ -29,7 +29,7 @@ allprojects {
 subprojects {
 
     apply(plugin = "kotlin")
-    
+
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
         testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")

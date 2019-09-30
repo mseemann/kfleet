@@ -10,15 +10,10 @@ import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQuerySer
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
 
-
-interface ICommandsResponseRepositroy {
-    fun findCommandResponse(commandId: String): Mono<CommandResponse>
-}
-
 @Repository
-class CommandsResponseRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) : ICommandsResponseRepositroy {
+class CommandsResponseRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) {
 
-    override fun findCommandResponse(commandId: String): Mono<CommandResponse> {
+    fun findCommandResponse(commandId: String): Mono<CommandResponse> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE, commandId, StringSerializer())
         return createWebClient(hostInfo).get().uri("/$COMMAND_RESPONSE_RPC/$commandId").retrieve().bodyToMono(CommandResponse::class.java)
     }

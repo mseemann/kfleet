@@ -1,7 +1,7 @@
 package io.kfleet.cars.service.rpclayer
 
 import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.repos.ICarsLocalRepository
+import io.kfleet.cars.service.repos.CarsLocalRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,7 +16,7 @@ const val CARS_RPC = "cars-rpc"
 
 @RestController
 @RequestMapping("/$CARS_RPC")
-class CarsLocalRpcService(@Autowired private val carsRepository: ICarsLocalRepository) {
+class CarsLocalRpcService(@Autowired private val carsRepository: CarsLocalRepository) {
 
     @GetMapping()
     fun cars(): Flux<Car> = carsRepository

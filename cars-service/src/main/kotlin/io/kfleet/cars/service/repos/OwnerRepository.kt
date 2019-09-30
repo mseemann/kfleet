@@ -19,11 +19,6 @@ import java.util.*
 
 data class CreateOwnerParams(val ownerId: String, val ownerName: String)
 
-interface IOwnerRepository {
-    fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand>
-    fun findById(ownerId: String): Mono<Owner>
-}
-
 interface OwnersBindings {
 
     companion object {
@@ -39,10 +34,10 @@ interface OwnersBindings {
 @EnableBinding(OwnersBindings::class)
 class OwnerRepository(
         @Autowired @Output(OwnersBindings.OWNER_COMMANDS) private val outputOwnerCommands: MessageChannel,
-        @Autowired private val interactiveQueryService: InteractiveQueryService) : IOwnerRepository {
+        @Autowired private val interactiveQueryService: InteractiveQueryService) {
 
 
-    override fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {
+    fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {
 
         val commandId = UUID.randomUUID().toString()
         val ownerCommand = CreateOwnerCommand(commandId, createOwnerParams.ownerId, createOwnerParams.ownerName)
@@ -60,7 +55,7 @@ class OwnerRepository(
         }
     }
 
-    override fun findById(ownerId: String): Mono<Owner> {
+    fun findById(ownerId: String): Mono<Owner> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
         return createWebClient(hostInfo).get().uri("/$OWNER_RPC/$ownerId").retrieve().bodyToMono(Owner::class.java)
     }
