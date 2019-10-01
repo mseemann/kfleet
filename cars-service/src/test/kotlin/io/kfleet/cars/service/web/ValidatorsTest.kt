@@ -19,12 +19,23 @@ class ValidatorsTest {
     }
 
     @Test
-    fun validateErrorCreateOwnerParams() {
+    fun validateErrorCreateOwnerParamsName() {
         val params = CreateOwnerParams(ownerId = "1", ownerName = "")
 
         StepVerifier.create(validate(params))
                 .expectErrorMatches() {
                     it.message == "ownerName invalid"
+                }
+                .verify()
+    }
+
+    @Test
+    fun validateErrorCreateOwnerParamsId() {
+        val params = CreateOwnerParams(ownerId = "", ownerName = "test")
+
+        StepVerifier.create(validate(params))
+                .expectErrorMatches() {
+                    it.message == "ownerId invalid"
                 }
                 .verify()
     }
