@@ -5,7 +5,6 @@ import io.kfleet.cars.service.repos.CreateOwnerParams
 import io.kfleet.cars.service.repos.OwnerRepository
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
-import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -16,7 +15,6 @@ import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import java.time.Duration
 
-private val log = KotlinLogging.logger {}
 
 @Component
 class OwnerService(

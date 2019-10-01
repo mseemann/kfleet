@@ -40,3 +40,10 @@ object GeoPositionFactory {
     }.build()
 }
 
+object OwnerFactory {
+
+    fun create(id: String, name: String): Owner = Owner.newBuilder().apply {
+        setId(id)
+        setName(name)
+    }.build()
+}

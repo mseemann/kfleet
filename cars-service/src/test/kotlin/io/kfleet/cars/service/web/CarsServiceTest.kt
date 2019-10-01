@@ -64,7 +64,7 @@ class CarsServiceTest {
                 .expectBody(Car::class.java)
                 .returnResult()
 
-        expect(response.responseBody) { car }
+        expect(car) { response.responseBody }
     }
 
     @Test
