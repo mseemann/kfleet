@@ -11,14 +11,8 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.WebTestClient.BodySpec
-import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec
 import reactor.core.publisher.Mono
 import kotlin.test.expect
-
-// see https://youtrack.jetbrains.com/issue/KT-23834
-inline fun <reified B : Any> ResponseSpec.expectBody(): BodySpec<B, *> =
-        expectBody(B::class.java)
 
 @WebFluxTest(OwnerService::class)
 @Import(JacksonObjectMapper::class, OwnerRoutes::class)
@@ -45,7 +39,7 @@ class OwnerServiceTest {
         val response = webClient.get().uri("/owners/1")
                 .exchange()
                 .expectStatus().isOk
-                .expectBody<Owner>()
+                .expectBody(Owner::class.java)
                 .returnResult()
 
         expect(response.responseBody) { owner }
