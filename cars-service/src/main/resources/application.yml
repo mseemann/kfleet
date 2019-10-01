@@ -88,6 +88,9 @@ management.endpoints.web.exposure.include: "*"
 logging.level.org: WARN
 logging.level.io.confluent: WARN
 logging.level.io.kfleet: DEBUG
+logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+logging.level.reactor.netty: INFO
 #logging.level.org.springframework.cloud.stream.binding: DEBUG
+
 
 cars.service.simulation.enabled: false

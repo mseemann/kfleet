@@ -3,10 +3,9 @@ package io.kfleet.cars.service.repos
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
-import io.kfleet.cars.service.rpclayer.OWNER_RPC
+import io.kfleet.cars.service.rpclayer.RPC_OWNER
 import io.kfleet.common.createWebClient
 import org.apache.kafka.common.serialization.StringSerializer
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
@@ -33,8 +32,8 @@ interface OwnersBindings {
 @Repository
 @EnableBinding(OwnersBindings::class)
 class OwnerRepository(
-        @Autowired @Output(OwnersBindings.OWNER_COMMANDS) private val outputOwnerCommands: MessageChannel,
-        @Autowired private val interactiveQueryService: InteractiveQueryService) {
+        @Output(OwnersBindings.OWNER_COMMANDS) private val outputOwnerCommands: MessageChannel,
+        private val interactiveQueryService: InteractiveQueryService) {
 
 
     fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {
@@ -57,7 +56,7 @@ class OwnerRepository(
 
     fun findById(ownerId: String): Mono<Owner> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
-        return createWebClient(hostInfo).get().uri("/$OWNER_RPC/$ownerId").retrieve().bodyToMono(Owner::class.java)
+        return createWebClient(hostInfo).get().uri("$RPC_OWNER/$ownerId").retrieve().bodyToMono(Owner::class.java)
     }
 
 }

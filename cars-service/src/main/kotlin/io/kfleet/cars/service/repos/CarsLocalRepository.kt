@@ -4,7 +4,6 @@ import io.kfleet.cars.service.domain.Car
 import io.kfleet.cars.service.processors.CarStateCountProcessorBinding
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
@@ -13,7 +12,7 @@ import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
 
 @Repository
-class CarsLocalRepository(@Autowired private val interactiveQueryService: InteractiveQueryService) {
+class CarsLocalRepository(private val interactiveQueryService: InteractiveQueryService) {
 
     fun findByIdLocal(id: String): Mono<Car> {
         return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))

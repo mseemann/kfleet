@@ -4,7 +4,6 @@ import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.commands.CommandResponse
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyWindowStore
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Mono
@@ -13,8 +12,7 @@ import java.time.Instant
 
 
 @Repository
-class CommandResponseLocalRepository(
-        @Autowired private val interactiveQueryService: InteractiveQueryService) {
+class CommandResponseLocalRepository(private val interactiveQueryService: InteractiveQueryService) {
 
 
     fun findByIdLocal(commandId: String): Mono<CommandResponse> {

@@ -1,35 +1,41 @@
 package io.kfleet.cars.service.rpclayer
 
-import io.kfleet.cars.service.domain.Car
 import io.kfleet.cars.service.repos.CarsLocalRepository
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Flux
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 
 
-const val CARS_RPC = "cars-rpc"
+@Component
+class CarsLocalRpcService(private val carsRepository: CarsLocalRepository) {
 
-@RestController
-@RequestMapping("/$CARS_RPC")
-class CarsLocalRpcService(@Autowired private val carsRepository: CarsLocalRepository) {
 
-    @GetMapping()
-    fun cars(): Flux<Car> = carsRepository
-            .findAllCarsLocal()
-            .subscribeOn(Schedulers.elastic())
+    fun cars(request: ServerRequest): Mono<ServerResponse> {
+        return carsRepository
+                .findAllCarsLocal()
+                .collectList()
+                .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+                .subscribeOn(Schedulers.elastic())
+    }
 
-    @GetMapping("/{id}")
-    fun carById(@PathVariable("id") id: String): Mono<Car> = carsRepository
-            .findByIdLocal(id)
-            .subscribeOn(Schedulers.elastic())
 
-    @GetMapping("/stats")
-    fun carsStateCount(): Mono<Map<String, Long>> = carsRepository
-            .getLocalCarsStateCounts()
-            .subscribeOn(Schedulers.elastic())
+    fun carById(request: ServerRequest): Mono<ServerResponse> {
+        val id = request.pathVariable("id")
+        return carsRepository
+                .findByIdLocal(id)
+                .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+                .onErrorResume { ServerResponse.notFound().build() }
+                .subscribeOn(Schedulers.elastic())
+    }
+
+
+    fun carsStateCount(request: ServerRequest): Mono<ServerResponse> {
+        return carsRepository
+                .getLocalCarsStateCounts()
+                .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+                .subscribeOn(Schedulers.elastic())
+    }
 }

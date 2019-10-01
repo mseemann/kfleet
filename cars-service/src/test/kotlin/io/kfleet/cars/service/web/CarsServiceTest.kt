@@ -16,7 +16,7 @@ import reactor.core.publisher.Flux
 
 
 @WebFluxTest(CarsService::class)
-@Import(JacksonObjectMapper::class)
+@Import(JacksonObjectMapper::class, CarsRoutes::class)
 class CarsServiceTest {
 
     @Autowired

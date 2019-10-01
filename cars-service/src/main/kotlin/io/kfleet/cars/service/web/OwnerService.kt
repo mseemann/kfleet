@@ -6,7 +6,6 @@ import io.kfleet.cars.service.repos.OwnerRepository
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import mu.KotlinLogging
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -21,8 +20,8 @@ private val log = KotlinLogging.logger {}
 
 @Component
 class OwnerService(
-        @Autowired private val ownerRepository: OwnerRepository,
-        @Autowired private val commandsResponseRepository: CommandsResponseRepository) {
+        private val ownerRepository: OwnerRepository,
+        private val commandsResponseRepository: CommandsResponseRepository) {
 
 
     // The client is responsible to create a globally unique id (for example a uuid).

@@ -1,23 +1,25 @@
 package io.kfleet.cars.service.rpclayer
 
 import io.kfleet.cars.service.repos.CommandResponseLocalRepository
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.reactive.function.server.ServerResponse
+import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 
+@Component
+class CommandsResponseLocalRpcService(
+        private val commandResponseRepository: CommandResponseLocalRepository) {
 
-const val COMMAND_RESPONSE_RPC = "command-response-rpc"
 
-@RestController
-@RequestMapping("/$COMMAND_RESPONSE_RPC")
-class CommandsResponseLocalRpcService(@Autowired private val commandResponseRepository: CommandResponseLocalRepository) {
-
-    @GetMapping("/{commandId}")
-    fun ownerById(@PathVariable("commandId") commandId: String) = commandResponseRepository
-            .findByIdLocal(commandId)
-            .subscribeOn(Schedulers.elastic())
+    fun commandById(request: ServerRequest): Mono<ServerResponse> {
+        val commandId = request.pathVariable("commandId")
+        return commandResponseRepository
+                .findByIdLocal(commandId)
+                .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+                .onErrorResume { ServerResponse.notFound().build() }
+                .subscribeOn(Schedulers.elastic())
+    }
 
 }

@@ -21,7 +21,7 @@ inline fun <reified B : Any> ResponseSpec.expectBody(): BodySpec<B, *> =
         expectBody(B::class.java)
 
 @WebFluxTest(OwnerService::class)
-@Import(JacksonObjectMapper::class, Routes::class)
+@Import(JacksonObjectMapper::class, OwnerRoutes::class)
 class OwnerServiceTest {
 
     @Autowired

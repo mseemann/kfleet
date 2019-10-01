@@ -13,7 +13,6 @@ import org.apache.kafka.common.utils.Bytes
 import org.apache.kafka.streams.kstream.*
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.WindowStore
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Input
@@ -51,7 +50,7 @@ interface OwnerCommandsProcessorBinding {
 @EnableBinding(OwnerCommandsProcessorBinding::class)
 class OwnerCommandsProcessor(
         @Value("\${spring.cloud.stream.schema-registry-client.endpoint}") private val endpoint: String,
-        @Autowired private val ownerProcessor: OwnerProcessor) {
+        private val ownerProcessor: OwnerProcessor) {
 
     private val ownerSerde by lazy { createSerdeWithAvroRegistry<Owner>(endpoint)() }
     private val commandResponseSerde by lazy { createSerdeWithAvroRegistry<CommandResponse>(endpoint)() }
