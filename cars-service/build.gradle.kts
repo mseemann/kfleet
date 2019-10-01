@@ -36,6 +36,7 @@ dependencies {
     testImplementation("org.springframework.cloud:spring-cloud-stream-test-support") {
         exclude(module = "junit")
     }
+    testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
 
 }
 
