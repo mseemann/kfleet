@@ -6,11 +6,11 @@ import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import mu.KotlinLogging
 import org.apache.kafka.streams.KeyValue
-import org.springframework.stereotype.Service
+import org.springframework.stereotype.Component
 
 private val log = KotlinLogging.logger {}
 
-@Service
+@Component
 class OwnerProcessor {
 
     fun createOwner(ownerId: String, commandAndOwner: CommandAndOwner): MutableList<KeyValue<String, Any>> {

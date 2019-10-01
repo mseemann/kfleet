@@ -9,22 +9,42 @@ const val RPC_CARS = "/rpc/cars"
 const val RPC_COMMAND_RESPONSE = "/rpc/command-response"
 
 @Configuration
-class RpcRoutes(
-        private val ownerLocalRpcService: OwnerLocalRpcService,
-        private val carsLocalRpcService: CarsLocalRpcService,
-        private val commandsResponseRpcService: CommandsResponseLocalRpcService) {
+class OwnerRpcRoutes(private val ownerLocalRpcService: OwnerLocalRpcService) {
 
     @Bean
-    fun rpcLocalApis() = router {
+    fun rpcOwnerLocalApis() = router {
         ("/rpc").nest {
             ("/owner").nest {
                 GET("/{ownerId}", ownerLocalRpcService::ownerById)
             }
+        }
+    }
+
+}
+
+@Configuration
+class CarsRpcRoutes(private val carsLocalRpcService: CarsLocalRpcService) {
+
+    @Bean
+    fun rpcCarsLocalApis() = router {
+        ("/rpc").nest {
             ("/cars").nest {
                 GET("/", carsLocalRpcService::cars)
                 GET("/stats", carsLocalRpcService::carsStateCount)
                 GET("/{id}", carsLocalRpcService::carById)
             }
+        }
+    }
+
+}
+
+@Configuration
+class CommandsResponseRpcRoutes(
+        private val commandsResponseRpcService: CommandsResponseLocalRpcService) {
+
+    @Bean
+    fun rpcCommandResponseLocalApis() = router {
+        ("/rpc").nest {
             ("/command-response").nest {
                 GET("/{commandId}", commandsResponseRpcService::commandById)
             }

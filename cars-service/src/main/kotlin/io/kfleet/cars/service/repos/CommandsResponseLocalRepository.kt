@@ -12,7 +12,7 @@ import java.time.Instant
 
 
 @Repository
-class CommandResponseLocalRepository(private val interactiveQueryService: InteractiveQueryService) {
+class CommandsResponseLocalRepository(private val interactiveQueryService: InteractiveQueryService) {
 
 
     fun findByIdLocal(commandId: String): Mono<CommandResponse> {

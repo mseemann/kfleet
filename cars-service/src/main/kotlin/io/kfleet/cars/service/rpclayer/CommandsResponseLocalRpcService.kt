@@ -1,6 +1,6 @@
 package io.kfleet.cars.service.rpclayer
 
-import io.kfleet.cars.service.repos.CommandResponseLocalRepository
+import io.kfleet.cars.service.repos.CommandsResponseLocalRepository
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -10,7 +10,7 @@ import reactor.core.scheduler.Schedulers
 
 @Component
 class CommandsResponseLocalRpcService(
-        private val commandResponseRepository: CommandResponseLocalRepository) {
+        private val commandResponseRepository: CommandsResponseLocalRepository) {
 
 
     fun commandById(request: ServerRequest): Mono<ServerResponse> {
