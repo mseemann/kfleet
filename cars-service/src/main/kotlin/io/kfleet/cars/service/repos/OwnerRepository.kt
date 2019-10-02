@@ -1,10 +1,10 @@
 package io.kfleet.cars.service.repos
 
+import io.kfleet.cars.service.WebClientUtil
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.cars.service.rpclayer.RPC_OWNER
-import io.kfleet.common.createWebClient
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
@@ -12,11 +12,12 @@ import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQuerySer
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
-import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.util.*
 
 data class CreateOwnerParams(val ownerId: String, val ownerName: String)
+
 
 interface OwnersBindings {
 
@@ -29,12 +30,12 @@ interface OwnersBindings {
 
 }
 
-@Repository
+@Component
 @EnableBinding(OwnersBindings::class)
 class OwnerRepository(
         @Output(OwnersBindings.OWNER_COMMANDS) private val outputOwnerCommands: MessageChannel,
-        private val interactiveQueryService: InteractiveQueryService) {
-
+        private val interactiveQueryService: InteractiveQueryService,
+        private val webClientUtil: WebClientUtil) {
 
     fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {
 
@@ -56,7 +57,7 @@ class OwnerRepository(
 
     fun findById(ownerId: String): Mono<Owner> {
         val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
-        return createWebClient(hostInfo).get().uri("$RPC_OWNER/$ownerId").retrieve().bodyToMono(Owner::class.java)
+        return webClientUtil.doGet(hostInfo, "$RPC_OWNER/$ownerId", Owner::class.java)
     }
 
 }

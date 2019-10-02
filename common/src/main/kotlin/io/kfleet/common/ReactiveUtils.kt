@@ -15,3 +15,4 @@ fun <T> Flux<T>.customRetry(): Flux<T> {
 }
 
 fun createWebClient(hostInfo: HostInfo) = WebClient.create("http://${hostInfo.host()}:${hostInfo.port()}")
+

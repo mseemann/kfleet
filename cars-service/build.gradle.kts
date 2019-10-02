@@ -37,6 +37,7 @@ dependencies {
         exclude(module = "junit")
     }
     testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
 
 }
 
