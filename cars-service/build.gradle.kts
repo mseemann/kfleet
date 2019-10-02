@@ -33,13 +33,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "junit")
     }
-//    testImplementation("org.springframework.cloud:spring-cloud-stream-test-support") {
-//        exclude(module = "junit")
-//    }
+
     testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
-    //testImplementation("org.springframework.kafka:spring-kafka-test")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:junit-jupiter:1.12.2")
-    //testImplementation("org.testcontainers:kafka:1.12.2")
 
 }
 

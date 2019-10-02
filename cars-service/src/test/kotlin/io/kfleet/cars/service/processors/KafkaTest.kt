@@ -29,6 +29,7 @@ class KafkaTest {
 
     @Test
     fun anyTest() {
+        
         StepVerifier.create(repo.submitCreateOwnerCommand(CreateOwnerParams(ownerId = "1", ownerName = "test")))
                 .expectNextMatches { command ->
                     command.getOwnerId() === "1"
