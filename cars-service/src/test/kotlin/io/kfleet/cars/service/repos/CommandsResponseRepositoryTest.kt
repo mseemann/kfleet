@@ -17,7 +17,7 @@ import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 
 
-class CommandResponseRepositoryTest {
+class CommandsResponseRepositoryTest {
 
 
     @Mock

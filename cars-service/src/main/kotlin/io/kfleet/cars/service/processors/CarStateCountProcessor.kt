@@ -32,8 +32,8 @@ class CarStateCountProcessor() {
     @StreamListener
     fun carStateUpdates(@Input(CarStateCountProcessorBinding.CARS) carTable: KTable<String, Car>) {
 
-        carTable.groupBy(
-                { _, car ->
+        carTable
+                .groupBy({ _, car ->
                     KeyValue(car?.getState().toString(), "")
                 }, Serialized.with(Serdes.String(), Serdes.String()))
                 .count(Materialized.`as`(CarStateCountProcessorBinding.CAR_STATE_STORE))
