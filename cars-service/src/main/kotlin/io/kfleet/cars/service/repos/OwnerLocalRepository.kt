@@ -17,7 +17,9 @@ class OwnerLocalRepository(private val interactiveQueryService: InteractiveQuery
         return ownerStore().get(ownerId)?.toMono() ?: Mono.error(Exception("owner with id: $ownerId not found"))
     }
 
-    private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> = interactiveQueryService
-            .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
+    private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> {
+        return interactiveQueryService
+                .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
+    }
 
 }
