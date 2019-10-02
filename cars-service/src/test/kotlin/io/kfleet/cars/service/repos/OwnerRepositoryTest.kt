@@ -51,7 +51,6 @@ class OwnerRepositoryTest {
         val result = ownerRepo.submitCreateOwnerCommand(createOwnerParams)
 
         val returnedCommand = result.block()!!
-        expect(true) { returnedCommand is CreateOwnerCommand }
         expect(createOwnerParams.ownerId) { returnedCommand.getOwnerId() }
         expect(createOwnerParams.ownerName) { returnedCommand.getName() }
 
