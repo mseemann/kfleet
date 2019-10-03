@@ -1,6 +1,7 @@
 package io.kfleet.cars.service.processors
 
 import io.kfleet.cars.service.domain.CarFactory
+import io.kfleet.cars.service.repos.CarsRepository
 import io.kfleet.cars.service.repos.CommandsResponseRepository
 import io.kfleet.cars.service.repos.CreateOwnerParams
 import io.kfleet.cars.service.repos.OwnerRepository
@@ -43,6 +44,9 @@ class KafkaTest {
     @Output(CarsOutBindings.CARS)
     lateinit var carOuputChannel: MessageChannel
 
+    @Autowired
+    lateinit var carsRepository: CarsRepository
+
     @Test
     fun submitCreateOwnerCommand() {
 
@@ -69,6 +73,16 @@ class KafkaTest {
         val sended = carOuputChannel.send(message)
         // this must be always true - because for this output sync is false - e.g. not configured to be sync
         assert(true) { sended }
+
+        // FIXME How to know how mutch time we need to wait - or even better: how to know the
+        // event ist processed
+        Thread.sleep(10000)
+
+        val stats = carsRepository.getCarsStateCounts().block()
+
+        assertNotNull(stats)
+        expect(1) { stats.get(car.getState().toString()) }
+
     }
 }
 
