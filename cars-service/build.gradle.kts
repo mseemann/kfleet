@@ -35,7 +35,7 @@ dependencies {
     }
 
     testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
-    testImplementation("org.springframework.kafka:spring-kafka-test")
+    // testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.testcontainers:junit-jupiter:1.12.2")
 
 }
