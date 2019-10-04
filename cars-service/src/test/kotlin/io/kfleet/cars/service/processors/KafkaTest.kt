@@ -9,6 +9,10 @@ import io.kfleet.cars.service.simulation.CarsOutBindings
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import io.kfleet.common.headers
+import org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.untilAsserted
+import org.awaitility.kotlin.withPollInterval
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +31,7 @@ import org.testcontainers.containers.wait.strategy.Wait
 import java.io.File
 import kotlin.test.assertNotNull
 import kotlin.test.expect
+
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -67,21 +72,24 @@ class KafkaTest {
 
     @Test
     fun submitCar() {
+
+        val stats = carsRepository.getCarsStateCounts().block()
+        assertNotNull(stats)
+        expect(0) { stats.size }
+
         val carId = 1
         val car = CarFactory.createRandom(carId)
         val message = MessageBuilder.createMessage(car, headers(carId))
         val sended = carOuputChannel.send(message)
-        // this must be always true - because for this output sync is false - e.g. not configured to be sync
+        // this must always be true - because for this output sync is false - e.g. not configured to be sync
         assert(true) { sended }
 
-        // FIXME How to know how mutch time we need to wait - or even better: how to know the
-        // event ist processed
-        Thread.sleep(10000)
+        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
 
-        val stats = carsRepository.getCarsStateCounts().block()
+            val statsAfterPushMsg = carsRepository.getCarsStateCounts().block()!!
 
-        assertNotNull(stats)
-        expect(1) { stats.get(car.getState().toString()) }
+            expect(1L) { statsAfterPushMsg.get(car.getState().toString()) }
+        }
 
     }
 }
