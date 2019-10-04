@@ -29,8 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import java.io.File
-import kotlin.test.assertNotNull
-import kotlin.test.expect
+import kotlin.test.*
 
 
 @ExtendWith(SpringExtension::class)
@@ -52,22 +51,68 @@ class KafkaTest {
     @Autowired
     lateinit var carsRepository: CarsRepository
 
+
     @Test
     fun submitCreateOwnerCommand() {
+        val ownerName = "test"
+        val ownerId = "1"
+        val createOwnerParams = CreateOwnerParams(ownerId = ownerId, ownerName = ownerName)
 
-        val command = repo.submitCreateOwnerCommand(CreateOwnerParams(ownerId = "1", ownerName = "test")).block()
-
+        val command = repo.submitCreateOwnerCommand(createOwnerParams).block()
         assertNotNull(command)
-        expect("1") { command.getOwnerId() }
-        expect("test") { command.getName() }
+        expect(ownerId) { command.getOwnerId() }
+        expect(ownerName) { command.getName() }
 
         val commandResponse = commandsResponseRepository
                 .findCommandResponse(command.getCommandId())
                 .customRetry()
                 .block()
-
         assertNotNull(commandResponse)
-        expect(CommandStatus.SUCCEEDED) { commandResponse.getStatus() }
+        assertEquals(CommandStatus.SUCCEEDED, commandResponse.getStatus())
+        assertEquals(ownerId, commandResponse.getRessourceId())
+        assertNotEquals(ownerId, commandResponse.getCommandId())
+
+        val owner = repo
+                .findById(commandResponse.getRessourceId())
+                .customRetry().block()
+        assertNotNull(owner)
+        expect(ownerName) { owner.getName() }
+    }
+
+    @Test
+    fun submitCreateOwnerCommandRejected() {
+        val ownerName = "test2"
+        val ownerId = "2"
+        val createOwnerParams = CreateOwnerParams(ownerId = ownerId, ownerName = ownerName)
+
+        val commandSucceeded = repo.submitCreateOwnerCommand(createOwnerParams).block()
+        assertNotNull(commandSucceeded)
+        println(commandSucceeded)
+
+        // This is a huge problem: it is not sufficient to submit commands with a specific id
+        // it is mandatory to wait for the owner creation process to happen to be safe that
+        // the next command did not create an owner
+        // So we have a todo: reject a second creation command with the same commandId (e.g. the ownerId)
+        val commandResponseSucceeded = commandsResponseRepository
+                .findCommandResponse(commandSucceeded.getCommandId())
+                .customRetry()
+                .block()
+        assertNotNull(commandResponseSucceeded)
+
+        val commandRejected = repo.submitCreateOwnerCommand(createOwnerParams).block()
+        assertNotNull(commandRejected)
+        println(commandRejected)
+
+        val commandResponse = commandsResponseRepository
+                .findCommandResponse(commandRejected.getCommandId())
+                .customRetry()
+                .block()
+        assertNotNull(commandResponse)
+        assertEquals(CommandStatus.REJECTED, commandResponse.getStatus())
+        assertNull(commandResponse.getRessourceId())
+        assertNotEquals(ownerId, commandResponse.getCommandId())
+        assertEquals("Owner with id $ownerId already exists", commandResponse.getReason())
+        
     }
 
     @Test
