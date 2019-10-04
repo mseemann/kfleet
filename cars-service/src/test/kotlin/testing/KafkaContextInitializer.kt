@@ -6,6 +6,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.testcontainers.containers.DockerComposeContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import java.io.File
+import java.time.Duration
 
 class KafkaContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
 
@@ -20,7 +21,9 @@ class KafkaContextInitializer : ApplicationContextInitializer<ConfigurableApplic
     companion object {
         private val instance: KDockerComposeContainer by lazy {
             defineDockerCompose()
-                    .waitingFor("registry", Wait.forHttp("/"))
+                    .waitingFor("registry",
+                            Wait.forHttp("/")
+                                    .withStartupTimeout(Duration.ofMinutes(5)))
         }
 
         class KDockerComposeContainer(file: File) : DockerComposeContainer<KDockerComposeContainer>(file)

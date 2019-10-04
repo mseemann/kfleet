@@ -95,9 +95,16 @@ class OwnerCommandsProcessor(
                         .withKeySerde(Serdes.String())
                         .withValueSerde(ownerSerde)
 
-        return ownersStream
+        val ktable = ownersStream
                 .groupByKey(Serialized.with(Serdes.String(), ownerSerde))
                 .reduce({ _, y -> y }, ownerStateStore)
+
+        ktable.toStream()
+                .foreach { onerID: String, owner: Owner ->
+                    log.debug { "owner in table inserted: $onerID -> $owner" }
+                }
+
+        return ktable
     }
 
     private fun createOwnerCommandResponseWindowedTable(commandResponseStream: KStream<String, CommandResponse>) {

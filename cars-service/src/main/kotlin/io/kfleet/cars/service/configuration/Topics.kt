@@ -9,23 +9,23 @@ import org.springframework.context.annotation.Configuration
 class Topics {
 
     @Bean
-    fun carsTopic() = NewTopic("cars", 3, 1)
+    fun carsTopic() = NewTopic("cars", 3, 3)
 
     @Bean
-    fun carCommandTopic() = NewTopic("car_commands", 3, 1)
+    fun carCommandTopic() = NewTopic("car_commands", 3, 3)
 
     @Bean
-    fun carEventTopic() = NewTopic("car_events", 3, 1)
+    fun carEventTopic() = NewTopic("car_events", 3, 3)
 
     @Bean
-    fun ownerCommandsTopic() = NewTopic("owner_commands", 3, 1)
+    fun ownerCommandsTopic() = NewTopic("owner_commands", 3, 3)
 
     @Bean
-    fun ownerCommandsResponseTopic() = NewTopic("owner_commands_response", 3, 1)
+    fun ownerCommandsResponseTopic() = NewTopic("owner_commands_response", 3, 3)
 
     @Bean
-    fun unknownCommandsTopic() = NewTopic("unknown_owner_commands", 3, 1)
+    fun unknownCommandsTopic() = NewTopic("unknown_owner_commands", 3, 3)
 
     @Bean
-    fun ownersTopic() = NewTopic("owners", 3, 1)
+    fun ownersTopic() = NewTopic("owners", 3, 3)
 }
