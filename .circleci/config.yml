@@ -2,14 +2,12 @@ version: 2
 executorType: machine
 jobs:
   build:
-    #docker:
-    #  - image: circleci/openjdk:8-jdk
-
     working_directory: ~/repo
 
     environment:
       JVM_OPTS: -Xmx3200m
       TERM: dumb
+      ENV: ci
 
     steps:
       - checkout
@@ -26,5 +24,5 @@ jobs:
             - ~/.m2
           key: v1-dependencies-{{ checksum "build.gradle.kts" }}
 
-      - run: ./gradlew test jacocoTestReport
+      - run: ./gradlew test jacocoTestReport --stacktrace
       - run: bash <(curl -s https://codecov.io/bash)

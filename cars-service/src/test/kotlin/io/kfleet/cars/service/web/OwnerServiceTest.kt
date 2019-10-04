@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
+import kotlin.test.assertEquals
 import kotlin.test.expect
 
 @WebFluxTest(OwnerService::class)
@@ -89,9 +90,12 @@ class OwnerServiceTest {
 
     @Test
     fun createOwnerBadRequest() {
-        webClient.post().uri("/owners/1/ ")
+        val result = webClient.post().uri("/owners/1/ ")
                 .exchange()
                 .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+        assertEquals("ownerName invalid", result.responseBody)
     }
 
     @Test

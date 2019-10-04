@@ -14,27 +14,21 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.withPollInterval
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.cloud.stream.annotation.Output
-import org.springframework.context.ApplicationContextInitializer
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.testcontainers.containers.DockerComposeContainer
-import org.testcontainers.containers.wait.strategy.Wait
-import java.io.File
+import testing.KafkaContextInitializer
 import kotlin.test.*
 
-
+@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles("it")
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
 class KafkaTest {
 
@@ -112,7 +106,7 @@ class KafkaTest {
         assertNull(commandResponse.getRessourceId())
         assertNotEquals(ownerId, commandResponse.getCommandId())
         assertEquals("Owner with id $ownerId already exists", commandResponse.getReason())
-        
+
     }
 
     @Test
@@ -140,25 +134,3 @@ class KafkaTest {
 }
 
 
-class KafkaContextInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-
-    override fun initialize(context: ConfigurableApplicationContext) {
-        instance.start()
-        TestPropertyValues.of(
-                "broker-url=${instance}"
-        ).applyTo(context.environment)
-    }
-
-
-    companion object {
-        private val instance: KDockerComposeContainer by lazy {
-            defineDockerCompose()
-                    .waitingFor("registry", Wait.forHttp("/"))
-        }
-
-        class KDockerComposeContainer(file: File) : DockerComposeContainer<KDockerComposeContainer>(file)
-
-        private fun defineDockerCompose() = KDockerComposeContainer(File("./../docker-compose.yml"))
-
-    }
-}
