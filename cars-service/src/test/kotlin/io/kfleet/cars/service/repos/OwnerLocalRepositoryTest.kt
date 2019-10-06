@@ -32,7 +32,7 @@ class OwnerLocalRepositoryTest {
     @Test
     fun findByIdLocal() {
         given(interactiveQService.getQueryableStore<ReadOnlyKeyValueStore<String, Owner>>(
-                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_STORE),
+                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_RW_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 
@@ -52,7 +52,7 @@ class OwnerLocalRepositoryTest {
     @Test
     fun findByIdLocalNotFound() {
         given(interactiveQService.getQueryableStore<ReadOnlyKeyValueStore<String, Owner>>(
-                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_STORE),
+                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_RW_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 

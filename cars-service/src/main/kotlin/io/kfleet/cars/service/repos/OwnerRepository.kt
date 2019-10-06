@@ -56,7 +56,7 @@ class OwnerRepository(
     }
 
     fun findById(ownerId: String): Mono<Owner> {
-        val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_STORE, ownerId, StringSerializer())
+        val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_RW_STORE, ownerId, StringSerializer())
         return webClientUtil.doGet(hostInfo, "$RPC_OWNER/$ownerId", Owner::class.java)
     }
 

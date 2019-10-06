@@ -19,7 +19,7 @@ class OwnerLocalRepository(private val interactiveQueryService: InteractiveQuery
 
     private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> {
         return interactiveQueryService
-                .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
+                .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
     }
 
 }

@@ -87,11 +87,11 @@ class KafkaTest {
         // it is mandatory to wait for the owner creation process to happen to be safe that
         // the next command did not create an owner
         // So we have a todo: reject a second creation command with the same commandId (e.g. the ownerId)
-        val commandResponseSucceeded = commandsResponseRepository
-                .findCommandResponse(commandSucceeded.getCommandId())
-                .customRetry()
-                .block()
-        assertNotNull(commandResponseSucceeded)
+//        val commandResponseSucceeded = commandsResponseRepository
+//                .findCommandResponse(commandSucceeded.getCommandId())
+//                .customRetry()
+//                .block()
+//        assertNotNull(commandResponseSucceeded)
 
         val commandRejected = repo.submitCreateOwnerCommand(createOwnerParams).block()
         assertNotNull(commandRejected)
