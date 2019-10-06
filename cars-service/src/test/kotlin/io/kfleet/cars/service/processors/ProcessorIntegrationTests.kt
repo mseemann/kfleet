@@ -81,21 +81,9 @@ class KafkaTest {
 
         val commandSucceeded = repo.submitCreateOwnerCommand(createOwnerParams).block()
         assertNotNull(commandSucceeded)
-        println(commandSucceeded)
-
-        // This is a huge problem: it is not sufficient to submit commands with a specific id
-        // it is mandatory to wait for the owner creation process to happen to be safe that
-        // the next command did not create an owner
-        // So we have a todo: reject a second creation command with the same commandId (e.g. the ownerId)
-//        val commandResponseSucceeded = commandsResponseRepository
-//                .findCommandResponse(commandSucceeded.getCommandId())
-//                .customRetry()
-//                .block()
-//        assertNotNull(commandResponseSucceeded)
 
         val commandRejected = repo.submitCreateOwnerCommand(createOwnerParams).block()
         assertNotNull(commandRejected)
-        println(commandRejected)
 
         val commandResponse = commandsResponseRepository
                 .findCommandResponse(commandRejected.getCommandId())
@@ -122,6 +110,18 @@ class KafkaTest {
         val sended = carOuputChannel.send(message)
         // this must always be true - because for this output sync is false - e.g. not configured to be sync
         assert(true) { sended }
+
+        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
+            val respCar = carsRepository.findById("$carId").block();
+
+            expect(car.getState()) { respCar!!.getState() }
+        }
+
+        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
+            val respCars = carsRepository.findAllCars().collectList().block();
+
+            expect(1) { respCars!!.size }
+        }
 
         await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
 
