@@ -5,33 +5,24 @@ spring.cloud.stream:
   schema-registry-client:
     endpoint: http://localhost:8081
 
+spring.cloud.stream.default.consumer:
+  useNativeDecoding: true
+spring.cloud.stream.default.producer:
+  useNativeEncoding: true
+
 spring.cloud.stream.bindings:
   cars_out:
     destination: cars
-    producer:
-      useNativeEncoding: true
   car_events_out:
     destination: car_events
   owner_commands_out:
     destination: owner_commands
-    producer:
-      useNativeEncoding: true
   cars:
     destination: cars
-    producer:
-      useNativeEncoding: true
-    consumer:
-      useNativeDecoding: true
   owner_commands:
     destination: owner_commands
-    consumer:
-      useNativeDecoding: true
   owner_commands_response:
     destination: owner_commands_response
-    producer:
-      useNativeEncoding: true
-    consumer:
-      useNativeDecoding: true
   owner_events_in:
     destination: owner_events
 
@@ -93,7 +84,7 @@ logging.level.io.confluent: WARN
 logging.level.io.kfleet: DEBUG
 logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 logging.level.reactor.netty: INFO
-#logging.level.org.springframework.cloud.stream.binding: DEBUG
+logging.level.org.springframework.cloud.stream.binding: ERROR
 
 
 cars.service.simulation.enabled: false
