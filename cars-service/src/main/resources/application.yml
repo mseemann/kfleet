@@ -32,6 +32,8 @@ spring.cloud.stream.bindings:
       useNativeEncoding: true
     consumer:
       useNativeDecoding: true
+  owner_events_in:
+    destination: owner_events
 
 spring.cloud.stream.kafka.streams.binder.configuration:
   schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
@@ -39,7 +41,7 @@ spring.cloud.stream.kafka.streams.binder.configuration:
   specific.avro.reader: true
   application.server: localhost:${server.port}
   # a shorter commit interval results in more accurate statistics
-  commit.interval.ms: 100
+  commit.interval.ms: 1
   # a shorter session timeout results in a shorter reablancing time if a streaming processor goes down
   session.timeout.ms: 6000
   default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
@@ -52,6 +54,12 @@ spring.cloud.stream.kafka.binder.producerProperties:
   value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
   value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
   schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
+spring.cloud.stream.kafka.binder.consumerProperties:
+  isolation.level: read_committed
+  key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+  schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
+  specific.avro.reader: true
 
 spring.cloud.stream.kafka.bindings:
   owner_commands_out:

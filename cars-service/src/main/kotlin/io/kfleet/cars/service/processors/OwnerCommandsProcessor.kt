@@ -131,8 +131,10 @@ class OwnerCommandsProcessor(
 
                     }
                 }, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-        createOwnerResult.filter { _, value -> value is OwnerCreatedEvent }.to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
-        createOwnerResult.filter { _, value -> value is CommandResponse }.to(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE)
+        createOwnerResult.filter { _, value -> value is OwnerCreatedEvent }
+                .to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
+        createOwnerResult.filter { _, value -> value is CommandResponse }
+                .to(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE)
     }
 
 
