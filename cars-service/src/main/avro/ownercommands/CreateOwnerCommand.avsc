@@ -1,6 +1,7 @@
 {
   "namespace" : "io.kfleet.cars.service.commands",
   "type" : "record",
+  "javaAnnotation": "io.kfleet.cars.service.domain.OwnerCommand",
   "name" : "CreateOwnerCommand",
   "fields" : [
     {"name":"commandId","type":"string"},

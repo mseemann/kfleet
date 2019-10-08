@@ -30,7 +30,7 @@ import kotlin.test.*
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
-class KafkaTest {
+class ProcessorIntegrationTests {
 
     @Autowired
     lateinit var repo: OwnerRepository
