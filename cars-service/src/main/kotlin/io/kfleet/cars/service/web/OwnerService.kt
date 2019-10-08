@@ -61,7 +61,7 @@ class OwnerService(
     }
 
     // The update ownerName is idempotent - so PUT is used. There is no optimistic locking
-    // the owner is cahnged in any case. The last received update command "winns" the game.
+    // the owner is changed in any case. The last received update command "winns" the game.
     fun updateOwnersName(request: ServerRequest): Mono<ServerResponse> {
 
         return ServerResponse.noContent().build()

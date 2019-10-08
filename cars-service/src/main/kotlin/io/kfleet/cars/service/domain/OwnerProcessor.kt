@@ -24,7 +24,7 @@ fun SpecificRecord.isOwnerCommand(): Boolean {
 @Component
 class OwnerProcessor {
 
-    fun createOwner(ownerId: String, commandAndOwner: CommandAndOwner): MutableList<KeyValue<String, SpecificRecord>> {
+    fun processCommand(ownerId: String, commandAndOwner: CommandAndOwner): MutableList<KeyValue<String, SpecificRecord>> {
 
         log.debug { commandAndOwner.command::class.findAnnotation<OwnerCommand>() }
         log.debug { "$ownerId -> $commandAndOwner" }

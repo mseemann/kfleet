@@ -42,7 +42,7 @@ interface OwnerCommandsProcessorBinding {
         // backed by a topic cars-service-owners-owner_commands_response_store-changelog
         const val OWNER_COMMANDS_RESPONSE_STORE = "owner_commands_response_store"
         // backed by a topic cars-service-owners-owners-changelog
-        const val OWNER_RW_STORE = "owners"
+        const val OWNER_RW_STORE = "owners_store"
     }
 
     @Input(OWNER_COMMANDS)
@@ -79,7 +79,6 @@ class OwnerCommandsProcessor(
     @StreamListener
     fun processCommands(@Input(OwnerCommandsProcessorBinding.OWNER_COMMANDS) commandStream: KStream<String, SpecificRecord>) {
 
-
         val beanNameCreatedBySpring = "&stream-builder-${OwnerCommandsProcessor::processCommands.name}"
         val streamsBuilderFactory = (context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class) as StreamsBuilderFactoryBean)
                 .getObject()
@@ -97,7 +96,7 @@ class OwnerCommandsProcessor(
 
         val createOwnerResult = ownerCommands
                 .transform(mapToOwnerAndCommand(), OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-                .flatMap { ownerId, commandAndOwner -> ownerProcessor.createOwner(ownerId, commandAndOwner) }
+                .flatMap { ownerId, commandAndOwner -> ownerProcessor.processCommand(ownerId, commandAndOwner) }
 
         createOwnerResult.foreach { k, v -> log.debug { "$k -> $v" } }
 
@@ -116,74 +115,68 @@ class OwnerCommandsProcessor(
                 .process(writeCommandResponseToState(), OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
     }
 
-    private fun writeOwnerToState(): ProcessorSupplier<String, Owner> {
-        return ProcessorSupplier<String, Owner> {
-            object : Processor<String, Owner> {
+    private fun writeOwnerToState() = ProcessorSupplier<String, Owner> {
+        object : Processor<String, Owner> {
 
-                lateinit var ownerStore: KeyValueStore<String, Owner>
+            lateinit var ownerStore: KeyValueStore<String, Owner>
 
-                override fun init(context: ProcessorContext) {
-                    val store = context.getStateStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-                    @Suppress("UNCHECKED_CAST")
-                    ownerStore = store as KeyValueStore<String, Owner>
-                }
-
-                override fun process(key: String, value: Owner?) {
-                    log.debug { "put $value for $key" }
-                    ownerStore.put(key, value)
-                }
-
-                override fun close() {}
-
+            override fun init(context: ProcessorContext) {
+                @Suppress("UNCHECKED_CAST")
+                ownerStore = context
+                        .getStateStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE) as KeyValueStore<String, Owner>
             }
+
+            override fun process(key: String, value: Owner?) {
+                log.debug { "put $value for $key" }
+                ownerStore.put(key, value)
+            }
+
+            override fun close() {}
+
         }
     }
 
-    private fun writeCommandResponseToState(): ProcessorSupplier<String, CommandResponse> {
-        return ProcessorSupplier<String, CommandResponse> {
-            object : Processor<String, CommandResponse> {
 
-                lateinit var commandResponseStore: WindowStore<String, CommandResponse>
+    private fun writeCommandResponseToState() = ProcessorSupplier<String, CommandResponse> {
+        object : Processor<String, CommandResponse> {
 
-                override fun init(context: ProcessorContext) {
-                    val store = context.getStateStore(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
-                    @Suppress("UNCHECKED_CAST")
-                    commandResponseStore = store as WindowStore<String, CommandResponse>
-                }
+            lateinit var commandResponseStore: WindowStore<String, CommandResponse>
 
-                override fun process(key: String, value: CommandResponse) {
-                    log.debug { "put $value for $key" }
-                    commandResponseStore.put(key, value)
-                }
-
-                override fun close() {}
-
+            override fun init(context: ProcessorContext) {
+                @Suppress("UNCHECKED_CAST")
+                commandResponseStore = context
+                        .getStateStore(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE) as WindowStore<String, CommandResponse>
             }
+
+            override fun process(key: String, value: CommandResponse) {
+                log.debug { "put $value for $key" }
+                commandResponseStore.put(key, value)
+            }
+
+            override fun close() {}
+
         }
     }
 
-    private fun mapToOwnerAndCommand(): TransformerSupplier<String, SpecificRecord, KeyValue<String, CommandAndOwner>> {
-        return TransformerSupplier {
-            object : Transformer<String, SpecificRecord, KeyValue<String, CommandAndOwner>> {
-                lateinit var ownerStore: KeyValueStore<String, Owner>
+    private fun mapToOwnerAndCommand() = TransformerSupplier {
+        object : Transformer<String, SpecificRecord, KeyValue<String, CommandAndOwner>> {
+            lateinit var ownerStore: KeyValueStore<String, Owner>
 
-                override fun init(context: ProcessorContext) {
-                    val store = context.getStateStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-                    @Suppress("UNCHECKED_CAST")
-                    ownerStore = store as KeyValueStore<String, Owner>
-                }
-
-                override fun transform(ownerId: String, value: SpecificRecord): KeyValue<String, CommandAndOwner> {
-                    val existingOwner = ownerStore.get(ownerId)
-                    log.debug { "existing owner. $existingOwner" }
-                    return KeyValue(ownerId, CommandAndOwner(value, existingOwner))
-                }
-
-                override fun close() {}
+            override fun init(context: ProcessorContext) {
+                @Suppress("UNCHECKED_CAST")
+                ownerStore = context
+                        .getStateStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE) as KeyValueStore<String, Owner>
             }
+
+            override fun transform(ownerId: String, value: SpecificRecord): KeyValue<String, CommandAndOwner> {
+                val existingOwner = ownerStore.get(ownerId)
+                log.debug { "existing owner. $existingOwner" }
+                return KeyValue(ownerId, CommandAndOwner(value, existingOwner))
+            }
+
+            override fun close() {}
         }
     }
-    
 }
 
 
