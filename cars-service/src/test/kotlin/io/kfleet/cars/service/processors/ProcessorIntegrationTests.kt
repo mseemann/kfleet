@@ -14,6 +14,7 @@ import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
 import org.awaitility.kotlin.withPollInterval
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -25,7 +26,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import testing.KafkaContextInitializer
 import kotlin.test.*
 
-//@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
+@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
