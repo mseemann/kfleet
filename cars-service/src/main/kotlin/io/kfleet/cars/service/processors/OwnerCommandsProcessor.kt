@@ -101,7 +101,7 @@ class OwnerCommandsProcessor(
         createOwnerResult.foreach { k, v -> log.debug { "$k -> $v" } }
 
         createOwnerResult
-                .filter { _, value -> value is Owner }
+                .filter { _, value -> value is Owner || value == null }
                 .mapValues { v -> v as Owner }
                 .process(writeOwnerToState, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
 

@@ -11,6 +11,6 @@ inline fun commandResponse(buildCommandResponse: CommandResponse.Builder.() -> U
     return builder.build()
 }
 
-fun CommandResponse.asKeyValue(): KeyValue<String, SpecificRecord> {
+fun CommandResponse.asKeyValue(): KeyValue<String, SpecificRecord?> {
     return KeyValue(this.getCommandId(), this)
 }

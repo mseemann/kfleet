@@ -3,6 +3,7 @@ package io.kfleet.cars.service.repos
 import io.kfleet.cars.service.WebClientUtil
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
+import io.kfleet.cars.service.domain.createOwnerCommand
 import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.cars.service.rpclayer.RPC_OWNER
@@ -49,8 +50,11 @@ class OwnerRepository(
 
     fun submitCreateOwnerCommand(createOwnerParams: CreateOwnerParams): Mono<CreateOwnerCommand> {
 
-        val commandId = UUID.randomUUID().toString()
-        val ownerCommand = CreateOwnerCommand(commandId, createOwnerParams.ownerId, createOwnerParams.ownerName)
+        val ownerCommand = createOwnerCommand {
+            commandId = UUID.randomUUID().toString()
+            ownerId = createOwnerParams.ownerId
+            name = createOwnerParams.ownerName
+        }
 
         val msg = MessageBuilder
                 .withPayload(ownerCommand)
