@@ -31,7 +31,7 @@ class OwnerPorcessorTest {
             name = "test"
         }.build()
 
-        val result = ownerProcessor.processCommand(ownerId, CommandAndOwner(command, owner))
+        val result = ownerProcessor.processCommand(CommandAndOwner(command, owner))
 
         expect(1) { result.count() }
         expect(ownerId) { result[0].key }
@@ -54,7 +54,7 @@ class OwnerPorcessorTest {
 
         val owner = null
 
-        val result = ownerProcessor.processCommand(ownerId, CommandAndOwner(command, owner))
+        val result = ownerProcessor.processCommand(CommandAndOwner(command, owner))
 
         expect(3, { result.count() })
 

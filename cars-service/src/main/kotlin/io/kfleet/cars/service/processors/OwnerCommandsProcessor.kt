@@ -96,14 +96,14 @@ class OwnerCommandsProcessor(
 
         val createOwnerResult = ownerCommands
                 .transform(mapToOwnerAndCommand(), OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-                .flatMap { ownerId, commandAndOwner -> ownerProcessor.processCommand(ownerId, commandAndOwner) }
+                .flatMap { ownerId, commandAndOwner -> ownerProcessor.processCommand(commandAndOwner) }
 
         createOwnerResult.foreach { k, v -> log.debug { "$k -> $v" } }
 
         createOwnerResult
                 .filter { _, value -> value is Owner }
                 .mapValues { v -> v as Owner }
-                .process(writeOwnerToState(), OwnerCommandsProcessorBinding.OWNER_RW_STORE)
+                .process(writeOwnerToState, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
 
         createOwnerResult
                 .filter { _, value -> value is OwnerCreatedEvent }
@@ -115,7 +115,7 @@ class OwnerCommandsProcessor(
                 .process(writeCommandResponseToState(), OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
     }
 
-    private fun writeOwnerToState() = ProcessorSupplier<String, Owner> {
+    private val writeOwnerToState = ProcessorSupplier<String, Owner> {
         object : Processor<String, Owner> {
 
             lateinit var ownerStore: KeyValueStore<String, Owner>

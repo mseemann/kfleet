@@ -1,10 +1,13 @@
 package io.kfleet.cars.service.domain
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
-import io.kfleet.cars.service.events.OwnerCreatedEvent
+import io.kfleet.cars.service.commands.UpdateOwnernameCommand
 import io.kfleet.cars.service.processors.CommandAndOwner
-import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
+import io.kfleet.domain.asKeyValue
+import io.kfleet.domain.commandResponse
+import io.kfleet.domain.events.asKeyValue
+import io.kfleet.domain.events.ownerCreated
 import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
@@ -21,49 +24,70 @@ fun SpecificRecord.isOwnerCommand(): Boolean {
     return this::class.findAnnotation<OwnerCommand>() != null
 }
 
+inline fun owner(buildOwner: Owner.Builder.() -> Unit): Owner {
+    val builder = Owner.newBuilder()
+    builder.buildOwner()
+    return builder.build()
+}
+
+fun Owner.asKeyValue(): KeyValue<String, SpecificRecord> {
+    return KeyValue(this.getId(), this)
+}
+
+fun KeyValue<String, SpecificRecord>.addTo(kv: MutableList<KeyValue<String, SpecificRecord>>) {
+    kv.add(this)
+}
+
 @Component
 class OwnerProcessor {
 
-    fun processCommand(ownerId: String, commandAndOwner: CommandAndOwner): MutableList<KeyValue<String, SpecificRecord>> {
+    fun processCommand(commandAndOwner: CommandAndOwner): List<KeyValue<String, SpecificRecord>> {
 
-        log.debug { commandAndOwner.command::class.findAnnotation<OwnerCommand>() }
-        log.debug { "$ownerId -> $commandAndOwner" }
+        log.debug { "$commandAndOwner" }
 
+        return when (val command = commandAndOwner.command) {
+            is CreateOwnerCommand -> createOwner(command, commandAndOwner.owner)
+            is UpdateOwnernameCommand -> updateOwner(command, commandAndOwner.owner)
+            else -> throw RuntimeException("unsupported command ${command::class}")
+        }
+
+    }
+
+    fun createOwner(command: CreateOwnerCommand, owner: Owner?): List<KeyValue<String, SpecificRecord>> {
         val result = mutableListOf<KeyValue<String, SpecificRecord>>()
+        if (owner != null) {
 
-        val command = commandAndOwner.command as CreateOwnerCommand
-
-        if (commandAndOwner.owner != null) {
-
-            val response = CommandResponse.newBuilder().apply {
+            commandResponse {
                 commandId = command.getCommandId()
                 ressourceId = null
                 status = CommandStatus.REJECTED
-                reason = "Owner with id $ownerId already exists"
-            }.build()
-            result.add(KeyValue(command.getCommandId(), response))
+                reason = "Owner with id ${owner.getId()} already exists"
+            }.asKeyValue().addTo(result)
 
         } else {
 
-            val owner = Owner.newBuilder().apply {
-                id = ownerId
+            owner {
+                id = command.getOwnerId()
                 name = command.getName()
-            }.build()
-            result.add(KeyValue(ownerId, owner))
+            }.asKeyValue().addTo(result)
 
-            val ownerCreatedEvents = OwnerCreatedEvent.newBuilder().apply {
-                setOwnerId(ownerId)
+            ownerCreated {
+                ownerId = command.getOwnerId()
                 name = command.getName()
-            }.build()
-            result.add(KeyValue(ownerId, ownerCreatedEvents))
+            }.asKeyValue().addTo(result)
 
-            val response = CommandResponse.newBuilder().apply {
+            commandResponse {
                 commandId = command.getCommandId()
-                ressourceId = ownerId
+                ressourceId = command.getOwnerId()
                 status = CommandStatus.SUCCEEDED
-            }.build()
-            result.add(KeyValue(command.getCommandId(), response))
+            }.asKeyValue().addTo(result)
         }
+
+        return result
+    }
+
+    fun updateOwner(command: UpdateOwnernameCommand, owner: Owner?): List<KeyValue<String, SpecificRecord>> {
+        val result = mutableListOf<KeyValue<String, SpecificRecord>>()
 
         return result
     }
