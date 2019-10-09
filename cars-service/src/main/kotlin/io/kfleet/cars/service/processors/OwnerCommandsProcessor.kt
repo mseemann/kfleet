@@ -95,8 +95,8 @@ class OwnerCommandsProcessor(
         unknownCommands.to(OwnerCommandsProcessorBinding.UNKNOW_COMMANDS)
 
         val createOwnerResult = ownerCommands
-                .transform(mapToOwnerAndCommand(), OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-                .flatMap { ownerId, commandAndOwner -> ownerProcessor.processCommand(commandAndOwner) }
+                .transform(mapToOwnerAndCommand, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
+                .flatMap { _, commandAndOwner -> ownerProcessor.processCommand(commandAndOwner) }
 
         createOwnerResult.foreach { k, v -> log.debug { "$k -> $v" } }
 
@@ -112,10 +112,10 @@ class OwnerCommandsProcessor(
         createOwnerResult
                 .filter { _, value -> value is CommandResponse }
                 .mapValues { v -> v as CommandResponse }
-                .process(writeCommandResponseToState(), OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
+                .process(writeCommandResponseToState, OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
     }
 
-    private val writeOwnerToState = ProcessorSupplier<String, Owner> {
+    private val writeOwnerToState = ProcessorSupplier {
         object : Processor<String, Owner> {
 
             lateinit var ownerStore: KeyValueStore<String, Owner>
@@ -137,7 +137,7 @@ class OwnerCommandsProcessor(
     }
 
 
-    private fun writeCommandResponseToState() = ProcessorSupplier<String, CommandResponse> {
+    private val writeCommandResponseToState = ProcessorSupplier {
         object : Processor<String, CommandResponse> {
 
             lateinit var commandResponseStore: WindowStore<String, CommandResponse>
@@ -158,7 +158,7 @@ class OwnerCommandsProcessor(
         }
     }
 
-    private fun mapToOwnerAndCommand() = TransformerSupplier {
+    private val mapToOwnerAndCommand = TransformerSupplier {
         object : Transformer<String, SpecificRecord, KeyValue<String, CommandAndOwner>> {
             lateinit var ownerStore: KeyValueStore<String, Owner>
 

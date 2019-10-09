@@ -5,7 +5,7 @@ import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 
 
-inline fun commandResponse(buildCommandResponse: CommandResponse.Builder.() -> Unit): CommandResponse {
+fun commandResponse(buildCommandResponse: CommandResponse.Builder.() -> Unit): CommandResponse {
     val builder = CommandResponse.newBuilder()
     builder.buildCommandResponse()
     return builder.build()

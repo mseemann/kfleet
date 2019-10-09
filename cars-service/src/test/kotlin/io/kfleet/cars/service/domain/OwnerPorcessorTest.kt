@@ -6,7 +6,9 @@ import io.kfleet.cars.service.events.OwnerUpdatedEvent
 import io.kfleet.cars.service.processors.CommandAndOwner
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
+import io.kfleet.domain.events.ownerCreated
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.expect
@@ -183,5 +185,17 @@ class OwnerPorcessorTest {
         val eventKv = result.filter { it.value is OwnerDeletedEvent }
         expect(ownerId) { eventKv[0].key }
         expect(ownerId) { (eventKv[0].value as OwnerDeletedEvent).getOwnerId() }
+    }
+
+    @Test
+    fun testUnknownCommandException() {
+        // this is not a owner command! did you see it?
+        val command = ownerCreated {
+            ownerId = "1"
+            name = " name"
+        }
+        assertFailsWith(RuntimeException::class) {
+            ownerProcessor.processCommand(CommandAndOwner(command, null))
+        }
     }
 }
