@@ -1,6 +1,7 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("com.commercehub.gradle.plugin.avro") version "0.17.0"
+    jacoco
 }
 
 
