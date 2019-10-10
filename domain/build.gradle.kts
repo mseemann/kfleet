@@ -19,6 +19,6 @@ dependencies {
     implementation("org.apache.avro:avro:1.9.1")
     implementation("org.apache.kafka:kafka-streams:2.0.1")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+//    testImplementation("org.jetbrains.kotlin:kotlin-test")
+//    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }

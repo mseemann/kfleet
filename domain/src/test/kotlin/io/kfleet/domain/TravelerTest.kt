@@ -11,3 +11,4 @@ class TravelerTest {
         expect(TravelerStatus.IS_LIVING) { traveler.state }
     }
 }
+
