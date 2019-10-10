@@ -27,33 +27,21 @@ fun SpecificRecord.isOwnerCommand(): Boolean {
     return this::class.findAnnotation<OwnerCommand>() != null
 }
 
-fun owner(buildOwner: Owner.Builder.() -> Unit): Owner {
-    val builder = Owner.newBuilder()
-    builder.buildOwner()
-    return builder.build()
-}
+fun owner(buildOwner: Owner.Builder.() -> Unit): Owner =
+        Owner.newBuilder().apply { buildOwner() }.build()
 
 fun Owner.asKeyValue(): KeyValue<String, SpecificRecord?> {
     return KeyValue(this.getId(), this)
 }
 
-fun createOwnerCommand(buildCreateOwnerCommand: CreateOwnerCommand.Builder.() -> Unit): CreateOwnerCommand {
-    val builder = CreateOwnerCommand.newBuilder()
-    builder.buildCreateOwnerCommand()
-    return builder.build()
-}
+fun createOwnerCommand(buildCreateOwnerCommand: CreateOwnerCommand.Builder.() -> Unit): CreateOwnerCommand =
+        CreateOwnerCommand.newBuilder().apply { buildCreateOwnerCommand() }.build()
 
-fun updateOwnerNameCommand(buildUpdateOwnerCommand: UpdateOwnernameCommand.Builder.() -> Unit): UpdateOwnernameCommand {
-    val builder = UpdateOwnernameCommand.newBuilder()
-    builder.buildUpdateOwnerCommand()
-    return builder.build()
-}
+fun updateOwnerNameCommand(buildUpdateOwnerCommand: UpdateOwnernameCommand.Builder.() -> Unit): UpdateOwnernameCommand =
+        UpdateOwnernameCommand.newBuilder().apply { buildUpdateOwnerCommand() }.build()
 
-fun deleteOwnerCommand(buildDeleteOwnerCommand: DeleteOwnerCommand.Builder.() -> Unit): DeleteOwnerCommand {
-    val builder = DeleteOwnerCommand.newBuilder()
-    builder.buildDeleteOwnerCommand()
-    return builder.build()
-}
+fun deleteOwnerCommand(buildDeleteOwnerCommand: DeleteOwnerCommand.Builder.() -> Unit): DeleteOwnerCommand =
+        DeleteOwnerCommand.newBuilder().apply { buildDeleteOwnerCommand() }.build()
 
 @Component
 class OwnerProcessor {
