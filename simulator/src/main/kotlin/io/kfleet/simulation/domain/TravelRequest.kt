@@ -1,4 +1,4 @@
-package io.kfleet.domain
+package io.kfleet.simulation.domain
 
 data class TravelRequest(
         val personId: String,

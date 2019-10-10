@@ -1,4 +1,4 @@
-package io.kfleet.domain
+package io.kfleet.simulation.domain
 
 enum class TravelerStatus {
     IS_GOING, // sits in a car and is going to its destination

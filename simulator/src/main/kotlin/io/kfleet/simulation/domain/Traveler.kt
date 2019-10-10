@@ -1,4 +1,4 @@
-package io.kfleet.domain
+package io.kfleet.simulation.domain
 
 import kotlin.random.Random
 

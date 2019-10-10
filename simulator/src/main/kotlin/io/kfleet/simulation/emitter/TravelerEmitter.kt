@@ -1,7 +1,7 @@
 package io.kfleet.simulation.emitter
 
 import io.kfleet.common.headers
-import io.kfleet.domain.Traveler
+import io.kfleet.simulation.domain.Traveler
 import mu.KotlinLogging
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output

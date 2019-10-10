@@ -1,4 +1,4 @@
-package io.kfleet.domain
+package io.kfleet.simulation.domain
 
 import kotlin.random.Random
 
@@ -10,8 +10,8 @@ data class GeoPosition(val lat: Double, val lng: Double) {
         val OsloLngRange = arrayOf(10.3772388202, 10.9805373651)
 
         fun random() = GeoPosition(
-            lat = Random.nextDouble(OsloLatRange[0], OsloLatRange[1]),
-            lng = Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
+                lat = Random.nextDouble(OsloLatRange[0], OsloLatRange[1]),
+                lng = Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
         )
     }
 }
