@@ -54,20 +54,12 @@ docker run --tty \
 
 {"id":"1","state":"FREE","geoPosition":{"lat":59.83977184696787,"lng":10.70939965449577},"stateOfCharge":49.76350057919342}
 
-### Resources and readings
-
-[1] [Should You Put Several Event Types in the Same Kafka Topic?](https://www.confluent.io/blog/put-several-event-types-kafka-topic/)
-
-[2] [1 Year of Event Sourcing and CQRS](https://medium.com/hackernoon/1-year-of-event-sourcing-and-cqrs-fb9033ccd1c6)
-
-[3] [A CQRS and ES deep dive](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591577(v=pandp.10)?redirectedfrom=MSDN)
-
-[4] [Every Company is Becoming ~~a~~ Software ~~Company~~](https://www.confluent.io/blog/every-company-is-becoming-software)
 ### Thoughts and findings
 - *In domain-driven design (DDD), an aggregate defines a consistency boundary" [3]
 - "Both the sender and the receiver of a command should be in the same bounded context. You should not send a command to another bounded context because you would be instructing that other bounded context, which has separate responsibilities in another consistency boundary, to perform some work for you." [3]
 - "Commands should be processed once, by a single recipient." [3]
-
+- "When source code is executed sequentially, the code is easier to understand and debug. When concurrency is used, code may get executed in parallel or in some irregular order." [5]
+- "Tell don't ask!"
 
 ### Using the interactive query service to provide a REST-Interface 
 Kafka Streams provide a ReadOnlyKeyValueStore that is a thread safe way to access a state store. 
@@ -136,3 +128,15 @@ override fun findById(id: String): Mono<Car> {
             .bodyToMono(Car::class.java)
 }
 ```
+
+### Resources and readings
+
+[1] [Should You Put Several Event Types in the Same Kafka Topic?](https://www.confluent.io/blog/put-several-event-types-kafka-topic/)
+
+[2] [1 Year of Event Sourcing and CQRS](https://medium.com/hackernoon/1-year-of-event-sourcing-and-cqrs-fb9033ccd1c6)
+
+[3] [A CQRS and ES deep dive](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591577(v=pandp.10)?redirectedfrom=MSDN)
+
+[4] [Every Company is Becoming ~~a~~ Software ~~Company~~](https://www.confluent.io/blog/every-company-is-becoming-software)
+
+[5] [How To Write Less Code and Get More Done.](https://medium.com/@rsrajan1/how-to-write-less-code-and-get-more-done-40006282817d)

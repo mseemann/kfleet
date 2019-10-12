@@ -79,5 +79,6 @@ services:
       - "8088:8088"
     environment:
       KSQL_BOOTSTRAP_SERVERS: "broker1:29092"
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://registry:8081"
       KSQL_OPTS: "-Dksql.service.id=kfleet  -Dlisteners=http://0.0.0.0:8088/ -Dconfluent.support.metrics.enable=false"
 

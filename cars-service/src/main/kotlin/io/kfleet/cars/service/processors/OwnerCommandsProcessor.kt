@@ -10,6 +10,7 @@ import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KeyValue
+import org.apache.kafka.streams.StreamsBuilder
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
 import org.apache.kafka.streams.kstream.Transformer
@@ -76,15 +77,18 @@ class OwnerCommandsProcessor(
                     Serdes.StringSerde(),
                     commandResponseSerde)
 
+    private val streamsBuilder: StreamsBuilder
+        get() {
+            val beanNameCreatedBySpring = "&stream-builder-${OwnerCommandsProcessor::processCommands.name}"
+            return (context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class) as StreamsBuilderFactoryBean)
+                    .getObject()
+        }
+
     @StreamListener
     fun processCommands(@Input(OwnerCommandsProcessorBinding.OWNER_COMMANDS) commandStream: KStream<String, SpecificRecord>) {
 
-        val beanNameCreatedBySpring = "&stream-builder-${OwnerCommandsProcessor::processCommands.name}"
-        val streamsBuilderFactory = (context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class) as StreamsBuilderFactoryBean)
-                .getObject()
-
-        streamsBuilderFactory.addStateStore(ownerStateStore)
-        streamsBuilderFactory.addStateStore(commandResponseWindowedStore)
+        streamsBuilder.addStateStore(ownerStateStore)
+        streamsBuilder.addStateStore(commandResponseWindowedStore)
 
         val (ownerCommands, unknownCommands) = commandStream
                 .branch(

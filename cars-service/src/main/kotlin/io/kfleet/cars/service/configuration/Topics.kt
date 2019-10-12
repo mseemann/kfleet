@@ -21,11 +21,6 @@ class Topics {
     fun ownerCommandsTopic() = NewTopic("owner_commands", 3, 3)
 
     @Bean
-    fun ownerCommandsResponseTopic() = NewTopic("owner_commands_response", 3, 3)
-
-    @Bean
     fun unknownCommandsTopic() = NewTopic("unknown_owner_commands", 3, 3)
 
-    @Bean
-    fun ownersTopic() = NewTopic("owners", 3, 3)
 }
