@@ -2,7 +2,7 @@ package io.kfleet.cars.service.rpclayer
 
 import io.kfleet.cars.service.configuration.JacksonObjectMapper
 import io.kfleet.cars.service.domain.Owner
-import io.kfleet.cars.service.domain.OwnerFactory
+import io.kfleet.cars.service.domain.owner
 import io.kfleet.cars.service.repos.OwnerLocalRepository
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -26,7 +26,10 @@ class OwnerLocalRpcServiceTest {
 
     @Test
     fun ownerByIdTest() {
-        val owner = OwnerFactory.create(id = "1", name = "testname")
+        val owner = owner {
+            id = "1"
+            name = "test"
+        }
 
         BDDMockito.given(repo.findByIdLocal("1")).willReturn(Mono.just(owner))
 

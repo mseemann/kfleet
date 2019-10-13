@@ -1,12 +1,12 @@
 package io.kfleet.cars.service.web
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
+import io.kfleet.cars.service.commands.DeleteOwnerCommand
+import io.kfleet.cars.service.commands.UpdateOwnernameCommand
 import io.kfleet.cars.service.configuration.JacksonObjectMapper
 import io.kfleet.cars.service.domain.Owner
-import io.kfleet.cars.service.domain.OwnerFactory
-import io.kfleet.cars.service.repos.CommandsResponseRepository
-import io.kfleet.cars.service.repos.CreateOwnerParams
-import io.kfleet.cars.service.repos.OwnerRepository
+import io.kfleet.cars.service.domain.owner
+import io.kfleet.cars.service.repos.*
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import org.junit.jupiter.api.Test
@@ -37,7 +37,10 @@ class OwnerServiceTest {
 
     @Test
     fun ownerByIdTest() {
-        val owner = OwnerFactory.create(id = "1", name = "testname")
+        val owner = owner {
+            id = "1"
+            name = "testname"
+        }
 
         BDDMockito.given(repo.findById("1")).willReturn(Mono.just(owner))
 
@@ -64,7 +67,10 @@ class OwnerServiceTest {
     fun createOwner() {
 
         val params = CreateOwnerParams("1", "testName")
-        val owner = OwnerFactory.create("1", "testName")
+        val owner = owner {
+            id = "1"
+            name = "testName"
+        }
         val createOwnerCommand = CreateOwnerCommand("c1", "1", "testName")
 
         BDDMockito
@@ -119,5 +125,113 @@ class OwnerServiceTest {
                 .returnResult()
 
         expect("exists") { response.responseBody }
+    }
+
+
+    @Test
+    fun updateOwner() {
+
+        val params = UpdateOwnerParams("1", "testName")
+        val owner = owner {
+            id = "1"
+            name = "testName"
+        }
+        val updateOwnerCommand = UpdateOwnernameCommand("c1", "1", "testName")
+
+        BDDMockito
+                .given(repo.submitUpdateOwnerNameCommand(params))
+                .willReturn(Mono.just(updateOwnerCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(updateOwnerCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(updateOwnerCommand.getCommandId(), updateOwnerCommand.getOwnerId(), CommandStatus.SUCCEEDED, null)))
+
+        BDDMockito.given(repo.findById(owner.getId())).willReturn(Mono.just(owner))
+
+
+        val response = webClient.put().uri("/owners/1/testName")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody(Owner::class.java)
+                .returnResult()
+
+        expect("1") { response.responseBody!!.getId() }
+        expect(owner) { response.responseBody }
+    }
+
+    @Test
+    fun updateOwnerBadRequest() {
+        val result = webClient.put().uri("/owners/1/ ")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+        assertEquals("ownerName invalid", result.responseBody)
+    }
+
+    @Test
+    fun updateOwnerBadRequestOwnerDidNotExists() {
+        val params = UpdateOwnerParams("1", "testName")
+        val updateOwnerCommand = UpdateOwnernameCommand("c1", "1", "testName")
+
+        BDDMockito
+                .given(repo.submitUpdateOwnerNameCommand(params))
+                .willReturn(Mono.just(updateOwnerCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(updateOwnerCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(updateOwnerCommand.getCommandId(), updateOwnerCommand.getOwnerId(), CommandStatus.REJECTED, "did not exist")))
+
+
+        val response = webClient.put().uri("/owners/1/testName")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+
+        expect("did not exist") { response.responseBody }
+    }
+
+    @Test
+    fun deleteOwner() {
+
+        val params = DeleteOwnerParams("1")
+        val deleteOwnerCommand = DeleteOwnerCommand("c1", "1")
+
+        BDDMockito
+                .given(repo.submitDeleteOwnerCommand(params))
+                .willReturn(Mono.just(deleteOwnerCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(deleteOwnerCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(deleteOwnerCommand.getCommandId(), deleteOwnerCommand.getOwnerId(), CommandStatus.SUCCEEDED, null)))
+
+        webClient.delete().uri("/owners/1")
+                .exchange()
+                .expectStatus().isNoContent
+
+    }
+
+    @Test
+    fun deleteOwnerBadRequestOwnerDidNotExists() {
+        val params = DeleteOwnerParams("1")
+        val deleteOwnerCommand = DeleteOwnerCommand("c1", "1")
+
+        BDDMockito
+                .given(repo.submitDeleteOwnerCommand(params))
+                .willReturn(Mono.just(deleteOwnerCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(deleteOwnerCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(deleteOwnerCommand.getCommandId(), deleteOwnerCommand.getOwnerId(), CommandStatus.REJECTED, "did not exist")))
+
+
+        val response = webClient.delete().uri("/owners/1")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+
+        expect("did not exist") { response.responseBody }
     }
 }

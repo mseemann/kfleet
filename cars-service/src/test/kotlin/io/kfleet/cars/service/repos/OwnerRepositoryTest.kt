@@ -4,7 +4,7 @@ package io.kfleet.cars.service.repos
 import io.kfleet.cars.service.WebClientUtil
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.domain.Owner
-import io.kfleet.cars.service.domain.OwnerFactory
+import io.kfleet.cars.service.domain.owner
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.state.HostInfo
 import org.junit.jupiter.api.BeforeAll
@@ -85,7 +85,10 @@ class OwnerRepositoryTest {
     @Test
     fun findOwnerById() {
 
-        val owner = OwnerFactory.create("1", "test")
+        val owner = owner {
+            id = "1"
+            name = "test"
+        }
         val hostInfo = HostInfo("localhost", 8084)
 
         given(interactiveQService.getHostInfo(anyString(), anyString(), any<StringSerializer>()))

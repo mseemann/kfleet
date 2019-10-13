@@ -1,18 +1,14 @@
 package io.kfleet.cars.service.web
 
-import io.kfleet.cars.service.repos.CommandsResponseRepository
-import io.kfleet.cars.service.repos.CreateOwnerParams
-import io.kfleet.cars.service.repos.OwnerRepository
+import io.kfleet.cars.service.repos.*
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import java.time.Duration
 
 
@@ -43,43 +39,77 @@ class OwnerService(
                     if (it.getStatus() == CommandStatus.REJECTED) {
                         ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
                     } else {
-                        ownerRepository
-                                .findById(it.getRessourceId())
-                                .customRetry()
-                                .flatMap {
-                                    ServerResponse
-                                            .status(HttpStatus.CREATED)
-                                            .contentType(MediaType.APPLICATION_JSON)
-                                            .body(BodyInserters.fromObject(it))
-                                }
+                        ownerById(it.getRessourceId(), HttpStatus.CREATED)
                     }
                 }
                 .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
                     ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
                 }
-                .subscribeOn(Schedulers.elastic())
     }
 
     // The update ownerName is idempotent - so PUT is used. There is no optimistic locking
     // the owner is changed in any case. The last received update command "winns" the game.
     fun updateOwnersName(request: ServerRequest): Mono<ServerResponse> {
+        val ownerId = request.pathVariable("ownerId")
+        val ownerName = request.pathVariable("ownerName")
 
-        return ServerResponse.noContent().build()
+        return Mono.just(UpdateOwnerParams(ownerId.trim(), ownerName.trim()))
+                .flatMap { validate(it) }
+                .flatMap { ownerRepository.submitUpdateOwnerNameCommand(it) }
+                .delayElement(Duration.ofMillis(200))
+                .flatMap {
+                    commandsResponseRepository
+                            .findCommandResponse(it.getCommandId())
+                            .customRetry()
+                }
+                .flatMap {
+                    if (it.getStatus() == CommandStatus.REJECTED) {
+                        ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
+                    } else {
+                        ownerById(it.getRessourceId())
+                    }
+                }
+                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
+                    ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
+                }
+    }
+
+    fun deleteOwner(request: ServerRequest): Mono<ServerResponse> {
+        val ownerId = request.pathVariable("ownerId")
+        return Mono.just(DeleteOwnerParams(ownerId.trim()))
+                .flatMap { validate(it) }
+                .flatMap { ownerRepository.submitDeleteOwnerCommand(it) }
+                .delayElement(Duration.ofMillis(200))
+                .flatMap {
+                    commandsResponseRepository
+                            .findCommandResponse(it.getCommandId())
+                            .customRetry()
+                }
+                .flatMap {
+                    if (it.getStatus() == CommandStatus.REJECTED) {
+                        ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
+                    } else {
+                        ServerResponse.noContent().build()
+                    }
+                }
+                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
+                    ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
+                }
     }
 
     fun ownerById(request: ServerRequest): Mono<ServerResponse> {
         val id = request.pathVariable("id")
+        return ownerById(id).onErrorResume { ServerResponse.notFound().build() }
+    }
 
+    private fun ownerById(id: String, defaultStatus: HttpStatus = HttpStatus.OK): Mono<ServerResponse> {
         return ownerRepository
                 .findById(id)
                 .customRetry()
                 .flatMap {
                     ServerResponse
-                            .ok()
-                            .contentType(MediaType.APPLICATION_JSON)
+                            .status(defaultStatus)
                             .body(BodyInserters.fromObject(it))
                 }
-                .onErrorResume { ServerResponse.notFound().build() }
-                .subscribeOn(Schedulers.elastic())
     }
 }

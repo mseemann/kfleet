@@ -2,8 +2,12 @@ package io.kfleet.cars.service.repos
 
 import io.kfleet.cars.service.WebClientUtil
 import io.kfleet.cars.service.commands.CreateOwnerCommand
+import io.kfleet.cars.service.commands.DeleteOwnerCommand
+import io.kfleet.cars.service.commands.UpdateOwnernameCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.domain.createOwnerCommand
+import io.kfleet.cars.service.domain.deleteOwnerCommand
+import io.kfleet.cars.service.domain.updateOwnerNameCommand
 import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.cars.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.cars.service.rpclayer.RPC_OWNER
@@ -24,6 +28,8 @@ import reactor.core.publisher.Mono
 import java.util.*
 
 data class CreateOwnerParams(val ownerId: String, val ownerName: String)
+data class UpdateOwnerParams(val ownerId: String, val ownerName: String)
+data class DeleteOwnerParams(val ownerId: String)
 
 private val log = KotlinLogging.logger {}
 
@@ -64,6 +70,45 @@ class OwnerRepository(
         return try {
             // this works because cloud stream is configured as sync for this topic
             if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("CreateOwnerCommand coud not be send."))
+        } catch (e: RuntimeException) {
+            Mono.error(e)
+        }
+    }
+
+    fun submitUpdateOwnerNameCommand(updateOwnerParams: UpdateOwnerParams): Mono<UpdateOwnernameCommand> {
+        val ownerCommand = updateOwnerNameCommand {
+            commandId = UUID.randomUUID().toString()
+            ownerId = updateOwnerParams.ownerId
+            name = updateOwnerParams.ownerName
+        }
+
+        val msg = MessageBuilder
+                .withPayload(ownerCommand)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, ownerCommand.getOwnerId())
+                .build()
+
+        return try {
+            // this works because cloud stream is configured as sync for this topic
+            if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("UpdateOwnerNameCommand coud not be send."))
+        } catch (e: RuntimeException) {
+            Mono.error(e)
+        }
+    }
+
+    fun submitDeleteOwnerCommand(deleteOwnerParams: DeleteOwnerParams): Mono<DeleteOwnerCommand> {
+        val ownerCommand = deleteOwnerCommand {
+            commandId = UUID.randomUUID().toString()
+            ownerId = deleteOwnerParams.ownerId
+        }
+
+        val msg = MessageBuilder
+                .withPayload(ownerCommand)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, ownerCommand.getOwnerId())
+                .build()
+
+        return try {
+            // this works because cloud stream is configured as sync for this topic
+            if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("DeleteOwnerCommand coud not be send."))
         } catch (e: RuntimeException) {
             Mono.error(e)
         }

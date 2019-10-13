@@ -13,6 +13,7 @@ class OwnerRoutes(private val ownerService: OwnerService) {
             GET("/{id}", ownerService::ownerById)
             POST("/{ownerId}/{ownerName}", ownerService::createOwner)
             PUT("/{ownerId}/{ownerName}", ownerService::updateOwnersName)
+            DELETE("/{ownerId}", ownerService::deleteOwner)
         }
     }
 
