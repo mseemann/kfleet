@@ -1,10 +1,7 @@
 package io.kfleet.cars.service.processors
 
 import io.kfleet.cars.service.domain.CarFactory
-import io.kfleet.cars.service.repos.CarsRepository
-import io.kfleet.cars.service.repos.CommandsResponseRepository
-import io.kfleet.cars.service.repos.CreateOwnerParams
-import io.kfleet.cars.service.repos.OwnerRepository
+import io.kfleet.cars.service.repos.*
 import io.kfleet.cars.service.simulation.CarsOutBindings
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
@@ -94,6 +91,36 @@ class ProcessorIntegrationTests {
         assertNull(commandResponse.getRessourceId())
         assertNotEquals(ownerId, commandResponse.getCommandId())
         assertEquals("Owner with id $ownerId already exists", commandResponse.getReason())
+
+    }
+
+    @Test
+    fun submitDeleteOwnerCommand() {
+        val ownerName = "test"
+        val ownerId = "1"
+        val createOwnerParams = CreateOwnerParams(ownerId = ownerId, ownerName = ownerName)
+
+        val command = repo.submitCreateOwnerCommand(createOwnerParams).block()
+        assertNotNull(command)
+        
+        repo.findById(ownerId).customRetry().block()
+
+
+        val deleteOwnerCommand = DeleteOwnerParams(ownerId = ownerId)
+
+        val commandDelete = repo.submitDeleteOwnerCommand(deleteOwnerCommand).block()
+        assertNotNull(commandDelete)
+        expect(ownerId) { commandDelete.getOwnerId() }
+
+
+        val commandDeleteResponse = commandsResponseRepository
+                .findCommandResponse(commandDelete.getCommandId())
+                .customRetry()
+                .block()
+        assertNotNull(commandDeleteResponse)
+        assertEquals(CommandStatus.SUCCEEDED, commandDeleteResponse.getStatus())
+        assertEquals(ownerId, commandDeleteResponse.getRessourceId())
+        assertNotEquals(ownerId, commandDeleteResponse.getCommandId())
 
     }
 

@@ -234,4 +234,14 @@ class OwnerServiceTest {
 
         expect("did not exist") { response.responseBody }
     }
+
+    @Test
+    fun deleteOwnerBadRequest() {
+        val result = webClient.delete().uri("/owners/ ")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+        assertEquals("ownerId invalid", result.responseBody)
+    }
 }
