@@ -15,7 +15,7 @@ import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Predicate
 import org.apache.kafka.streams.kstream.Transformer
 import org.apache.kafka.streams.kstream.TransformerSupplier
-import org.apache.kafka.streams.processor.Processor
+import org.apache.kafka.streams.processor.AbstractProcessor
 import org.apache.kafka.streams.processor.ProcessorContext
 import org.apache.kafka.streams.processor.ProcessorSupplier
 import org.apache.kafka.streams.state.KeyValueStore
@@ -108,7 +108,7 @@ class OwnerCommandsProcessor(
                 .filter { _, value -> value is Owner || value == null }
                 .mapValues { v -> v as Owner? }
                 .process(writeOwnerToState, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
-        
+
         createOwnerResult
                 .filter { _, value -> value is OwnerCreatedEvent }
                 .to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
@@ -120,7 +120,7 @@ class OwnerCommandsProcessor(
     }
 
     private val writeOwnerToState = ProcessorSupplier {
-        object : Processor<String, Owner?> {
+        object : AbstractProcessor<String, Owner?>() {
 
             lateinit var ownerStore: KeyValueStore<String, Owner>
 
@@ -134,15 +134,12 @@ class OwnerCommandsProcessor(
                 log.debug { "put $value for $key" }
                 ownerStore.put(key, value)
             }
-
-            override fun close() {}
-
         }
     }
 
 
     private val writeCommandResponseToState = ProcessorSupplier {
-        object : Processor<String, CommandResponse> {
+        object : AbstractProcessor<String, CommandResponse>() {
 
             lateinit var commandResponseStore: WindowStore<String, CommandResponse>
 
@@ -156,8 +153,6 @@ class OwnerCommandsProcessor(
                 log.debug { "put $value for $key" }
                 commandResponseStore.put(key, value)
             }
-
-            override fun close() {}
 
         }
     }

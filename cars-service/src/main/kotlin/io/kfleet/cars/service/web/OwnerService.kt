@@ -1,6 +1,7 @@
 package io.kfleet.cars.service.web
 
 import io.kfleet.cars.service.repos.*
+import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import org.springframework.http.HttpStatus
@@ -30,18 +31,8 @@ class OwnerService(
                 .flatMap { validate(it) }
                 .flatMap { ownerRepository.submitCreateOwnerCommand(it) }
                 .delayElement(Duration.ofMillis(200))
-                .flatMap {
-                    commandsResponseRepository
-                            .findCommandResponse(it.getCommandId())
-                            .customRetry()
-                }
-                .flatMap {
-                    if (it.getStatus() == CommandStatus.REJECTED) {
-                        ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
-                    } else {
-                        ownerById(it.getRessourceId(), HttpStatus.CREATED)
-                    }
-                }
+                .flatMap { findCommand(it.getCommandId()) }
+                .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId(), HttpStatus.CREATED) } }
                 .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
@@ -55,18 +46,8 @@ class OwnerService(
                 .flatMap { validate(it) }
                 .flatMap { ownerRepository.submitUpdateOwnerNameCommand(it) }
                 .delayElement(Duration.ofMillis(200))
-                .flatMap {
-                    commandsResponseRepository
-                            .findCommandResponse(it.getCommandId())
-                            .customRetry()
-                }
-                .flatMap {
-                    if (it.getStatus() == CommandStatus.REJECTED) {
-                        ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
-                    } else {
-                        ownerById(it.getRessourceId())
-                    }
-                }
+                .flatMap { findCommand(it.getCommandId()) }
+                .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId()) } }
                 .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
@@ -76,20 +57,23 @@ class OwnerService(
                 .flatMap { validate(it) }
                 .flatMap { ownerRepository.submitDeleteOwnerCommand(it) }
                 .delayElement(Duration.ofMillis(200))
-                .flatMap {
-                    commandsResponseRepository
-                            .findCommandResponse(it.getCommandId())
-                            .customRetry()
-                }
-                .flatMap {
-                    if (it.getStatus() == CommandStatus.REJECTED) {
-                        ServerResponse.badRequest().body(BodyInserters.fromObject(it.getReason()))
-                    } else {
-                        ServerResponse.noContent().build()
-                    }
-                }
+                .flatMap { findCommand(it.getCommandId()) }
+                .flatMap { mapCommandResponse(it) { ServerResponse.noContent().build() } }
                 .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
+
+    fun findCommand(commandId: String): Mono<CommandResponse> = commandsResponseRepository
+            .findCommandResponse(commandId)
+            .customRetry()
+
+
+    private fun mapCommandResponse(cResponse: CommandResponse, mapResult: () -> Mono<ServerResponse>): Mono<ServerResponse> =
+            if (cResponse.getStatus() == CommandStatus.REJECTED) {
+                ServerResponse.badRequest().body(BodyInserters.fromObject(cResponse.getReason()))
+            } else {
+                mapResult()
+            }
+
 
     private fun toServerResponse(e: IllegalArgumentException) =
             ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
