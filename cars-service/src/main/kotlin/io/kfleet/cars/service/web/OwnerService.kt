@@ -42,9 +42,7 @@ class OwnerService(
                         ownerById(it.getRessourceId(), HttpStatus.CREATED)
                     }
                 }
-                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
-                    ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
-                }
+                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
     // The update ownerName is idempotent - so PUT is used. There is no optimistic locking
@@ -69,9 +67,7 @@ class OwnerService(
                         ownerById(it.getRessourceId())
                     }
                 }
-                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
-                    ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
-                }
+                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
     fun deleteOwner(request: ServerRequest): Mono<ServerResponse> {
@@ -92,10 +88,12 @@ class OwnerService(
                         ServerResponse.noContent().build()
                     }
                 }
-                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e ->
-                    ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
-                }
+                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
+
+    private fun toServerResponse(e: IllegalArgumentException) =
+            ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
+
 
     fun ownerById(request: ServerRequest): Mono<ServerResponse> {
         val id = request.pathVariable("id")
