@@ -68,6 +68,8 @@ class OwnerRepository(
                 .build()
 
         return try {
+            println(outputOwnerCommands.javaClass)
+            println(ownerCommand)
             // this works because cloud stream is configured as sync for this topic
             if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("CreateOwnerCommand coud not be send."))
         } catch (e: RuntimeException) {
@@ -88,9 +90,13 @@ class OwnerRepository(
                 .build()
 
         return try {
+            println(outputOwnerCommands.javaClass)
+            println(ownerCommand)
             // this works because cloud stream is configured as sync for this topic
             if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("UpdateOwnerNameCommand coud not be send."))
         } catch (e: RuntimeException) {
+            println(e.cause)
+            e.printStackTrace()
             Mono.error(e)
         }
     }
