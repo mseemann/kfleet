@@ -2,9 +2,9 @@ package io.kfleet.cars.service.web
 
 import io.kfleet.cars.service.configuration.JacksonObjectMapper
 import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.domain.CarFactory
 import io.kfleet.cars.service.domain.CarState
-import io.kfleet.cars.service.domain.GeoPositionFactory
+import io.kfleet.cars.service.domain.car
+import io.kfleet.cars.service.domain.geoPosition
 import io.kfleet.cars.service.repos.CarsRepository
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -25,12 +25,15 @@ import kotlin.test.expect
 @AutoConfigureWebTestClient(timeout = "15001") // backof retry is between 1 and 3 seconds; 5 times
 class CarsServiceTest {
 
-    private val car = CarFactory.create(
-            id = "1",
-            state = CarState.FREE,
-            stateOfCharge = 0.5,
-            geoPosition = GeoPositionFactory.create(lng = 1.0, lat = 2.0)
-    )
+    private val car = car {
+        id = "1"
+        state = CarState.FREE
+        stateOfCharge = 0.5
+        geoPosition = geoPosition {
+            lng = 1.0
+            lat = 2.0
+        }
+    }
 
     @Autowired
     private lateinit var webClient: WebTestClient
