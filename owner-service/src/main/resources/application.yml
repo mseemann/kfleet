@@ -60,11 +60,11 @@ spring.cloud.stream.kafka.bindings:
 spring.cloud.stream.kafka.streams.bindings:
   cars:
     consumer:
-      applicationId: cars-service-repo
+      applicationId: owners-cars-service
       materializedAs: all-cars
   owner_commands:
     consumer:
-      applicationId: cars-service-owners
+      applicationId: owners-service
 
 
 

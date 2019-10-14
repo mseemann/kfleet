@@ -4,7 +4,7 @@ rootProject.name = "kfleet"
 //include("monitoring")
 include("domain")
 //include("travel-request-validator")
-include("cars-service")
+include("owner-service")
 include("common")
 
 // make the avro plugihn available

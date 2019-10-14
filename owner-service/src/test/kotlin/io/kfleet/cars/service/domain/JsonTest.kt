@@ -17,7 +17,7 @@ class JsonTest {
         mapper.addMixIn(SpecificRecord::class.java, MixInIgnoreAvroSchemaProperties::class.java)
 
 
-        val car = Car("1", Random.nextDouble(0.0, 100.0), CarState.FREE, GeoPositionFactory.createRandom())
+        val car = Car("1", CarModel.Model3, Random.nextDouble(0.0, 100.0), CarState.FREE, GeoPositionFactory.createRandom())
 
         val serialized = mapper.writeValueAsString(car)
 

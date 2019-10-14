@@ -9,6 +9,7 @@ object CarFactory {
 
     fun createRandom(id: Int) = Car(
             "$id",
+            CarModel.values()[Random.nextInt(CarModel.values().size)],
             Random.nextDouble(0.0, 100.0),
             CarState.values()[Random.nextInt(CarState.values().size)],
             GeoPositionFactory.createRandom()
