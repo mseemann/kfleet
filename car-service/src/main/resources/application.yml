@@ -1,0 +1,73 @@
+server.port: 8184
+spring.application.name: car-service
+
+spring.cloud.stream:
+  schema-registry-client:
+    endpoint: http://localhost:8081
+
+spring.cloud.stream.default.consumer:
+  useNativeDecoding: true
+spring.cloud.stream.default.producer:
+  useNativeEncoding: true
+
+spring.cloud.stream.bindings:
+  cars_out:
+    destination: cars
+  car_events_out:
+    destination: car_events
+  cars:
+    destination: cars
+
+spring.cloud.stream.kafka.streams.binder.configuration:
+  schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
+  value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
+  specific.avro.reader: true
+  application.server: localhost:${server.port}
+  # a shorter commit interval results in more accurate statistics
+  commit.interval.ms: 1
+  # a shorter session timeout results in a shorter reablancing time if a streaming processor goes down
+  session.timeout.ms: 6000
+  default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+  default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
+  # TODO default.deserialization.exception.handler: io.kfleet.owner.service.configuration.CustomDeserializationExceptionHandler
+
+#default producer config for all kafka binder bindings
+spring.cloud.stream.kafka.binder.producerProperties:
+  key.serializer: org.apache.kafka.common.serialization.StringSerializer
+  value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+  value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicRecordNameStrategy
+  schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
+spring.cloud.stream.kafka.binder.consumerProperties:
+  isolation.level: read_committed
+  key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+  schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
+  specific.avro.reader: true
+
+spring.cloud.stream.kafka.streams.bindings:
+  cars:
+    consumer:
+      applicationId: owners-cars-service
+      materializedAs: all-cars
+
+
+#error if not at least 3 broker: Number of alive brokers '1' does not meet the required replication factor '3' for the transactions state topic
+spring.cloud.stream.kafka.streams.binder.configuration.processing.guarantee: exactly_once
+
+# spring.cloud.stream.kafka.streams.binder.configuration.num.standby.replicas: 2
+# spring.cloud.stream.kafka.streams.binder.configuration.num.stream.threads: 2
+
+# make sure every streaming app has it's own state store folder
+spring.cloud.stream.kafka.streams.binder.configuration.state.dir: "/tmp/kafka-streams/${server.port}"
+
+management.endpoints.web.exposure.include: "*"
+
+logging.level.org: WARN
+logging.level.io.confluent: WARN
+logging.level.io.kfleet: DEBUG
+logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+logging.level.reactor.netty: INFO
+logging.level.org.springframework.cloud.stream.binding: ERROR
+
+
+cars.service.simulation.enabled: false

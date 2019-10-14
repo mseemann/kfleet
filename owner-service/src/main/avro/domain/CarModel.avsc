@@ -1,6 +1,6 @@
 {
     "name": "CarModel",
-    "namespace": "io.kfleet.cars.service.domain",
+    "namespace": "io.kfleet.owner.service.domain",
     "type": "enum",
     "symbols" : ["Roadster", "ModelS", "ModelX", "Model3"]
 }

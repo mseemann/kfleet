@@ -3,7 +3,6 @@ plugins {
     id("org.springframework.boot") version "2.1.7.RELEASE" apply false
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
-    //jacoco
 }
 
 
@@ -27,8 +26,14 @@ dependencies {
     implementation("io.confluent:kafka-avro-serializer:5.2.2")
     implementation("io.confluent:kafka-schema-registry-client:5.2.1")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
+//    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+//        exclude(module = "junit")
+//    }
+
+    //testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
+    //testImplementation("org.awaitility:awaitility:4.0.1")
+    //testImplementation("org.awaitility:awaitility-kotlin:4.0.1")
+    //testImplementation("org.testcontainers:junit-jupiter:1.12.2")
 }
 
 dependencyManagement {

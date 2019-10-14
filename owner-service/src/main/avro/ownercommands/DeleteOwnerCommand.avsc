@@ -1,7 +1,7 @@
 {
-  "namespace" : "io.kfleet.cars.service.commands",
+  "namespace" : "io.kfleet.owner.service.commands",
   "type" : "record",
-  "javaAnnotation": "io.kfleet.cars.service.domain.OwnerCommand",
+  "javaAnnotation": "io.kfleet.owner.service.domain.OwnerCommand",
   "name" : "DeleteOwnerCommand",
   "fields" : [
     {"name":"commandId","type":"string"},

@@ -1,5 +1,5 @@
 server.port: 8084
-spring.application.name: car-service
+spring.application.name: owner-service
 
 spring.cloud.stream:
   schema-registry-client:
@@ -11,14 +11,8 @@ spring.cloud.stream.default.producer:
   useNativeEncoding: true
 
 spring.cloud.stream.bindings:
-  cars_out:
-    destination: cars
-  car_events_out:
-    destination: car_events
   owner_commands_out:
     destination: owner_commands
-  cars:
-    destination: cars
   owner_commands:
     destination: owner_commands
   owner_commands_response:
@@ -37,7 +31,7 @@ spring.cloud.stream.kafka.streams.binder.configuration:
   session.timeout.ms: 6000
   default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
   default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
-  default.deserialization.exception.handler: io.kfleet.cars.service.configuration.CustomDeserializationExceptionHandler
+  default.deserialization.exception.handler: io.kfleet.owner.service.configuration.CustomDeserializationExceptionHandler
 
 #default producer config for all kafka binder bindings
 spring.cloud.stream.kafka.binder.producerProperties:
@@ -58,10 +52,6 @@ spring.cloud.stream.kafka.bindings:
       sync: true
 
 spring.cloud.stream.kafka.streams.bindings:
-  cars:
-    consumer:
-      applicationId: owners-cars-service
-      materializedAs: all-cars
   owner_commands:
     consumer:
       applicationId: owners-service
@@ -85,6 +75,3 @@ logging.level.io.kfleet: DEBUG
 logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 logging.level.reactor.netty: INFO
 logging.level.org.springframework.cloud.stream.binding: ERROR
-
-
-cars.service.simulation.enabled: false

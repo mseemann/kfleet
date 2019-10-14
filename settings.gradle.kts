@@ -1,11 +1,10 @@
 rootProject.name = "kfleet"
 
-//include("simulator")
-//include("monitoring")
 include("domain")
-//include("travel-request-validator")
-include("owner-service")
 include("common")
+include("test-common")
+include("owner-service")
+include("car-service")
 
 // make the avro plugihn available
 pluginManagement {

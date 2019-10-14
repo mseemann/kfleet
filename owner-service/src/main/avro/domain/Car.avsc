@@ -1,12 +1,9 @@
 {
-  "namespace" : "io.kfleet.cars.service.domain",
+  "namespace" : "io.kfleet.owner.service.domain",
   "type" : "record",
   "name" : "Car",
   "fields" : [
     {"name":"id", "type": "string"},
-    {"name":"type", "type": "CarModel", "default": "ModelS"},
-    {"name":"stateOfCharge", "type": "double"},
-    {"name":"state", "type": "CarState", "default": "OUT_OF_POOL"},
-    {"name":"geoPosition", "type": "GeoPosition"}
+    {"name":"type", "type": "CarModel", "default": "ModelS"}
   ]
 }
