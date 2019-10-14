@@ -4,7 +4,7 @@ package io.kfleet.cars.service.repos
 import io.kfleet.cars.service.WebClientUtil
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.commands.DeleteOwnerCommand
-import io.kfleet.cars.service.commands.UpdateOwnernameCommand
+import io.kfleet.cars.service.commands.UpdateOwnerNameCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.domain.owner
 import org.apache.kafka.common.serialization.StringSerializer
@@ -101,7 +101,7 @@ class OwnerRepositoryTest {
         expect(updateOwnerParams.ownerName) { returnedCommand.getName() }
 
         val sendMessage = capture.value
-        val command = sendMessage.payload as UpdateOwnernameCommand
+        val command = sendMessage.payload as UpdateOwnerNameCommand
         val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
         expect(updateOwnerParams.ownerId) { messageKey }
         expect(updateOwnerParams.ownerId) { command.getOwnerId() }

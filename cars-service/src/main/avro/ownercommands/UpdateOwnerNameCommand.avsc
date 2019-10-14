@@ -2,7 +2,7 @@
   "namespace" : "io.kfleet.cars.service.commands",
   "type" : "record",
   "javaAnnotation": "io.kfleet.cars.service.domain.OwnerCommand",
-  "name" : "UpdateOwnernameCommand",
+  "name" : "UpdateOwnerNameCommand",
   "fields" : [
     {"name":"commandId","type":"string"},
     {"name":"ownerId","type":"string"},

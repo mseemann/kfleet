@@ -2,7 +2,7 @@ package io.kfleet.cars.service.domain
 
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.commands.DeleteOwnerCommand
-import io.kfleet.cars.service.commands.UpdateOwnernameCommand
+import io.kfleet.cars.service.commands.UpdateOwnerNameCommand
 import io.kfleet.cars.service.processors.CommandAndOwner
 import io.kfleet.commands.CommandStatus
 import io.kfleet.domain.asKeyValue
@@ -37,8 +37,8 @@ fun Owner.asKeyValue(): KeyValue<String, SpecificRecord?> {
 fun createOwnerCommand(buildCreateOwnerCommand: CreateOwnerCommand.Builder.() -> Unit): CreateOwnerCommand =
         CreateOwnerCommand.newBuilder().apply { buildCreateOwnerCommand() }.build()
 
-fun updateOwnerNameCommand(buildUpdateOwnerCommand: UpdateOwnernameCommand.Builder.() -> Unit): UpdateOwnernameCommand =
-        UpdateOwnernameCommand.newBuilder().apply { buildUpdateOwnerCommand() }.build()
+fun updateOwnerNameCommand(buildUpdateOwnerCommand: UpdateOwnerNameCommand.Builder.() -> Unit): UpdateOwnerNameCommand =
+        UpdateOwnerNameCommand.newBuilder().apply { buildUpdateOwnerCommand() }.build()
 
 fun deleteOwnerCommand(buildDeleteOwnerCommand: DeleteOwnerCommand.Builder.() -> Unit): DeleteOwnerCommand =
         DeleteOwnerCommand.newBuilder().apply { buildDeleteOwnerCommand() }.build()
@@ -52,7 +52,7 @@ class OwnerProcessor {
 
         return when (val command = commandAndOwner.command) {
             is CreateOwnerCommand -> createOwner(command, commandAndOwner.owner)
-            is UpdateOwnernameCommand -> updateOwner(command, commandAndOwner.owner)
+            is UpdateOwnerNameCommand -> updateOwner(command, commandAndOwner.owner)
             is DeleteOwnerCommand -> deleteOwner(command, commandAndOwner.owner)
             else -> throw RuntimeException("unsupported command: ${command::class}")
         }
@@ -91,7 +91,7 @@ class OwnerProcessor {
         }
     }
 
-    private fun updateOwner(command: UpdateOwnernameCommand, owner: Owner?): List<KeyValue<String, SpecificRecord?>> {
+    private fun updateOwner(command: UpdateOwnerNameCommand, owner: Owner?): List<KeyValue<String, SpecificRecord?>> {
         return if (owner == null) {
             listOf(responseOwnerNotExist(command.getCommandId(), command.getOwnerId()))
         } else {

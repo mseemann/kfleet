@@ -1,11 +1,7 @@
 package io.kfleet.cars.service.web
 
-import io.kfleet.cars.service.commands.CreateOwnerCommand
-import io.kfleet.cars.service.commands.DeleteOwnerCommand
-import io.kfleet.cars.service.commands.UpdateOwnernameCommand
 import io.kfleet.cars.service.configuration.JacksonObjectMapper
-import io.kfleet.cars.service.domain.Owner
-import io.kfleet.cars.service.domain.owner
+import io.kfleet.cars.service.domain.*
 import io.kfleet.cars.service.repos.*
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
@@ -66,12 +62,16 @@ class OwnerServiceTest {
     @Test
     fun createOwner() {
 
-        val params = CreateOwnerParams("1", "testName")
+        val params = CreateOwnerParams(ownerId = "1", ownerName = "testName")
         val owner = owner {
             id = "1"
             name = "testName"
         }
-        val createOwnerCommand = CreateOwnerCommand("c1", "1", "testName")
+        val createOwnerCommand = createOwnerCommand {
+            commandId = "c1"
+            ownerId = "1"
+            name = "testName"
+        }
 
         BDDMockito
                 .given(repo.submitCreateOwnerCommand(params))
@@ -106,8 +106,12 @@ class OwnerServiceTest {
 
     @Test
     fun createOwnerBadRequestOwnerExists() {
-        val params = CreateOwnerParams("1", "testName")
-        val createOwnerCommand = CreateOwnerCommand("c1", "1", "testName")
+        val params = CreateOwnerParams(ownerId = "1", ownerName = "testName")
+        val createOwnerCommand = createOwnerCommand {
+            commandId = "c1"
+            ownerId = "1"
+            name = "testName"
+        }
 
         BDDMockito
                 .given(repo.submitCreateOwnerCommand(params))
@@ -131,12 +135,16 @@ class OwnerServiceTest {
     @Test
     fun updateOwner() {
 
-        val params = UpdateOwnerParams("1", "testName")
+        val params = UpdateOwnerParams(ownerId = "1", ownerName = "testName")
         val owner = owner {
             id = "1"
             name = "testName"
         }
-        val updateOwnerCommand = UpdateOwnernameCommand("c1", "1", "testName")
+        val updateOwnerCommand = updateOwnerNameCommand {
+            commandId = "c1"
+            ownerId = "1"
+            name = "testName"
+        }
 
         BDDMockito
                 .given(repo.submitUpdateOwnerNameCommand(params))
@@ -171,8 +179,13 @@ class OwnerServiceTest {
 
     @Test
     fun updateOwnerBadRequestOwnerDidNotExists() {
-        val params = UpdateOwnerParams("1", "testName")
-        val updateOwnerCommand = UpdateOwnernameCommand("c1", "1", "testName")
+        val params = UpdateOwnerParams(ownerId = "1", ownerName = "testName")
+        val updateOwnerCommand = updateOwnerNameCommand {
+            commandId = "c1"
+            ownerId = "1"
+            name = "testName"
+        }
+
 
         BDDMockito
                 .given(repo.submitUpdateOwnerNameCommand(params))
@@ -195,8 +208,11 @@ class OwnerServiceTest {
     @Test
     fun deleteOwner() {
 
-        val params = DeleteOwnerParams("1")
-        val deleteOwnerCommand = DeleteOwnerCommand("c1", "1")
+        val params = DeleteOwnerParams(ownerId = "1")
+        val deleteOwnerCommand = deleteOwnerCommand {
+            commandId = "c1"
+            ownerId = "1"
+        }
 
         BDDMockito
                 .given(repo.submitDeleteOwnerCommand(params))
@@ -214,8 +230,11 @@ class OwnerServiceTest {
 
     @Test
     fun deleteOwnerBadRequestOwnerDidNotExists() {
-        val params = DeleteOwnerParams("1")
-        val deleteOwnerCommand = DeleteOwnerCommand("c1", "1")
+        val params = DeleteOwnerParams(ownerId = "1")
+        val deleteOwnerCommand = deleteOwnerCommand {
+            commandId = "c1"
+            ownerId = "1"
+        }
 
         BDDMockito
                 .given(repo.submitDeleteOwnerCommand(params))

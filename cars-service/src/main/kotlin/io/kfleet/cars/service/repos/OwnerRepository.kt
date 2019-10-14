@@ -3,7 +3,7 @@ package io.kfleet.cars.service.repos
 import io.kfleet.cars.service.WebClientUtil
 import io.kfleet.cars.service.commands.CreateOwnerCommand
 import io.kfleet.cars.service.commands.DeleteOwnerCommand
-import io.kfleet.cars.service.commands.UpdateOwnernameCommand
+import io.kfleet.cars.service.commands.UpdateOwnerNameCommand
 import io.kfleet.cars.service.domain.Owner
 import io.kfleet.cars.service.domain.createOwnerCommand
 import io.kfleet.cars.service.domain.deleteOwnerCommand
@@ -77,7 +77,7 @@ class OwnerRepository(
         }
     }
 
-    fun submitUpdateOwnerNameCommand(updateOwnerParams: UpdateOwnerParams): Mono<UpdateOwnernameCommand> {
+    fun submitUpdateOwnerNameCommand(updateOwnerParams: UpdateOwnerParams): Mono<UpdateOwnerNameCommand> {
         val ownerCommand = updateOwnerNameCommand {
             commandId = UUID.randomUUID().toString()
             ownerId = updateOwnerParams.ownerId
