@@ -17,8 +17,7 @@ import java.time.Duration
 class OwnerService(
         private val ownerRepository: OwnerRepository,
         private val commandsResponseRepository: CommandsResponseRepository) {
-
-
+    
     // The client is responsible to create a globally unique id (for example a uuid).
     // Post is used to state that this operation is not idempotent. If something
     // goes wrong the client can query for the ownerid late and check if the owner
@@ -33,7 +32,7 @@ class OwnerService(
                 .delayElement(Duration.ofMillis(200))
                 .flatMap { findCommand(it.getCommandId()) }
                 .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId(), HttpStatus.CREATED) } }
-                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
+                .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
     // The update ownerName is idempotent - so PUT is used. There is no optimistic locking
@@ -48,7 +47,7 @@ class OwnerService(
                 .delayElement(Duration.ofMillis(200))
                 .flatMap { findCommand(it.getCommandId()) }
                 .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId()) } }
-                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
+                .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
     fun deleteOwner(request: ServerRequest): Mono<ServerResponse> {
@@ -59,10 +58,10 @@ class OwnerService(
                 .delayElement(Duration.ofMillis(200))
                 .flatMap { findCommand(it.getCommandId()) }
                 .flatMap { mapCommandResponse(it) { ServerResponse.noContent().build() } }
-                .onErrorResume(java.lang.IllegalArgumentException::class.java) { e -> toServerResponse(e) }
+                .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
     }
 
-    fun findCommand(commandId: String): Mono<CommandResponse> = commandsResponseRepository
+    private fun findCommand(commandId: String): Mono<CommandResponse> = commandsResponseRepository
             .findCommandResponse(commandId)
             .customRetry()
 
