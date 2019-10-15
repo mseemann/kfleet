@@ -1,6 +1,6 @@
 package io.kfleet.car.service.processor
 
-import io.kfleet.cars.service.domain.Car
+import io.kfleet.car.service.domain.Car
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KeyValue

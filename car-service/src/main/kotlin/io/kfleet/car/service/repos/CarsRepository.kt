@@ -2,10 +2,10 @@ package io.kfleet.car.service.repos
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.processor.CarStateCountProcessor
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.rpclayer.RPC_CARS
-import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.WebClientUtil
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KafkaStreams

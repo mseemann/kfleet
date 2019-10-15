@@ -1,7 +1,7 @@
 package io.kfleet.car.service.simulation
 
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
-import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.headers
 import io.kfleet.common.randomDelayFluxer
 import mu.KotlinLogging

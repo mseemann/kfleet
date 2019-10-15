@@ -1,7 +1,7 @@
 package io.kfleet.car.service.repos
 
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
-import io.kfleet.cars.service.domain.Car
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
