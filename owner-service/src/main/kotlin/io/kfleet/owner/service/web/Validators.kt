@@ -28,3 +28,10 @@ fun validate(deleteOwnerParams: DeleteOwnerParams): Mono<DeleteOwnerParams> {
 fun validate(registerCarParams: RegisterCarParams): Mono<RegisterCarParams> {
     return Mono.just(registerCarParams).flatMap { validateOwnerId(it) }
 }
+
+fun validate(deregisterCarParams: DeregisterCarParams): Mono<DeregisterCarParams> {
+
+    if (deregisterCarParams.carId == "") return Mono.error(IllegalArgumentException("carId invalid"))
+
+    return Mono.just(deregisterCarParams).flatMap { validateOwnerId(it) }
+}

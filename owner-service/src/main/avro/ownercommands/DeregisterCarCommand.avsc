@@ -1,0 +1,11 @@
+{
+  "namespace" : "io.kfleet.owner.service.commands",
+  "type" : "record",
+  "javaAnnotation": "io.kfleet.owner.service.domain.OwnerCommand",
+  "name" : "DeregisterCarCommand",
+  "fields" : [
+    {"name":"commandId","type":"string"},
+    {"name":"ownerId","type":"string"},
+    {"name":"carId","type":"string"}
+  ]
+}

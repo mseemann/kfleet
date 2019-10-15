@@ -3,18 +3,14 @@ package io.kfleet.owner.service.domain
 import io.kfleet.commands.CommandStatus
 import io.kfleet.domain.asKeyValue
 import io.kfleet.domain.commandResponse
-import io.kfleet.domain.events.asKeyValue
-import io.kfleet.domain.events.ownerCreated
-import io.kfleet.domain.events.ownerDeleted
-import io.kfleet.domain.events.ownerUpdated
-import io.kfleet.owner.service.commands.CreateOwnerCommand
-import io.kfleet.owner.service.commands.DeleteOwnerCommand
-import io.kfleet.owner.service.commands.UpdateOwnerNameCommand
+import io.kfleet.domain.events.*
+import io.kfleet.owner.service.commands.*
 import io.kfleet.owner.service.processors.CommandAndOwner
 import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 import org.springframework.stereotype.Component
+import java.util.*
 import kotlin.reflect.full.findAnnotation
 
 private val log = KotlinLogging.logger {}
@@ -34,6 +30,10 @@ fun Owner.asKeyValue(): KeyValue<String, SpecificRecord?> {
     return KeyValue(this.getId(), this)
 }
 
+fun car(buildCar: Car.Builder.() -> Unit): Car =
+        Car.newBuilder().apply { buildCar() }.build()
+
+
 fun createOwnerCommand(buildCreateOwnerCommand: CreateOwnerCommand.Builder.() -> Unit): CreateOwnerCommand =
         CreateOwnerCommand.newBuilder().apply { buildCreateOwnerCommand() }.build()
 
@@ -42,6 +42,13 @@ fun updateOwnerNameCommand(buildUpdateOwnerCommand: UpdateOwnerNameCommand.Build
 
 fun deleteOwnerCommand(buildDeleteOwnerCommand: DeleteOwnerCommand.Builder.() -> Unit): DeleteOwnerCommand =
         DeleteOwnerCommand.newBuilder().apply { buildDeleteOwnerCommand() }.build()
+
+fun registerCarCommand(buildRegisterCarCommand: RegisterCarCommand.Builder.() -> Unit): RegisterCarCommand =
+        RegisterCarCommand.newBuilder().apply { buildRegisterCarCommand() }.build()
+
+fun deregisterCarCommand(buildDeregisterCarCommand: DeregisterCarCommand.Builder.() -> Unit): DeregisterCarCommand =
+        DeregisterCarCommand.newBuilder().apply { buildDeregisterCarCommand() }.build()
+
 
 @Component
 class OwnerProcessor {
@@ -54,6 +61,8 @@ class OwnerProcessor {
             is CreateOwnerCommand -> createOwner(command, commandAndOwner.owner)
             is UpdateOwnerNameCommand -> updateOwner(command, commandAndOwner.owner)
             is DeleteOwnerCommand -> deleteOwner(command, commandAndOwner.owner)
+            is RegisterCarCommand -> registerCar(command, commandAndOwner.owner)
+            is DeregisterCarCommand -> deregisterCar(command, commandAndOwner.owner)
             else -> throw RuntimeException("unsupported command: ${command::class}")
         }
 
@@ -97,7 +106,7 @@ class OwnerProcessor {
         } else {
             listOf(
                     owner {
-                        id = command.getOwnerId()
+                        id = owner.getId()
                         name = command.getName()
                     }.asKeyValue(),
 
@@ -145,5 +154,71 @@ class OwnerProcessor {
             status = CommandStatus.REJECTED
             reason = "Owner with id $ownerId did not exist"
         }.asKeyValue()
+    }
+
+    private fun responseCarNotExist(commandId: String, carId: String): KeyValue<String, SpecificRecord?> {
+        return commandResponse {
+            setCommandId(commandId)
+            ressourceId = null
+            status = CommandStatus.REJECTED
+            reason = "Car with id $carId did not exist"
+        }.asKeyValue()
+    }
+
+    private fun registerCar(command: RegisterCarCommand, owner: Owner?): List<KeyValue<String, SpecificRecord?>> {
+        return if (owner == null) {
+            listOf(responseOwnerNotExist(command.getCommandId(), command.getOwnerId()))
+        } else {
+            val newCar = car {
+                id = UUID.randomUUID().toString()
+                type = command.getType()
+            }
+            val cars = owner.getCars().toMutableList()
+            cars.add(newCar)
+            owner.setCars(cars)
+
+            listOf(
+                    owner.asKeyValue(),
+
+                    carRegistered {
+                        carId = newCar.getId()
+                    }.asKeyValue(),
+
+
+                    commandResponse {
+                        commandId = command.getCommandId()
+                        ressourceId = command.getOwnerId()
+                        status = CommandStatus.SUCCEEDED
+                    }.asKeyValue()
+            )
+        }
+    }
+
+    private fun deregisterCar(command: DeregisterCarCommand, owner: Owner?): List<KeyValue<String, SpecificRecord?>> {
+        return if (owner == null) {
+            listOf(responseOwnerNotExist(command.getCommandId(), command.getOwnerId()))
+        } else {
+            if (owner.getCars().filter { it.getId() == command.getCarId() }.size == 0) {
+                return listOf(responseCarNotExist(command.getCommandId(), command.getCarId()))
+            }
+
+            val cars = owner.getCars().filter { it.getId() != command.getCarId() }
+            owner.setCars(cars)
+
+            listOf(
+                    owner.asKeyValue(),
+
+                    carDeregistered {
+                        carId = command.getCarId()
+                    }.asKeyValue(),
+
+
+                    commandResponse {
+                        commandId = command.getCommandId()
+                        ressourceId = command.getOwnerId()
+                        status = CommandStatus.SUCCEEDED
+                    }.asKeyValue()
+            )
+        }
     }
 }

@@ -1,0 +1,11 @@
+{
+  "namespace" : "io.kfleet.owner.service.commands",
+  "type" : "record",
+  "javaAnnotation": "io.kfleet.owner.service.domain.OwnerCommand",
+  "name" : "RegisterCarCommand",
+  "fields" : [
+    {"name":"commandId","type":"string"},
+    {"name":"ownerId","type":"string"},
+    {"name":"type", "type": "io.kfleet.owner.service.domain.CarModel", "default": "ModelS"}
+  ]
+}

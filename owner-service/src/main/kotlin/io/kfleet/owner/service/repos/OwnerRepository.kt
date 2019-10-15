@@ -2,13 +2,8 @@ package io.kfleet.owner.service.repos
 
 import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.common.WebClientUtil
-import io.kfleet.owner.service.commands.CreateOwnerCommand
-import io.kfleet.owner.service.commands.DeleteOwnerCommand
-import io.kfleet.owner.service.commands.UpdateOwnerNameCommand
-import io.kfleet.owner.service.domain.Owner
-import io.kfleet.owner.service.domain.createOwnerCommand
-import io.kfleet.owner.service.domain.deleteOwnerCommand
-import io.kfleet.owner.service.domain.updateOwnerNameCommand
+import io.kfleet.owner.service.commands.*
+import io.kfleet.owner.service.domain.*
 import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.owner.service.rpclayer.RPC_OWNER
 import io.kfleet.owner.service.web.NewCar
@@ -116,6 +111,47 @@ class OwnerRepository(
         return try {
             // this works because cloud stream is configured as sync for this topic
             if (outputOwnerCommands.send(msg)) Mono.just(ownerCommand) else Mono.error(RuntimeException("DeleteOwnerCommand coud not be send."))
+        } catch (e: RuntimeException) {
+            Mono.error(e)
+        }
+    }
+
+    fun submitRegisterCarCommand(regsiterCarParams: RegisterCarParams): Mono<RegisterCarCommand> {
+        val registerCarCommand = registerCarCommand {
+            commandId = UUID.randomUUID().toString()
+            ownerId = regsiterCarParams.ownerId
+            type = regsiterCarParams.newCar.model
+        }
+
+        val msg = MessageBuilder
+                .withPayload(registerCarCommand)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, registerCarCommand.getOwnerId())
+                .build()
+
+        return try {
+            // this works because cloud stream is configured as sync for this topic
+            if (outputOwnerCommands.send(msg)) Mono.just(registerCarCommand) else Mono.error(RuntimeException("RegisterCarCommand coud not be send."))
+        } catch (e: RuntimeException) {
+            Mono.error(e)
+        }
+    }
+
+    fun submitDeregisterCarCommand(deregisterCarParams: DeregisterCarParams): Mono<DeregisterCarCommand> {
+
+        val deregisterCarCommand = deregisterCarCommand {
+            commandId = UUID.randomUUID().toString()
+            ownerId = deregisterCarParams.ownerId
+            carId = deregisterCarParams.carId
+        }
+
+        val msg = MessageBuilder
+                .withPayload(deregisterCarCommand)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, deregisterCarCommand.getOwnerId())
+                .build()
+
+        return try {
+            // this works because cloud stream is configured as sync for this topic
+            if (outputOwnerCommands.send(msg)) Mono.just(deregisterCarCommand) else Mono.error(RuntimeException("DeregisterCarCommand coud not be send."))
         } catch (e: RuntimeException) {
             Mono.error(e)
         }

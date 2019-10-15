@@ -1,5 +1,5 @@
 {
-  "namespace" : "io.kfleet.cars.service.events",
+  "namespace" : "io.kfleet.owner.service.events",
   "type" : "record",
   "name" : "OwnerCreatedEvent",
   "fields" : [

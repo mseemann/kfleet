@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
 import java.time.Duration
 
@@ -96,27 +97,34 @@ class OwnerService(
                             .body(BodyInserters.fromObject(it))
                 }
     }
-//
-//    fun registerACar(request: ServerRequest): Mono<ServerResponse> = request.bodyToMono<NewCar>()
-//            .flatMap {
-//                val ownerId = request.pathVariable("ownerId")
-//                val registerCarParams = RegisterCarParams(ownerId = ownerId, newCar = it)
-//                Mono.just(registerCarParams)
-//                        .flatMap { validate(it) }
-//                        .flatMap {
-//                            ServerResponse
-//                                    .status(HttpStatus.CREATED)
-//                                    .body(BodyInserters.fromObject(it))
-//                        }
-//            }
-//
-//
-//    fun deregisterACar(request: ServerRequest): Mono<ServerResponse> {
-//        val ownerId = request.pathVariable("ownerId")
-//        val carId = request.pathVariable("carId")
-//        println(ownerId)
-//        println(carId)
-//        return ServerResponse.badRequest().build()
-//    }
+
+    fun registerACar(request: ServerRequest): Mono<ServerResponse> = request.bodyToMono<NewCar>()
+            .flatMap {
+                val ownerId = request.pathVariable("ownerId")
+                val registerCarParams = RegisterCarParams(ownerId = ownerId, newCar = it)
+                Mono.just(registerCarParams)
+                        .flatMap { validate(it) }
+                        .flatMap { ownerRepository.submitRegisterCarCommand(it) }
+                        .delayElement(Duration.ofMillis(200))
+                        .flatMap { findCommand(it.getCommandId()) }
+                        .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId(), HttpStatus.CREATED) } }
+                        .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
+            }
+
+
+    fun deregisterACar(request: ServerRequest): Mono<ServerResponse> {
+
+        val ownerId = request.pathVariable("ownerId")
+        val carId = request.pathVariable("carId")
+
+        return Mono.just(DeregisterCarParams(ownerId = ownerId, carId = carId))
+                .flatMap { validate(it) }
+                .flatMap { ownerRepository.submitDeregisterCarCommand(it) }
+                .delayElement(Duration.ofMillis(200))
+                .flatMap { findCommand(it.getCommandId()) }
+                .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId()) } }
+                .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
+
+    }
 }
 

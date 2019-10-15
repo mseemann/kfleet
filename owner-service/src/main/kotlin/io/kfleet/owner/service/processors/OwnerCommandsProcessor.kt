@@ -1,11 +1,15 @@
 package io.kfleet.owner.service.processors
 
 import io.kfleet.cars.service.events.OwnerCreatedEvent
+import io.kfleet.cars.service.events.OwnerDeletedEvent
+import io.kfleet.cars.service.events.OwnerUpdatedEvent
 import io.kfleet.commands.CommandResponse
 import io.kfleet.common.createSerdeWithAvroRegistry
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.OwnerProcessor
 import io.kfleet.owner.service.domain.isOwnerCommand
+import io.kfleet.owner.service.events.CarDeregisteredEvent
+import io.kfleet.owner.service.events.CarRegisteredEvent
 import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Serdes
@@ -39,10 +43,9 @@ interface OwnerCommandsProcessorBinding {
     companion object {
         const val OWNER_COMMANDS = "owner_commands"
         const val OWNER_EVENTS = "owner_events"
+        const val CAR_EVENTS = "car_events"
         const val UNKNOW_COMMANDS = "unknown_owner_commands"
-        // backed by a topic cars-service-owners-owner_commands_response_store-changelog
         const val OWNER_COMMANDS_RESPONSE_STORE = "owner_commands_response_store"
-        // backed by a topic cars-service-owners-owners-changelog
         const val OWNER_RW_STORE = "owners_store"
     }
 
@@ -110,8 +113,19 @@ class OwnerCommandsProcessor(
                 .process(writeOwnerToState, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
 
         createOwnerResult
-                .filter { _, value -> value is OwnerCreatedEvent }
+                .filter { _, value ->
+                    value is OwnerCreatedEvent
+                            || value is OwnerUpdatedEvent
+                            || value is OwnerDeletedEvent
+                }
                 .to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
+
+        createOwnerResult
+                .filter { _, value ->
+                    value is CarRegisteredEvent
+                            || value is CarDeregisteredEvent
+                }
+                .to(OwnerCommandsProcessorBinding.CAR_EVENTS)
 
         createOwnerResult
                 .filter { _, value -> value is CommandResponse }

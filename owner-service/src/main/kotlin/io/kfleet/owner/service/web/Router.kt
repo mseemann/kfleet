@@ -14,8 +14,8 @@ class OwnerRoutes(private val ownerService: OwnerService) {
             POST("/{ownerId}/{ownerName}", ownerService::createOwner)
             PUT("/{ownerId}/{ownerName}", ownerService::updateOwnersName)
             DELETE("/{ownerId}", ownerService::deleteOwner)
-            //POST("/{ownerId}/car/register", ownerService::registerACar)
-            //POST("/{ownerId}/car/{carId}/deregister", ownerService::deregisterACar)
+            POST("/{ownerId}/car/register", ownerService::registerACar)
+            POST("/{ownerId}/car/{carId}/deregister", ownerService::deregisterACar)
         }
     }
 
