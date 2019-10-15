@@ -1,13 +1,9 @@
 package io.kfleet.owner.service.domain
 
-import io.kfleet.cars.service.events.OwnerCreatedEvent
-import io.kfleet.cars.service.events.OwnerDeletedEvent
-import io.kfleet.cars.service.events.OwnerUpdatedEvent
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.domain.events.ownerCreated
-import io.kfleet.owner.service.events.CarDeregisteredEvent
-import io.kfleet.owner.service.events.CarRegisteredEvent
+import io.kfleet.owner.service.events.*
 import io.kfleet.owner.service.processors.CommandAndOwner
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith

@@ -1,15 +1,11 @@
 package io.kfleet.owner.service.processors
 
-import io.kfleet.cars.service.events.OwnerCreatedEvent
-import io.kfleet.cars.service.events.OwnerDeletedEvent
-import io.kfleet.cars.service.events.OwnerUpdatedEvent
 import io.kfleet.commands.CommandResponse
 import io.kfleet.common.createSerdeWithAvroRegistry
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.OwnerProcessor
 import io.kfleet.owner.service.domain.isOwnerCommand
-import io.kfleet.owner.service.events.CarDeregisteredEvent
-import io.kfleet.owner.service.events.CarRegisteredEvent
+import io.kfleet.owner.service.events.*
 import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.common.serialization.Serdes

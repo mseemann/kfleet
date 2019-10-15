@@ -1,9 +1,9 @@
 package io.kfleet.owner.service.repos
 
-import io.kfleet.cars.service.events.OwnerCreatedEvent
 import io.kfleet.common.WebClientUtil
 import io.kfleet.owner.service.commands.*
 import io.kfleet.owner.service.domain.*
+import io.kfleet.owner.service.events.OwnerCreatedEvent
 import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.owner.service.rpclayer.RPC_OWNER
 import io.kfleet.owner.service.web.NewCar

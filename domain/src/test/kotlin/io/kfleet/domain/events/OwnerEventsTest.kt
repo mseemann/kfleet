@@ -85,7 +85,7 @@ class OwnerEventsTest : BehaviorSpec({
             }
         }
 
-        When("ono owner id is given") {
+        When("only owner id is given") {
             Then("an exception should be thrown") {
                 shouldThrow<AvroMissingFieldException> {
                     ownerDeleted {}
