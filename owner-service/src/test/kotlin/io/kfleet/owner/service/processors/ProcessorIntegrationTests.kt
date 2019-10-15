@@ -110,7 +110,7 @@ class ProcessorIntegrationTests {
     }
 
     @Test
-    fun submitRegisterCarCommand() {
+    fun submitRegisterAnDeregisterCarCommand() {
         val ownerName = "test"
         val ownerId = "1"
         val createOwnerParams = CreateOwnerParams(ownerId = ownerId, ownerName = ownerName)
@@ -143,6 +143,23 @@ class ProcessorIntegrationTests {
         expect(ownerName) { owner.getName() }
         expect(1) { owner.getCars().size }
 
+        val deregisterCarCommand = DeregisterCarParams(ownerId = ownerId, carId = "1")
+        val commandDeregisterCar = repo.submitDeregisterCarCommand(deregisterCarCommand).block()
+        assertNotNull(commandDeregisterCar)
+        expect(ownerId) { commandDeregisterCar.getOwnerId() }
+
+        val commandResponseDereg = commandsResponseRepository
+                .findCommandResponse(commandDeregisterCar.getCommandId())
+                .customRetry()
+                .block()
+        assertNotNull(commandResponseDereg)
+        assertEquals(CommandStatus.SUCCEEDED, commandResponseDereg.getStatus())
+
+        val ownerDeregisteredCar = repo
+                .findById(commandResponse.getRessourceId())
+                .customRetry().block()
+        assertNotNull(ownerDeregisteredCar)
+        expect(0) { ownerDeregisteredCar.getCars().size }
     }
 }
 
