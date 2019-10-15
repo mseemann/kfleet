@@ -93,4 +93,56 @@ class OwnerEventsTest : BehaviorSpec({
             }
         }
     }
+
+    Given("owner car registered events") {
+        When("a carId is specified") {
+            val carRegisteredEvent = carRegistered {
+                carId = "1"
+            }
+
+            Then("an event should be created") {
+                carRegisteredEvent.shouldNotBeNull()
+            }
+
+            Then("carid should be the message key") {
+                carRegisteredEvent.should {
+                    it.asKeyValue().key == carRegisteredEvent.getCarId()
+                }
+            }
+        }
+
+        When("no car id is given") {
+            Then("an exception should be thrown") {
+                shouldThrow<AvroMissingFieldException> {
+                    carRegistered {}
+                }
+            }
+        }
+    }
+
+    Given("owner car deregistered events") {
+        When("a carId is specified") {
+            val carDeregisteredEvent = carDeregistered {
+                carId = "1"
+            }
+
+            Then("an event should be created") {
+                carDeregisteredEvent.shouldNotBeNull()
+            }
+
+            Then("carid should be the message key") {
+                carDeregisteredEvent.should {
+                    it.asKeyValue().key == carDeregisteredEvent.getCarId()
+                }
+            }
+        }
+
+        When("no car id is given") {
+            Then("an exception should be thrown") {
+                shouldThrow<AvroMissingFieldException> {
+                    carDeregistered {}
+                }
+            }
+        }
+    }
 })
