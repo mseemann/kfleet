@@ -1,9 +1,12 @@
 package io.kfleet.car.service.processors
 
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
+import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.simulation.CarsOutBindings
 import io.kfleet.common.headers
+import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
