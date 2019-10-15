@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import kotlin.test.assertEquals
 import kotlin.test.expect
@@ -262,5 +263,75 @@ class OwnerServiceTest {
                 .expectBody(String::class.java)
                 .returnResult()
         assertEquals("ownerId invalid", result.responseBody)
+    }
+
+    @Test
+    fun registerCar() {
+        val newCar = NewCar(CarModel.ModelX)
+        val params = RegisterCarParams(ownerId = "1", newCar = newCar)
+        val owner = owner {
+            id = "1"
+            name = "testName"
+            cars = listOf(
+                    car {
+                        id = "1"
+                    }
+            )
+        }
+
+        val registerCarCommand = registerCarCommand {
+            commandId = "c1"
+            ownerId = "1"
+            type = CarModel.ModelX
+        }
+
+        BDDMockito
+                .given(repo.submitRegisterCarCommand(params))
+                .willReturn(Mono.just(registerCarCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(registerCarCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(registerCarCommand.getCommandId(), registerCarCommand.getOwnerId(), CommandStatus.SUCCEEDED, null)))
+
+        BDDMockito.given(repo.findById(owner.getId())).willReturn(Mono.just(owner))
+
+
+        val response = webClient.post().uri("/owners/1/car/register").body(BodyInserters.fromObject(newCar))
+                .exchange()
+                .expectStatus().isCreated
+                .expectBody(Owner::class.java)
+                .returnResult()
+
+        expect("1") { response.responseBody!!.getId() }
+        expect(owner) { response.responseBody }
+    }
+
+    @Test
+    fun registerCarOwnerDidNotExists() {
+        val newCar = NewCar(CarModel.ModelX)
+        val params = RegisterCarParams(ownerId = "1", newCar = newCar)
+
+        val registerCarCommand = registerCarCommand {
+            commandId = "c1"
+            ownerId = "1"
+            type = CarModel.ModelX
+        }
+
+        BDDMockito
+                .given(repo.submitRegisterCarCommand(params))
+                .willReturn(Mono.just(registerCarCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(registerCarCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(registerCarCommand.getCommandId(), registerCarCommand.getOwnerId(), CommandStatus.REJECTED, "did not exist")))
+
+
+        val response = webClient.post().uri("/owners/1/car/register").body(BodyInserters.fromObject(newCar))
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+
+        expect("did not exist") { response.responseBody }
     }
 }
