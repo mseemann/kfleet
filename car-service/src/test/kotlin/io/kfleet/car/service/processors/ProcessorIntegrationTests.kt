@@ -1,6 +1,6 @@
 package io.kfleet.car.service.processors
 
-////@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
+//@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
 //@ExtendWith(SpringExtension::class)
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 //@ContextConfiguration(initializers = [KafkaContextInitializer::class])
