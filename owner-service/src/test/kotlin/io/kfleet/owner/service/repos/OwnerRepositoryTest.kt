@@ -2,11 +2,11 @@ package io.kfleet.owner.service.repos
 
 
 import io.kfleet.common.WebClientUtil
-import io.kfleet.owner.service.commands.CreateOwnerCommand
-import io.kfleet.owner.service.commands.DeleteOwnerCommand
-import io.kfleet.owner.service.commands.UpdateOwnerNameCommand
+import io.kfleet.owner.service.commands.*
+import io.kfleet.owner.service.domain.CarModel
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.owner
+import io.kfleet.owner.service.web.NewCar
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.state.HostInfo
 import org.junit.jupiter.api.BeforeAll
@@ -44,9 +44,12 @@ class OwnerRepositoryTest {
         MockitoAnnotations.initMocks(this)
     }
 
+    val newCar = NewCar(CarModel.ModelX)
     val createOwnerParams = CreateOwnerParams(ownerId = "1", ownerName = "testName")
     val updateOwnerParams = UpdateOwnerParams(ownerId = "1", ownerName = "testNameNew")
     val deleteOwnerParams = DeleteOwnerParams(ownerId = "1")
+    val registerCarParams = RegisterCarParams(ownerId = "1", newCar = newCar)
+    val deregisterCarParams = DeregisterCarParams(ownerId = "1", carId = "1")
 
     @Test
     fun sendCreateOwnerCommand() {
@@ -188,5 +191,65 @@ class OwnerRepositoryTest {
                 .expectNext(owner)
                 .verifyComplete()
 
+    }
+
+    @Test
+    fun sendRegisterCarCommand() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willReturn(true)
+
+        val result = ownerRepo.submitRegisterCarCommand(registerCarParams)
+
+        val returnedCommand = result.block()!!
+        expect(registerCarParams.ownerId) { returnedCommand.getOwnerId() }
+
+        val sendMessage = capture.value
+        val command = sendMessage.payload as RegisterCarCommand
+        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        expect(registerCarParams.ownerId) { messageKey }
+        expect(registerCarParams.ownerId) { command.getOwnerId() }
+    }
+
+    @Test
+    fun sendRegisterCarCommandUnknownFailure() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willThrow(RuntimeException())
+                // reset throw for the next call
+                .willReturn(true)
+
+        StepVerifier.create(ownerRepo.submitRegisterCarCommand(registerCarParams))
+                .expectError()
+                .verify()
+    }
+
+
+    @Test
+    fun sendDeregisterCarCommand() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willReturn(true)
+
+        val result = ownerRepo.submitDeregisterCarCommand(deregisterCarParams)
+
+        val returnedCommand = result.block()!!
+        expect(deregisterCarParams.ownerId) { returnedCommand.getOwnerId() }
+
+        val sendMessage = capture.value
+        val command = sendMessage.payload as DeregisterCarCommand
+        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        expect(deregisterCarParams.ownerId) { messageKey }
+        expect(deregisterCarParams.ownerId) { command.getOwnerId() }
+        expect(deregisterCarParams.carId) { command.getCarId() }
+    }
+
+    @Test
+    fun sendDeregisterCarCommandUnknownFailure() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willThrow(RuntimeException())
+                // reset throw for the next call
+                .willReturn(true)
+
+        StepVerifier.create(ownerRepo.submitDeregisterCarCommand(deregisterCarParams))
+                .expectError()
+                .verify()
     }
 }
