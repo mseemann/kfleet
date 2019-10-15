@@ -28,7 +28,7 @@ class KafkaContextInitializer : ApplicationContextInitializer<ConfigurableApplic
 
         class KDockerComposeContainer(file: File) : DockerComposeContainer<KDockerComposeContainer>(file)
 
-        private fun defineDockerCompose() = KDockerComposeContainer(File("./../docker-compose.yml"))
+        private fun defineDockerCompose() = KDockerComposeContainer(File("./../docker-compose-ci.yml"))
 
     }
 }
