@@ -1,9 +1,9 @@
 package io.kfleet.owner.service.repos
 
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsLocalRepository
-import io.kfleet.cars.service.domain.Car
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.state.KeyValueIterator
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore

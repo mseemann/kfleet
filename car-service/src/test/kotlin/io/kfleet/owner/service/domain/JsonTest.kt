@@ -2,9 +2,9 @@ package io.kfleet.owner.service.domain
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.kfleet.car.service.domain.Car
+import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.domain.GeoPositionFactory
-import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.domain.CarState
 import io.kfleet.common.configuration.MixInIgnoreAvroSchemaProperties
 import org.apache.avro.specific.SpecificRecord
 import org.junit.jupiter.api.Test

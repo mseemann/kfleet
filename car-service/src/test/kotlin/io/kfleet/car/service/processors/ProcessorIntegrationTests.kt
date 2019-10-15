@@ -1,10 +1,10 @@
 package io.kfleet.car.service.processors
 
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.simulation.CarsOutBindings
-import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.headers
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS

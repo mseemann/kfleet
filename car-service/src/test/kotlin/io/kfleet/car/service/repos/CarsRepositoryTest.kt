@@ -1,11 +1,11 @@
 package io.kfleet.owner.service.repos
 
 import io.kfleet.car.service.configuration.JacksonObjectMapper
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.repos.KafkaStreamsUtil
-import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.WebClientUtil
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KafkaStreams

@@ -3,6 +3,7 @@ package io.kfleet.owner.service.web
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
+import io.kfleet.owner.service.domain.CarModel
 import io.kfleet.owner.service.repos.*
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -12,6 +13,8 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 import java.time.Duration
 
+
+data class NewCar(val model: CarModel)
 
 @Component
 class OwnerService(
@@ -94,11 +97,19 @@ class OwnerService(
                 }
     }
 
-    fun registerACar() {
-
+    fun registerACar(request: ServerRequest): Mono<ServerResponse> {
+        val ownerId = request.pathVariable("ownerId")
+        val newCar = request.bodyToMono(NewCar::class.java)
+        println(ownerId)
+        println(newCar)
+        return ServerResponse.badRequest().build()
     }
 
-    fun deregisterACar() {
-
+    fun deregisterACar(request: ServerRequest): Mono<ServerResponse> {
+        val ownerId = request.pathVariable("ownerId")
+        val carId = request.pathVariable("carId")
+        println(ownerId)
+        println(carId)
+        return ServerResponse.badRequest().build()
     }
 }

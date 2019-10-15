@@ -1,10 +1,10 @@
 package io.kfleet.car.service.rpclayer
 
 import io.kfleet.car.service.configuration.JacksonObjectMapper
+import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
+import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.repos.CarsLocalRepository
-import io.kfleet.cars.service.domain.Car
-import io.kfleet.cars.service.domain.CarState
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
