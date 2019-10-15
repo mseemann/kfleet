@@ -1,9 +1,8 @@
 package io.kfleet.owner.service.web
 
 
-import io.kfleet.owner.service.repos.CreateOwnerParams
-import io.kfleet.owner.service.repos.DeleteOwnerParams
-import io.kfleet.owner.service.repos.UpdateOwnerParams
+import io.kfleet.owner.service.domain.CarModel
+import io.kfleet.owner.service.repos.*
 import org.junit.jupiter.api.Test
 import reactor.test.StepVerifier
 
@@ -61,6 +60,28 @@ class ValidatorsTest {
         StepVerifier.create(validate(params))
                 .expectErrorMatches() {
                     it.message == "ownerId invalid"
+                }
+                .verify()
+    }
+
+    @Test
+    fun validateErrorRegisterCarParams() {
+        val params = RegisterCarParams(ownerId = "", newCar = NewCar(CarModel.ModelX))
+
+        StepVerifier.create(validate(params))
+                .expectErrorMatches() {
+                    it.message == "ownerId invalid"
+                }
+                .verify()
+    }
+
+    @Test
+    fun validateErrorDeregisterCarParams() {
+        val params = DeregisterCarParams(ownerId = "x", carId = "")
+
+        StepVerifier.create(validate(params))
+                .expectErrorMatches() {
+                    it.message == "carId invalid"
                 }
                 .verify()
     }
