@@ -3,12 +3,10 @@ package io.kfleet.owner.service.processors
 
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
-import io.kfleet.owner.service.repos.CommandsResponseRepository
-import io.kfleet.owner.service.repos.CreateOwnerParams
-import io.kfleet.owner.service.repos.DeleteOwnerParams
-import io.kfleet.owner.service.repos.OwnerRepository
+import io.kfleet.owner.service.domain.CarModel
+import io.kfleet.owner.service.repos.*
+import io.kfleet.owner.service.web.NewCar
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -17,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import testing.KafkaContextInitializer
 import kotlin.test.*
 
-@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
+//@EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
@@ -111,6 +109,41 @@ class ProcessorIntegrationTests {
 
     }
 
+    @Test
+    fun submitRegisterCarCommand() {
+        val ownerName = "test"
+        val ownerId = "1"
+        val createOwnerParams = CreateOwnerParams(ownerId = ownerId, ownerName = ownerName)
+
+        val command = repo.submitCreateOwnerCommand(createOwnerParams).block()
+        assertNotNull(command)
+
+        repo.findById(ownerId).customRetry().block()
+
+        val newCar = NewCar(CarModel.ModelX)
+        val registerCarCommand = RegisterCarParams(ownerId = ownerId, newCar = newCar)
+
+        val commandRegisterCar = repo.submitRegisterCarCommand(registerCarCommand).block()
+        assertNotNull(commandRegisterCar)
+        expect(ownerId) { commandRegisterCar.getOwnerId() }
+
+        val commandResponse = commandsResponseRepository
+                .findCommandResponse(commandRegisterCar.getCommandId())
+                .customRetry()
+                .block()
+        assertNotNull(commandResponse)
+        assertEquals(CommandStatus.SUCCEEDED, commandResponse.getStatus())
+        assertEquals(ownerId, commandResponse.getRessourceId())
+        assertNotEquals(ownerId, commandResponse.getCommandId())
+
+        val owner = repo
+                .findById(commandResponse.getRessourceId())
+                .customRetry().block()
+        assertNotNull(owner)
+        expect(ownerName) { owner.getName() }
+        expect(1) { owner.getCars().size }
+
+    }
 }
 
 
