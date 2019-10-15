@@ -44,12 +44,12 @@ class OwnerRepositoryTest {
         MockitoAnnotations.initMocks(this)
     }
 
-    val newCar = NewCar(CarModel.ModelX)
-    val createOwnerParams = CreateOwnerParams(ownerId = "1", ownerName = "testName")
-    val updateOwnerParams = UpdateOwnerParams(ownerId = "1", ownerName = "testNameNew")
-    val deleteOwnerParams = DeleteOwnerParams(ownerId = "1")
-    val registerCarParams = RegisterCarParams(ownerId = "1", newCar = newCar)
-    val deregisterCarParams = DeregisterCarParams(ownerId = "1", carId = "1")
+    private val newCar = NewCar(CarModel.ModelX)
+    private val createOwnerParams = CreateOwnerParams(ownerId = "1", ownerName = "testName")
+    private val updateOwnerParams = UpdateOwnerParams(ownerId = "1", ownerName = "testNameNew")
+    private val deleteOwnerParams = DeleteOwnerParams(ownerId = "1")
+    private val registerCarParams = RegisterCarParams(ownerId = "1", newCar = newCar)
+    private val deregisterCarParams = DeregisterCarParams(ownerId = "1", carId = "1")
 
     @Test
     fun sendCreateOwnerCommand() {
@@ -64,7 +64,7 @@ class OwnerRepositoryTest {
 
         val sendMessage = capture.value
         val command = sendMessage.payload as CreateOwnerCommand
-        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
         expect(createOwnerParams.ownerId) { messageKey }
         expect(createOwnerParams.ownerId) { command.getOwnerId() }
         expect(createOwnerParams.ownerName) { command.getName() }
@@ -105,7 +105,7 @@ class OwnerRepositoryTest {
 
         val sendMessage = capture.value
         val command = sendMessage.payload as UpdateOwnerNameCommand
-        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
         expect(updateOwnerParams.ownerId) { messageKey }
         expect(updateOwnerParams.ownerId) { command.getOwnerId() }
         expect(updateOwnerParams.ownerName) { command.getName() }
@@ -145,7 +145,7 @@ class OwnerRepositoryTest {
 
         val sendMessage = capture.value
         val command = sendMessage.payload as DeleteOwnerCommand
-        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
         expect(updateOwnerParams.ownerId) { messageKey }
         expect(updateOwnerParams.ownerId) { command.getOwnerId() }
     }
@@ -205,7 +205,7 @@ class OwnerRepositoryTest {
 
         val sendMessage = capture.value
         val command = sendMessage.payload as RegisterCarCommand
-        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
         expect(registerCarParams.ownerId) { messageKey }
         expect(registerCarParams.ownerId) { command.getOwnerId() }
     }
@@ -235,7 +235,7 @@ class OwnerRepositoryTest {
 
         val sendMessage = capture.value
         val command = sendMessage.payload as DeregisterCarCommand
-        val messageKey = sendMessage.headers.get(KafkaHeaders.MESSAGE_KEY)
+        val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
         expect(deregisterCarParams.ownerId) { messageKey }
         expect(deregisterCarParams.ownerId) { command.getOwnerId() }
         expect(deregisterCarParams.carId) { command.getCarId() }

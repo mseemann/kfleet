@@ -7,10 +7,6 @@ import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.simulation.CarsOutBindings
 import io.kfleet.common.headers
 import org.apache.kafka.streams.state.QueryableStoreTypes
-import org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS
-import org.awaitility.kotlin.await
-import org.awaitility.kotlin.untilAsserted
-import org.awaitility.kotlin.withPollInterval
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
@@ -68,12 +64,12 @@ class ProcessorIntegrationTests {
 //            expect(1) { respCars!!.size }
 //        }
 
-        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
-
-            val statsAfterPushMsg = carsRepository.getCarsStateCounts().block()!!
-
-            expect(1L) { statsAfterPushMsg.get(car.getState().toString()) }
-        }
+//        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
+//
+//            val statsAfterPushMsg = carsRepository.getCarsStateCounts().block()!!
+//
+//            expect(1L) { statsAfterPushMsg.get(car.getState().toString()) }
+//        }
 
     }
 }
