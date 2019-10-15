@@ -5,12 +5,12 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.kfleet.car.service.processor.CarStateCountProcessor
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.rpclayer.RPC_CARS
-
 import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.WebClientUtil
-
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.KafkaStreams
+import org.apache.kafka.streams.errors.InvalidStateStoreException
+import org.apache.kafka.streams.state.QueryableStoreType
 import org.apache.kafka.streams.state.StreamsMetadata
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
 import org.springframework.context.ApplicationContext
@@ -21,6 +21,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toFlux
 import reactor.core.publisher.toMono
+
 
 @Component
 class KafkaStreamsUtil(private val context: ApplicationContext) {
@@ -70,6 +71,19 @@ class CarsRepository(
     fun getStreamMetaData(): Flux<StreamsMetadata> {
         return Flux.defer {
             kafkaStreamsUtil.getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE).toList().toFlux()
+        }
+    }
+
+    fun <T> waitForStoreTobeQueryable(storeName: String, queryableStoreType: QueryableStoreType<T>): T {
+        while (true) {
+            try {
+                return kafkaStreamsUtil.getKafakStreams().store(storeName, queryableStoreType)
+            } catch (ignored: InvalidStateStoreException) {
+                println(ignored)
+                // store not yet ready for querying
+                Thread.sleep(100)
+            }
+
         }
     }
 

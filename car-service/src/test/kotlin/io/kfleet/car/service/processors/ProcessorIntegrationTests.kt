@@ -1,9 +1,12 @@
 package io.kfleet.car.service.processors
 
 import io.kfleet.car.service.domain.CarFactory
+import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.simulation.CarsOutBindings
+import io.kfleet.cars.service.domain.Car
 import io.kfleet.common.headers
+import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilAsserted
@@ -49,6 +52,10 @@ class ProcessorIntegrationTests {
         val sended = carOuputChannel.send(message)
         // this must always be true - because for this output sync is false - e.g. not configured to be sync
         assert(true) { sended }
+
+
+        carsRepository.waitForStoreTobeQueryable(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
+        carsRepository.waitForStoreTobeQueryable(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
         await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
             val respCar = carsRepository.findById("$carId").block()

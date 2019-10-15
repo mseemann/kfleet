@@ -25,7 +25,7 @@ spring.cloud.stream.kafka.streams.binder.configuration:
   application.server: localhost:${server.port}
   # a shorter commit interval results in more accurate statistics
   commit.interval.ms: 1
-  # a shorter session timeout results in a shorter reablancing time if a streaming processor goes down
+  # a shorter session timeout results in a shorter rebalancing time if a streaming processor goes down
   session.timeout.ms: 6000
   default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
   default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde
@@ -47,7 +47,7 @@ spring.cloud.stream.kafka.binder.consumerProperties:
 spring.cloud.stream.kafka.streams.bindings:
   cars:
     consumer:
-      applicationId: owners-cars-service
+      applicationId: car-service-mat-cars
       materializedAs: all-cars
 
 
@@ -58,7 +58,7 @@ spring.cloud.stream.kafka.streams.binder.configuration.processing.guarantee: exa
 # spring.cloud.stream.kafka.streams.binder.configuration.num.stream.threads: 2
 
 # make sure every streaming app has it's own state store folder
-spring.cloud.stream.kafka.streams.binder.configuration.state.dir: "/tmp/kafka-streams/${server.port}"
+spring.cloud.stream.kafka.streams.binder.configuration.state.dir: "/tmp/kafka-streams/port_${server.port}"
 
 management.endpoints.web.exposure.include: "*"
 
