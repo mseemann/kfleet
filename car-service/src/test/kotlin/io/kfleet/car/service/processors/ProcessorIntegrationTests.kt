@@ -53,7 +53,7 @@ class ProcessorIntegrationTests {
         // this must always be true - because for this output sync is false - e.g. not configured to be sync
         assert(true) { sended }
 
-        Thread.sleep(10000)
+        Thread.sleep(30000)
 
         carsRepository.waitForStoreTobeQueryable(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
         carsRepository.waitForStoreTobeQueryable(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
