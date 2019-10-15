@@ -54,6 +54,26 @@ class ProcessorIntegrationTests {
                 .customRetry().block()
         assertNotNull(owner)
         expect(ownerName) { owner.getName() }
+
+        val newName = "test2"
+        val updateOwnerNameParams = UpdateOwnerParams(ownerId = ownerId, ownerName = newName)
+
+        val updateCommand = repo.submitUpdateOwnerNameCommand(updateOwnerNameParams).block()
+        assertNotNull(updateCommand)
+
+
+        val updateCommandResponse = commandsResponseRepository
+                .findCommandResponse(updateCommand.getCommandId())
+                .customRetry()
+                .block()
+        assertNotNull(updateCommandResponse)
+        assertEquals(CommandStatus.SUCCEEDED, updateCommandResponse.getStatus())
+
+        val updatedOwner = repo
+                .findById(updateCommandResponse.getRessourceId())
+                .customRetry().block()
+        assertNotNull(updatedOwner)
+        expect(newName) { updatedOwner.getName() }
     }
 
     @Test
