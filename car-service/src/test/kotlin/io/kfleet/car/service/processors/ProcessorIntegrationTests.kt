@@ -58,6 +58,8 @@ class ProcessorIntegrationTests {
         carsRepository.waitForStoreTobeQueryable(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
         carsRepository.waitForStoreTobeQueryable(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
 
+        Thread.sleep(30000)
+        
         await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
             val respCar = carsRepository.findById("$carId").block()
 

@@ -334,4 +334,69 @@ class OwnerServiceTest {
 
         expect("did not exist") { response.responseBody }
     }
+
+    @Test
+    fun deregisterCar() {
+
+        val params = DeregisterCarParams(ownerId = "1", carId = "1")
+        val owner = owner {
+            id = "1"
+            name = "testName"
+            cars = listOf()
+        }
+
+        val deregisterCarCommand = deregisterCarCommand {
+            commandId = "c1"
+            ownerId = "1"
+            carId = "1"
+        }
+
+        BDDMockito
+                .given(repo.submitDeregisterCarCommand(params))
+                .willReturn(Mono.just(deregisterCarCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(deregisterCarCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(deregisterCarCommand.getCommandId(), deregisterCarCommand.getOwnerId(), CommandStatus.SUCCEEDED, null)))
+
+        BDDMockito.given(repo.findById(owner.getId())).willReturn(Mono.just(owner))
+
+
+        val response = webClient.post().uri("/owners/1/car/1/deregister")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody(Owner::class.java)
+                .returnResult()
+
+        expect("1") { response.responseBody!!.getId() }
+        expect(owner) { response.responseBody }
+    }
+
+    @Test
+    fun deregisterCarOwnerDidNotExists() {
+        val params = DeregisterCarParams(ownerId = "1", carId = "1")
+
+        val deregisterCarCommand = deregisterCarCommand {
+            commandId = "c1"
+            ownerId = "1"
+            carId = "1"
+        }
+
+        BDDMockito
+                .given(repo.submitDeregisterCarCommand(params))
+                .willReturn(Mono.just(deregisterCarCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(deregisterCarCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(deregisterCarCommand.getCommandId(), deregisterCarCommand.getOwnerId(), CommandStatus.REJECTED, "did not exist")))
+
+
+        val response = webClient.post().uri("/owners/1/car/1/deregister")
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+
+        expect("did not exist") { response.responseBody }
+    }
 }
