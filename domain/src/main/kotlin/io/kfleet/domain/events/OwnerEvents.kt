@@ -1,10 +1,6 @@
 package io.kfleet.domain.events
 
-import io.kfleet.cars.service.events.OwnerCreatedEvent
-import io.kfleet.cars.service.events.OwnerDeletedEvent
-import io.kfleet.cars.service.events.OwnerUpdatedEvent
-import io.kfleet.owner.service.events.CarDeregisteredEvent
-import io.kfleet.owner.service.events.CarRegisteredEvent
+import io.kfleet.owner.service.events.*
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 

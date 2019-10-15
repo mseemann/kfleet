@@ -162,6 +162,7 @@ class OwnerRepository(
         return webClientUtil.doGet(hostInfo, "$RPC_OWNER/$ownerId", Owner::class.java)
     }
 
+    // just an example: how to listen to a topic
     @StreamListener(OwnersBindings.OWNER_EVENTS)
     fun process(message: Message<OwnerCreatedEvent>) {
         log.debug { "owner event: $message" }
