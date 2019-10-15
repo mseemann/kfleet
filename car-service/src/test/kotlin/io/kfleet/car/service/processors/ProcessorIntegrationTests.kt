@@ -62,11 +62,11 @@ class ProcessorIntegrationTests {
 //            expect(car.getState()) { respCar!!.getState() }
 //        }
 
-        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
-            val respCars = carsRepository.findAllCars().collectList().block()
-
-            expect(1) { respCars!!.size }
-        }
+//        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
+//            val respCars = carsRepository.findAllCars().collectList().block()
+//
+//            expect(1) { respCars!!.size }
+//        }
 
         await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
 
