@@ -1,29 +1,30 @@
 package io.kfleet.owner.service.web
 
-import io.kfleet.owner.service.repos.CreateOwnerParams
-import io.kfleet.owner.service.repos.DeleteOwnerParams
-import io.kfleet.owner.service.repos.UpdateOwnerParams
+import io.kfleet.owner.service.repos.*
 import reactor.core.publisher.Mono
+
+private fun <T : OwnerParams> validateOwnerId(ownerParams: T): Mono<T> =
+        if (ownerParams.ownerId == "") Mono.error(IllegalArgumentException("ownerId invalid")) else Mono.just(ownerParams)
+
 
 fun validate(newOwnerParams: CreateOwnerParams): Mono<CreateOwnerParams> {
 
-    if (newOwnerParams.ownerId == "") return Mono.error(IllegalArgumentException("ownerId invalid"))
     if (newOwnerParams.ownerName == "") return Mono.error(IllegalArgumentException("ownerName invalid"))
 
-    return Mono.just(newOwnerParams)
+    return Mono.just(newOwnerParams).flatMap { validateOwnerId(it) }
 }
 
 fun validate(updateOwnerParams: UpdateOwnerParams): Mono<UpdateOwnerParams> {
-
-    if (updateOwnerParams.ownerId == "") return Mono.error(IllegalArgumentException("ownerId invalid"))
     if (updateOwnerParams.ownerName == "") return Mono.error(IllegalArgumentException("ownerName invalid"))
 
-    return Mono.just(updateOwnerParams)
+    return Mono.just(updateOwnerParams).flatMap { validateOwnerId(it) }
 }
 
 fun validate(deleteOwnerParams: DeleteOwnerParams): Mono<DeleteOwnerParams> {
+    return Mono.just(deleteOwnerParams).flatMap { validateOwnerId(it) }
+}
 
-    if (deleteOwnerParams.ownerId == "") return Mono.error(IllegalArgumentException("ownerId invalid"))
 
-    return Mono.just(deleteOwnerParams)
+fun validate(registerCarParams: RegisterCarParams): Mono<RegisterCarParams> {
+    return Mono.just(registerCarParams).flatMap { validateOwnerId(it) }
 }

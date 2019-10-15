@@ -2,7 +2,6 @@ package io.kfleet.owner.service.rpclayer
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
-import io.kfleet.owner.service.configuration.JacksonObjectMapper
 import io.kfleet.owner.service.repos.CommandsResponseLocalRepository
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -15,7 +14,7 @@ import reactor.core.publisher.Mono
 import kotlin.test.expect
 
 @WebFluxTest(CommandsResponseLocalRpcService::class)
-@Import(JacksonObjectMapper::class, CommandsResponseRpcRoutes::class)
+@Import(CommandsResponseRpcRoutes::class)
 class CommandsResponseLocalRpcServiceTest {
 
 

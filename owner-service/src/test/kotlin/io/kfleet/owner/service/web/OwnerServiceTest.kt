@@ -3,7 +3,6 @@ package io.kfleet.owner.service.web
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
-import io.kfleet.owner.service.configuration.JacksonObjectMapper
 import io.kfleet.owner.service.domain.*
 import io.kfleet.owner.service.repos.*
 import org.junit.jupiter.api.Test
@@ -19,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.expect
 
 @WebFluxTest(OwnerService::class)
-@Import(JacksonObjectMapper::class, OwnerRoutes::class)
+@Import(OwnerRoutes::class)
 @AutoConfigureWebTestClient(timeout = "15001") // backof retry is between 1 and 3 seconds; 5 times
 class OwnerServiceTest {
 

@@ -1,7 +1,6 @@
 package io.kfleet.owner.service.rpclayer
 
 
-import io.kfleet.owner.service.configuration.JacksonObjectMapper
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.owner
 import io.kfleet.owner.service.repos.OwnerLocalRepository
@@ -16,7 +15,7 @@ import reactor.core.publisher.Mono
 import kotlin.test.expect
 
 @WebFluxTest(OwnerLocalRpcService::class)
-@Import(JacksonObjectMapper::class, OwnerRpcRoutes::class)
+@Import(OwnerRpcRoutes::class)
 class OwnerLocalRpcServiceTest {
 
     @Autowired

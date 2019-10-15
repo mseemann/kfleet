@@ -11,6 +11,7 @@ import io.kfleet.owner.service.domain.deleteOwnerCommand
 import io.kfleet.owner.service.domain.updateOwnerNameCommand
 import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.owner.service.rpclayer.RPC_OWNER
+import io.kfleet.owner.service.web.NewCar
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -27,9 +28,15 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.util.*
 
-data class CreateOwnerParams(val ownerId: String, val ownerName: String)
-data class UpdateOwnerParams(val ownerId: String, val ownerName: String)
-data class DeleteOwnerParams(val ownerId: String)
+interface OwnerParams {
+    val ownerId: String
+}
+
+data class CreateOwnerParams(override val ownerId: String, val ownerName: String) : OwnerParams
+data class UpdateOwnerParams(override val ownerId: String, val ownerName: String) : OwnerParams
+data class DeleteOwnerParams(override val ownerId: String) : OwnerParams
+data class RegisterCarParams(override val ownerId: String, val newCar: NewCar) : OwnerParams
+data class DeregisterCarParams(override val ownerId: String, val carId: String) : OwnerParams
 
 private val log = KotlinLogging.logger {}
 

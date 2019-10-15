@@ -96,20 +96,27 @@ class OwnerService(
                             .body(BodyInserters.fromObject(it))
                 }
     }
-
-    fun registerACar(request: ServerRequest): Mono<ServerResponse> {
-        val ownerId = request.pathVariable("ownerId")
-        val newCar = request.bodyToMono(NewCar::class.java)
-        println(ownerId)
-        println(newCar)
-        return ServerResponse.badRequest().build()
-    }
-
-    fun deregisterACar(request: ServerRequest): Mono<ServerResponse> {
-        val ownerId = request.pathVariable("ownerId")
-        val carId = request.pathVariable("carId")
-        println(ownerId)
-        println(carId)
-        return ServerResponse.badRequest().build()
-    }
+//
+//    fun registerACar(request: ServerRequest): Mono<ServerResponse> = request.bodyToMono<NewCar>()
+//            .flatMap {
+//                val ownerId = request.pathVariable("ownerId")
+//                val registerCarParams = RegisterCarParams(ownerId = ownerId, newCar = it)
+//                Mono.just(registerCarParams)
+//                        .flatMap { validate(it) }
+//                        .flatMap {
+//                            ServerResponse
+//                                    .status(HttpStatus.CREATED)
+//                                    .body(BodyInserters.fromObject(it))
+//                        }
+//            }
+//
+//
+//    fun deregisterACar(request: ServerRequest): Mono<ServerResponse> {
+//        val ownerId = request.pathVariable("ownerId")
+//        val carId = request.pathVariable("carId")
+//        println(ownerId)
+//        println(carId)
+//        return ServerResponse.badRequest().build()
+//    }
 }
+
