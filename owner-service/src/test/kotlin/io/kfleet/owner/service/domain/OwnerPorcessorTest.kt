@@ -189,9 +189,9 @@ class OwnerPorcessorTest {
         expect(ownerId) { eventKv[0].key }
         expect(ownerId) { (eventKv[0].value as OwnerDeletedEvent).getOwnerId() }
 
-        val deregsiterCarEvent = result.filter { it.value is CarDeregisteredEvent }
-        expect("1") { deregsiterCarEvent[0].key }
-        expect("1") { (deregsiterCarEvent[0].value as CarDeregisteredEvent).getCarId() }
+        val deregisterCarEvent = result.filter { it.value is CarDeregisteredEvent }
+        expect("1") { deregisterCarEvent[0].key }
+        expect("1") { (deregisterCarEvent[0].value as CarDeregisteredEvent).getCarId() }
     }
 
     @Test
