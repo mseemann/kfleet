@@ -143,6 +143,12 @@ class OwnerProcessor {
                         ressourceId = command.getOwnerId()
                         status = CommandStatus.SUCCEEDED
                     }.asKeyValue()
+            ).plus(
+                    owner.getCars().map {
+                        carDeregistered {
+                            carId = it.getId()
+                        }.asKeyValue()
+                    }
             )
         }
     }

@@ -135,7 +135,7 @@ class OwnerPorcessorTest {
     }
 
     @Test
-    fun deleteOwnerNameRejectedTest() {
+    fun deleteOwnerRejectedTest() {
         val ownerId = "1"
 
         val command = deleteOwnerCommand {
@@ -165,11 +165,16 @@ class OwnerPorcessorTest {
         val owner = owner {
             id = ownerId
             name = "name"
+            cars = listOf(
+                    car {
+                        id = "1"
+                    }
+            )
         }
 
         val result = ownerProcessor.processCommand(CommandAndOwner(command, owner))
 
-        expect(3, { result.count() })
+        expect(4, { result.count() })
 
         val ownerKV = result.filter { it.value == null }
         expect(ownerId) { ownerKV[0].key }
@@ -183,6 +188,10 @@ class OwnerPorcessorTest {
         val eventKv = result.filter { it.value is OwnerDeletedEvent }
         expect(ownerId) { eventKv[0].key }
         expect(ownerId) { (eventKv[0].value as OwnerDeletedEvent).getOwnerId() }
+
+        val deregsiterCarEvent = result.filter { it.value is CarDeregisteredEvent }
+        expect("1") { deregsiterCarEvent[0].key }
+        expect("1") { (deregsiterCarEvent[0].value as CarDeregisteredEvent).getCarId() }
     }
 
     @Test
