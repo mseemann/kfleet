@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("org.springframework.boot") version "2.1.7.RELEASE" apply false
+    id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
 }
@@ -20,7 +20,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
     implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
     implementation("org.apache.kafka:kafka-streams:2.0.1")
-    implementation("org.springframework.boot:spring-boot-starter-webflux:2.1.7.RELEASE")
+    implementation("org.springframework.boot:spring-boot-starter-webflux:2.1.9.RELEASE")
     implementation("org.apache.avro:avro:1.9.1")
     implementation("io.confluent:kafka-streams-avro-serde:5.2.1")
     implementation("io.confluent:kafka-avro-serializer:5.2.2")

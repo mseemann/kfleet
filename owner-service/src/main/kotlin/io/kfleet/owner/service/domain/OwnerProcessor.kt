@@ -33,7 +33,6 @@ fun Owner.asKeyValue(): KeyValue<String, SpecificRecord?> {
 fun car(buildCar: Car.Builder.() -> Unit): Car =
         Car.newBuilder().apply { buildCar() }.build()
 
-
 fun createOwnerCommand(buildCreateOwnerCommand: CreateOwnerCommand.Builder.() -> Unit): CreateOwnerCommand =
         CreateOwnerCommand.newBuilder().apply { buildCreateOwnerCommand() }.build()
 

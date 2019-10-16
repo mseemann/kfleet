@@ -1,5 +1,5 @@
 plugins {
-    id("org.springframework.boot") version "2.1.7.RELEASE"
+    id("org.springframework.boot") version "2.1.9.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
     kotlin("plugin.spring") version "1.3.50"
     id("com.commercehub.gradle.plugin.avro") version "0.17.0"
