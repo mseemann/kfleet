@@ -2,7 +2,7 @@ package io.kfleet.owner.service.domain
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
-import io.kfleet.domain.events.ownerCreated
+import io.kfleet.domain.events.ownerCreatedEvent
 import io.kfleet.owner.service.events.*
 import io.kfleet.owner.service.processors.CommandAndOwner
 import org.junit.jupiter.api.Test
@@ -197,7 +197,7 @@ class OwnerPorcessorTest {
     @Test
     fun testUnknownCommandException() {
         // this is not a owner command! did you see it?
-        val command = ownerCreated {
+        val command = ownerCreatedEvent {
             ownerId = "1"
             name = " name"
         }

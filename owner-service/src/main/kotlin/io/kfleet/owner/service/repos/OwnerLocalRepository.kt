@@ -13,13 +13,13 @@ import reactor.core.publisher.toMono
 @Repository
 class OwnerLocalRepository(private val interactiveQueryService: InteractiveQueryService) {
 
-    fun findByIdLocal(ownerId: String): Mono<Owner> {
-        return ownerStore().get(ownerId)?.toMono() ?: Mono.error(Exception("owner with id: $ownerId not found"))
-    }
+    fun findByIdLocal(ownerId: String): Mono<Owner> =
+            ownerStore().get(ownerId)?.toMono() ?: Mono.error(Exception("owner with id: $ownerId not found"))
 
-    private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> {
-        return interactiveQueryService
-                .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
-    }
+
+    private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> =
+            interactiveQueryService
+                    .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
+
 
 }

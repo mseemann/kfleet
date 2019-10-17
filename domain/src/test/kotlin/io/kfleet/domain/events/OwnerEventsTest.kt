@@ -11,7 +11,7 @@ class OwnerEventsTest : BehaviorSpec({
     Given("owner created events") {
 
         When("an ownerId and name is specified") {
-            val ownerCreatedEvent = ownerCreated {
+            val ownerCreatedEvent = ownerCreatedEvent {
                 ownerId = "1"
                 name = "nay name"
             }
@@ -30,7 +30,7 @@ class OwnerEventsTest : BehaviorSpec({
         When("only the owner id is given") {
             Then("an exception should be thrown") {
                 shouldThrow<AvroMissingFieldException> {
-                    ownerCreated {
+                    ownerCreatedEvent {
                         ownerId = "1"
                     }
                 }
@@ -41,7 +41,7 @@ class OwnerEventsTest : BehaviorSpec({
     Given("owner updated events") {
 
         When("an ownerId and name is specified") {
-            val ownerUpdatesEvent = ownerUpdated {
+            val ownerUpdatesEvent = ownerUpdatedEvent {
                 ownerId = "1"
                 name = "nay name"
             }
@@ -60,7 +60,7 @@ class OwnerEventsTest : BehaviorSpec({
         When("only the owner id is given") {
             Then("an exception should be thrown") {
                 shouldThrow<AvroMissingFieldException> {
-                    ownerUpdated {
+                    ownerUpdatedEvent {
                         ownerId = "1"
                     }
                 }
@@ -70,7 +70,7 @@ class OwnerEventsTest : BehaviorSpec({
 
     Given("owner deleted events") {
         When("an ownerId is specified") {
-            val ownerDeletedEvent = ownerDeleted {
+            val ownerDeletedEvent = ownerDeletedEvent {
                 ownerId = "1"
             }
 
@@ -88,7 +88,7 @@ class OwnerEventsTest : BehaviorSpec({
         When("only owner id is given") {
             Then("an exception should be thrown") {
                 shouldThrow<AvroMissingFieldException> {
-                    ownerDeleted {}
+                    ownerDeletedEvent {}
                 }
             }
         }
@@ -96,7 +96,7 @@ class OwnerEventsTest : BehaviorSpec({
 
     Given("owner car registered events") {
         When("a carId is specified") {
-            val carRegisteredEvent = carRegistered {
+            val carRegisteredEvent = carRegisteredEvent {
                 carId = "1"
             }
 
@@ -114,7 +114,7 @@ class OwnerEventsTest : BehaviorSpec({
         When("no car id is given") {
             Then("an exception should be thrown") {
                 shouldThrow<AvroMissingFieldException> {
-                    carRegistered {}
+                    carRegisteredEvent {}
                 }
             }
         }
@@ -122,7 +122,7 @@ class OwnerEventsTest : BehaviorSpec({
 
     Given("owner car deregistered events") {
         When("a carId is specified") {
-            val carDeregisteredEvent = carDeregistered {
+            val carDeregisteredEvent = carDeregisteredEvent {
                 carId = "1"
             }
 
@@ -140,7 +140,7 @@ class OwnerEventsTest : BehaviorSpec({
         When("no car id is given") {
             Then("an exception should be thrown") {
                 shouldThrow<AvroMissingFieldException> {
-                    carDeregistered {}
+                    carDeregisteredEvent {}
                 }
             }
         }

@@ -85,7 +85,7 @@ class OwnerProcessor {
                         name = command.getName()
                     }.asKeyValue(),
 
-                    ownerCreated {
+                    ownerCreatedEvent {
                         ownerId = command.getOwnerId()
                         name = command.getName()
                     }.asKeyValue(),
@@ -109,7 +109,7 @@ class OwnerProcessor {
                         name = command.getName()
                     }.asKeyValue(),
 
-                    ownerUpdated {
+                    ownerUpdatedEvent {
                         ownerId = command.getOwnerId()
                         name = command.getName()
                     }.asKeyValue(),
@@ -132,7 +132,7 @@ class OwnerProcessor {
             listOf(
                     KeyValue<String, SpecificRecord?>(command.getOwnerId(), null),
 
-                    ownerDeleted {
+                    ownerDeletedEvent {
                         ownerId = command.getOwnerId()
                     }.asKeyValue(),
 
@@ -144,7 +144,7 @@ class OwnerProcessor {
                     }.asKeyValue()
             ).plus(
                     owner.getCars().map {
-                        carDeregistered {
+                        carDeregisteredEvent {
                             carId = it.getId()
                         }.asKeyValue()
                     }
@@ -178,14 +178,13 @@ class OwnerProcessor {
                 id = UUID.randomUUID().toString()
                 type = command.getType()
             }
-            val cars = owner.getCars().toMutableList()
-            cars.add(newCar)
-            owner.setCars(cars)
+
+            owner.setCars(owner.getCars().plus(newCar))
 
             listOf(
                     owner.asKeyValue(),
 
-                    carRegistered {
+                    carRegisteredEvent {
                         carId = newCar.getId()
                     }.asKeyValue(),
 
@@ -203,20 +202,18 @@ class OwnerProcessor {
         return if (owner == null) {
             listOf(responseOwnerNotExist(command.getCommandId(), command.getOwnerId()))
         } else {
-            if (owner.getCars().filter { it.getId() == command.getCarId() }.size == 0) {
-                return listOf(responseCarNotExist(command.getCommandId(), command.getCarId()))
-            }
 
-            val cars = owner.getCars().filter { it.getId() != command.getCarId() }
-            owner.setCars(cars)
+            val carToDeregister = owner.getCars().filter { it.getId() == command.getCarId() }.firstOrNull()
+                    ?: return listOf(responseCarNotExist(command.getCommandId(), command.getCarId()))
+
+            owner.setCars(owner.getCars().minus(carToDeregister))
 
             listOf(
                     owner.asKeyValue(),
 
-                    carDeregistered {
+                    carDeregisteredEvent {
                         carId = command.getCarId()
                     }.asKeyValue(),
-
 
                     commandResponse {
                         commandId = command.getCommandId()
