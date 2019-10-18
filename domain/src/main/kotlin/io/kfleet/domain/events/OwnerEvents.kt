@@ -1,6 +1,8 @@
 package io.kfleet.domain.events
 
-import io.kfleet.owner.service.events.*
+import io.kfleet.owner.service.events.OwnerCreatedEvent
+import io.kfleet.owner.service.events.OwnerDeletedEvent
+import io.kfleet.owner.service.events.OwnerUpdatedEvent
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 
@@ -23,18 +25,4 @@ fun ownerDeletedEvent(buildOwnerDeleted: OwnerDeletedEvent.Builder.() -> Unit): 
 
 fun OwnerDeletedEvent.asKeyValue(): KeyValue<String, SpecificRecord?> {
     return KeyValue(this.getOwnerId(), this)
-}
-
-fun carRegisteredEvent(buildCarRegistered: CarRegisteredEvent.Builder.() -> Unit): CarRegisteredEvent =
-        CarRegisteredEvent.newBuilder().apply { buildCarRegistered() }.build()
-
-fun CarRegisteredEvent.asKeyValue(): KeyValue<String, SpecificRecord?> {
-    return KeyValue(this.getCarId(), this)
-}
-
-fun carDeregisteredEvent(buildCarDeregistered: CarDeregisteredEvent.Builder.() -> Unit): CarDeregisteredEvent =
-        CarDeregisteredEvent.newBuilder().apply { buildCarDeregistered() }.build()
-
-fun CarDeregisteredEvent.asKeyValue(): KeyValue<String, SpecificRecord?> {
-    return KeyValue(this.getCarId(), this)
 }
