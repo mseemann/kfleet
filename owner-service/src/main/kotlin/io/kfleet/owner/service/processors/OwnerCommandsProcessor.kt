@@ -2,6 +2,9 @@ package io.kfleet.owner.service.processors
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.common.createSerdeWithAvroRegistry
+import io.kfleet.owner.service.configuration.StoreNames
+import io.kfleet.owner.service.configuration.TopicBindingNames
+import io.kfleet.owner.service.configuration.TopicNames
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.OwnerProcessor
 import io.kfleet.owner.service.domain.isOwnerCommand
@@ -36,16 +39,7 @@ data class CommandAndOwner(val command: SpecificRecord, val owner: Owner?)
 
 interface OwnerCommandsProcessorBinding {
 
-    companion object {
-        const val OWNER_COMMANDS = "owner_commands"
-        const val OWNER_EVENTS = "owner_events"
-        const val CAR_EVENTS = "car_events"
-        const val UNKNOW_COMMANDS = "unknown_owner_commands"
-        const val OWNER_COMMANDS_RESPONSE_STORE = "owner_commands_response_store"
-        const val OWNER_RW_STORE = "owners_store"
-    }
-
-    @Input(OWNER_COMMANDS)
+    @Input(TopicBindingNames.OWNER_COMMANDS_IN)
     fun inputOwnerCommands(): KStream<String, SpecificRecord>
 
 }
@@ -62,13 +56,13 @@ class OwnerCommandsProcessor(
     private val commandResponseSerde by lazy { createSerdeWithAvroRegistry<CommandResponse>(endpoint)() }
 
     private val ownerStateStore = Stores
-            .keyValueStoreBuilder(Stores.persistentKeyValueStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE),
+            .keyValueStoreBuilder(Stores.persistentKeyValueStore(StoreNames.OWNER_RW_STORE),
                     Serdes.StringSerde(),
                     ownerSerde)
 
     private val commandResponseWindowedStore = Stores
             .windowStoreBuilder(Stores.persistentWindowStore(
-                    OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE,
+                    StoreNames.OWNER_COMMANDS_RESPONSE_STORE,
                     Duration.ofDays(1).toMillis(),
                     3,
                     Duration.ofHours(1).toMillis(),
@@ -84,7 +78,7 @@ class OwnerCommandsProcessor(
         }
 
     @StreamListener
-    fun processCommands(@Input(OwnerCommandsProcessorBinding.OWNER_COMMANDS) commandStream: KStream<String, SpecificRecord>) {
+    fun processCommands(@Input(TopicBindingNames.OWNER_COMMANDS_IN) commandStream: KStream<String, SpecificRecord>) {
 
         streamsBuilder.addStateStore(ownerStateStore)
         streamsBuilder.addStateStore(commandResponseWindowedStore)
@@ -95,10 +89,10 @@ class OwnerCommandsProcessor(
                         Predicate<String, SpecificRecord> { _, _ -> true }
                 )
 
-        unknownCommands.to(OwnerCommandsProcessorBinding.UNKNOW_COMMANDS)
+        unknownCommands.to(TopicNames.DLQ)
 
         val createOwnerResult = ownerCommands
-                .transform(mapToOwnerAndCommand, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
+                .transform(mapToOwnerAndCommand, StoreNames.OWNER_RW_STORE)
                 .flatMap { _, commandAndOwner -> ownerProcessor.processCommand(commandAndOwner) }
 
         createOwnerResult.foreach { k, v -> log.debug { "$k -> $v" } }
@@ -106,7 +100,7 @@ class OwnerCommandsProcessor(
         createOwnerResult
                 .filter { _, value -> value is Owner || value == null }
                 .mapValues { v -> v as Owner? }
-                .process(writeOwnerToState, OwnerCommandsProcessorBinding.OWNER_RW_STORE)
+                .process(writeOwnerToState, StoreNames.OWNER_RW_STORE)
 
         createOwnerResult
                 .filter { _, value ->
@@ -114,19 +108,19 @@ class OwnerCommandsProcessor(
                             || value is OwnerUpdatedEvent
                             || value is OwnerDeletedEvent
                 }
-                .to(OwnerCommandsProcessorBinding.OWNER_EVENTS)
+                .to(TopicNames.OWNER_EVENTS)
 
         createOwnerResult
                 .filter { _, value ->
                     value is CarRegisteredEvent
                             || value is CarDeregisteredEvent
                 }
-                .to(OwnerCommandsProcessorBinding.CAR_EVENTS)
+                .to(TopicNames.CAR_EVENTS)
 
         createOwnerResult
                 .filter { _, value -> value is CommandResponse }
                 .mapValues { v -> v as CommandResponse }
-                .process(writeCommandResponseToState, OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE)
+                .process(writeCommandResponseToState, StoreNames.OWNER_COMMANDS_RESPONSE_STORE)
     }
 
     private val writeOwnerToState = ProcessorSupplier {
@@ -137,7 +131,7 @@ class OwnerCommandsProcessor(
             override fun init(context: ProcessorContext) {
                 @Suppress("UNCHECKED_CAST")
                 ownerStore = context
-                        .getStateStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE) as KeyValueStore<String, Owner>
+                        .getStateStore(StoreNames.OWNER_RW_STORE) as KeyValueStore<String, Owner>
             }
 
             override fun process(key: String, value: Owner?) {
@@ -156,7 +150,7 @@ class OwnerCommandsProcessor(
             override fun init(context: ProcessorContext) {
                 @Suppress("UNCHECKED_CAST")
                 commandResponseStore = context
-                        .getStateStore(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE) as WindowStore<String, CommandResponse>
+                        .getStateStore(StoreNames.OWNER_COMMANDS_RESPONSE_STORE) as WindowStore<String, CommandResponse>
             }
 
             override fun process(key: String, value: CommandResponse) {
@@ -174,7 +168,7 @@ class OwnerCommandsProcessor(
             override fun init(context: ProcessorContext) {
                 @Suppress("UNCHECKED_CAST")
                 ownerStore = context
-                        .getStateStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE) as KeyValueStore<String, Owner>
+                        .getStateStore(StoreNames.OWNER_RW_STORE) as KeyValueStore<String, Owner>
             }
 
             override fun transform(ownerId: String, value: SpecificRecord): KeyValue<String, CommandAndOwner> {

@@ -24,7 +24,6 @@ fun validate(deleteOwnerParams: DeleteOwnerParams): Mono<DeleteOwnerParams> {
     return Mono.just(deleteOwnerParams).flatMap { validateOwnerId(it) }
 }
 
-
 fun validate(registerCarParams: RegisterCarParams): Mono<RegisterCarParams> {
     return Mono.just(registerCarParams).flatMap { validateOwnerId(it) }
 }

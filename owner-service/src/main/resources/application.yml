@@ -11,9 +11,9 @@ spring.cloud.stream.default.producer:
   useNativeEncoding: true
 
 spring.cloud.stream.bindings:
-  owner_commands_out:
+  owner_commands_in:
     destination: owner_commands
-  owner_commands:
+  owner_commands_out:
     destination: owner_commands
   owner_commands_response:
     destination: owner_commands_response
@@ -52,7 +52,7 @@ spring.cloud.stream.kafka.bindings:
       sync: true
 
 spring.cloud.stream.kafka.streams.bindings:
-  owner_commands:
+  owner_commands_in:
     consumer:
       applicationId: owners-service
 

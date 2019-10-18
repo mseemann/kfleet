@@ -1,7 +1,7 @@
 package io.kfleet.owner.service.repos
 
+import io.kfleet.owner.service.configuration.StoreNames
 import io.kfleet.owner.service.domain.Owner
-import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
@@ -19,7 +19,7 @@ class OwnerLocalRepository(private val interactiveQueryService: InteractiveQuery
 
     private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> =
             interactiveQueryService
-                    .getQueryableStore(OwnerCommandsProcessorBinding.OWNER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
+                    .getQueryableStore(StoreNames.OWNER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
 
 
 }

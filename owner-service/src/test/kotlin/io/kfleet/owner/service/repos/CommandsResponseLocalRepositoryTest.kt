@@ -3,7 +3,7 @@ package io.kfleet.owner.service.repos
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
-import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
+import io.kfleet.owner.service.configuration.StoreNames
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.state.ReadOnlyWindowStore
 import org.apache.kafka.streams.state.WindowStoreIterator
@@ -33,7 +33,7 @@ class CommandsResponseLocalRepositoryTest {
     fun findCommandResponseLocalById() {
 
         BDDMockito.given(interactiveQService.getQueryableStore<ReadOnlyWindowStore<String, CommandResponse>>(
-                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE),
+                ArgumentMatchers.eq(StoreNames.OWNER_COMMANDS_RESPONSE_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 
@@ -60,7 +60,7 @@ class CommandsResponseLocalRepositoryTest {
     fun findNoCommandResponseLocalById() {
 
         BDDMockito.given(interactiveQService.getQueryableStore<ReadOnlyWindowStore<String, CommandResponse>>(
-                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_COMMANDS_RESPONSE_STORE),
+                ArgumentMatchers.eq(StoreNames.OWNER_COMMANDS_RESPONSE_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 

@@ -1,7 +1,8 @@
 package io.kfleet.owner.service.repos
 
+import io.kfleet.owner.service.configuration.StoreNames
 import io.kfleet.owner.service.domain.Owner
-import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
+import io.kfleet.owner.service.domain.owner
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -19,7 +20,7 @@ class OwnerLocalRepositoryTest {
     lateinit var interactiveQService: InteractiveQueryService
 
     @Mock
-    lateinit var store: ReadOnlyKeyValueStore<String, Owner>;
+    lateinit var store: ReadOnlyKeyValueStore<String, Owner>
 
     @InjectMocks
     lateinit var ownerRepo: OwnerLocalRepository
@@ -32,15 +33,15 @@ class OwnerLocalRepositoryTest {
     @Test
     fun findByIdLocal() {
         given(interactiveQService.getQueryableStore<ReadOnlyKeyValueStore<String, Owner>>(
-                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_RW_STORE),
+                ArgumentMatchers.eq(StoreNames.OWNER_RW_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 
         val ownerId = "1"
-        val owner = Owner.newBuilder().apply {
+        val owner = owner {
             id = ownerId
             name = "test"
-        }.build()
+        }
 
         given(store.get(ownerId)).willReturn(owner)
 
@@ -52,7 +53,7 @@ class OwnerLocalRepositoryTest {
     @Test
     fun findByIdLocalNotFound() {
         given(interactiveQService.getQueryableStore<ReadOnlyKeyValueStore<String, Owner>>(
-                ArgumentMatchers.eq(OwnerCommandsProcessorBinding.OWNER_RW_STORE),
+                ArgumentMatchers.eq(StoreNames.OWNER_RW_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 

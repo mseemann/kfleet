@@ -2,9 +2,10 @@ package io.kfleet.owner.service.repos
 
 import io.kfleet.common.WebClientUtil
 import io.kfleet.owner.service.commands.*
+import io.kfleet.owner.service.configuration.StoreNames
+import io.kfleet.owner.service.configuration.TopicBindingNames
 import io.kfleet.owner.service.domain.*
 import io.kfleet.owner.service.events.OwnerCreatedEvent
-import io.kfleet.owner.service.processors.OwnerCommandsProcessorBinding
 import io.kfleet.owner.service.rpclayer.RPC_OWNER
 import io.kfleet.owner.service.web.NewCar
 import mu.KotlinLogging
@@ -37,22 +38,17 @@ private val log = KotlinLogging.logger {}
 
 interface OwnersBindings {
 
-    companion object {
-        const val OWNER_COMMANDS = "owner_commands_out"
-        const val OWNER_EVENTS = "owner_events_in"
-    }
-
-    @Output(OWNER_COMMANDS)
+    @Output(TopicBindingNames.OWNER_COMMANDS_OUT)
     fun ownersCommands(): MessageChannel
 
-    @Input(OWNER_EVENTS)
+    @Input(TopicBindingNames.OWNER_EVENTS_IN)
     fun ownerEvents(): SubscribableChannel
 }
 
 @Component
 @EnableBinding(OwnersBindings::class)
 class OwnerRepository(
-        @Output(OwnersBindings.OWNER_COMMANDS) private val outputOwnerCommands: MessageChannel,
+        @Output(TopicBindingNames.OWNER_COMMANDS_OUT) private val outputOwnerCommands: MessageChannel,
         private val interactiveQueryService: InteractiveQueryService,
         private val webClientUtil: WebClientUtil) {
 
@@ -158,12 +154,12 @@ class OwnerRepository(
     }
 
     fun findById(ownerId: String): Mono<Owner> {
-        val hostInfo = interactiveQueryService.getHostInfo(OwnerCommandsProcessorBinding.OWNER_RW_STORE, ownerId, StringSerializer())
+        val hostInfo = interactiveQueryService.getHostInfo(StoreNames.OWNER_RW_STORE, ownerId, StringSerializer())
         return webClientUtil.doGet(hostInfo, "$RPC_OWNER/$ownerId", Owner::class.java)
     }
 
     // just an example: how to listen to a topic
-    @StreamListener(OwnersBindings.OWNER_EVENTS)
+    @StreamListener(TopicBindingNames.OWNER_EVENTS_IN)
     fun process(message: Message<OwnerCreatedEvent>) {
         log.debug { "owner event: $message" }
     }
