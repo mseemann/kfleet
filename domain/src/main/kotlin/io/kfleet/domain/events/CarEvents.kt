@@ -4,10 +4,15 @@ import io.kfleet.domain.events.car.CarDeregisteredEvent
 import io.kfleet.domain.events.car.CarRegisteredEvent
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
+import kotlin.reflect.full.findAnnotation
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target((AnnotationTarget.CLASS))
 annotation class CarEvent
+
+fun SpecificRecord.isCarEvent(): Boolean {
+    return this::class.findAnnotation<CarEvent>() != null
+}
 
 fun carRegisteredEvent(buildCarRegistered: CarRegisteredEvent.Builder.() -> Unit): CarRegisteredEvent =
         CarRegisteredEvent.newBuilder().apply { buildCarRegistered() }.build()

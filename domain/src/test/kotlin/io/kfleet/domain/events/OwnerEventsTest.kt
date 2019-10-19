@@ -1,5 +1,6 @@
 package io.kfleet.domain.events
 
+import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
 import io.kotlintest.shouldThrow
@@ -24,6 +25,10 @@ class OwnerEventsTest : BehaviorSpec({
                 ownerCreatedEvent.should {
                     it.asKeyValue().key == ownerCreatedEvent.getOwnerId()
                 }
+            }
+
+            Then("the 'isOwnerEvent' method should return true") {
+                ownerCreatedEvent.isOwnerEvent().shouldBeTrue()
             }
         }
 
@@ -55,6 +60,10 @@ class OwnerEventsTest : BehaviorSpec({
                     it.asKeyValue().key == ownerUpdatesEvent.getOwnerId()
                 }
             }
+
+            Then("the 'isOwnerEvent' method should return true") {
+                ownerUpdatesEvent.isOwnerEvent().shouldBeTrue()
+            }
         }
 
         When("only the owner id is given") {
@@ -82,6 +91,10 @@ class OwnerEventsTest : BehaviorSpec({
                 ownerDeletedEvent.should {
                     it.asKeyValue().key == ownerDeletedEvent.getOwnerId()
                 }
+            }
+
+            Then("the 'isOwnerEvent' method should return true") {
+                ownerDeletedEvent.isOwnerEvent().shouldBeTrue()
             }
         }
 

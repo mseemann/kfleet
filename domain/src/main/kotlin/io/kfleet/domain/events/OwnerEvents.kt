@@ -6,11 +6,16 @@ import io.kfleet.domain.events.owner.OwnerDeletedEvent
 import io.kfleet.domain.events.owner.OwnerUpdatedEvent
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
+import kotlin.reflect.full.findAnnotation
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target((AnnotationTarget.CLASS))
 annotation class OwnerEvent
 
+
+fun SpecificRecord.isOwnerEvent(): Boolean {
+    return this::class.findAnnotation<OwnerEvent>() != null
+}
 
 fun ownerCreatedEvent(buildOwnerCreated: OwnerCreatedEvent.Builder.() -> Unit): OwnerCreatedEvent =
         OwnerCreatedEvent.newBuilder().apply { buildOwnerCreated() }.build()

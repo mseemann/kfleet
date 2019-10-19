@@ -1,5 +1,6 @@
 package io.kfleet.domain.events
 
+import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
 import io.kotlintest.shouldThrow
@@ -23,6 +24,10 @@ class CarEventsTest : BehaviorSpec({
                     it.asKeyValue().key == carRegisteredEvent.getCarId()
                 }
             }
+
+            Then("the 'isCarEvent' method should return true") {
+                carRegisteredEvent.isCarEvent().shouldBeTrue()
+            }
         }
 
         When("no car id is given") {
@@ -32,6 +37,7 @@ class CarEventsTest : BehaviorSpec({
                 }
             }
         }
+
     }
 
     Given("owner car deregistered events") {
@@ -48,6 +54,10 @@ class CarEventsTest : BehaviorSpec({
                 carDeregisteredEvent.should {
                     it.asKeyValue().key == carDeregisteredEvent.getCarId()
                 }
+            }
+
+            Then("the 'isCarEvent' method should return true") {
+                carDeregisteredEvent.isCarEvent().shouldBeTrue()
             }
         }
 
