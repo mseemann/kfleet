@@ -1,7 +1,8 @@
 {
-  "namespace" : "io.kfleet.owner.service.events",
+  "namespace" : "io.kfleet.domain.events.car",
   "type" : "record",
   "name" : "CarDeregisteredEvent",
+  "javaAnnotation": "io.kfleet.domain.events.CarEvent",
   "fields" : [
     {"name":"carId","type":"string"}
   ]

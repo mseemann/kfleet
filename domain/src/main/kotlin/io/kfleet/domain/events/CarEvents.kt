@@ -1,9 +1,13 @@
 package io.kfleet.domain.events
 
-import io.kfleet.owner.service.events.CarDeregisteredEvent
-import io.kfleet.owner.service.events.CarRegisteredEvent
+import io.kfleet.domain.events.car.CarDeregisteredEvent
+import io.kfleet.domain.events.car.CarRegisteredEvent
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
+
+@Retention(AnnotationRetention.RUNTIME)
+@Target((AnnotationTarget.CLASS))
+annotation class CarEvent
 
 fun carRegisteredEvent(buildCarRegistered: CarRegisteredEvent.Builder.() -> Unit): CarRegisteredEvent =
         CarRegisteredEvent.newBuilder().apply { buildCarRegistered() }.build()

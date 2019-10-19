@@ -1,11 +1,11 @@
 package io.kfleet.owner.service.repos
 
 import io.kfleet.common.WebClientUtil
+import io.kfleet.domain.events.owner.OwnerCreatedEvent
 import io.kfleet.owner.service.commands.*
 import io.kfleet.owner.service.configuration.StoreNames
 import io.kfleet.owner.service.configuration.TopicBindingNames
 import io.kfleet.owner.service.domain.*
-import io.kfleet.owner.service.events.OwnerCreatedEvent
 import io.kfleet.owner.service.rpclayer.RPC_OWNER
 import io.kfleet.owner.service.web.NewCar
 import mu.KotlinLogging

@@ -1,10 +1,16 @@
 package io.kfleet.domain.events
 
-import io.kfleet.owner.service.events.OwnerCreatedEvent
-import io.kfleet.owner.service.events.OwnerDeletedEvent
-import io.kfleet.owner.service.events.OwnerUpdatedEvent
+
+import io.kfleet.domain.events.owner.OwnerCreatedEvent
+import io.kfleet.domain.events.owner.OwnerDeletedEvent
+import io.kfleet.domain.events.owner.OwnerUpdatedEvent
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
+
+@Retention(AnnotationRetention.RUNTIME)
+@Target((AnnotationTarget.CLASS))
+annotation class OwnerEvent
+
 
 fun ownerCreatedEvent(buildOwnerCreated: OwnerCreatedEvent.Builder.() -> Unit): OwnerCreatedEvent =
         OwnerCreatedEvent.newBuilder().apply { buildOwnerCreated() }.build()

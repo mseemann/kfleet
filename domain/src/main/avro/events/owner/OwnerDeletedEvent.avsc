@@ -1,7 +1,8 @@
 {
-  "namespace" : "io.kfleet.owner.service.events",
+  "namespace" : "io.kfleet.domain.events.owner",
   "type" : "record",
   "name" : "OwnerDeletedEvent",
+  "javaAnnotation": "io.kfleet.domain.events.OwnerEvent",
   "fields" : [
     {"name":"ownerId","type":"string"}
   ]
