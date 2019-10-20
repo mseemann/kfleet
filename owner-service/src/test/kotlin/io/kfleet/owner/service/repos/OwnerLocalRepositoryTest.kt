@@ -1,6 +1,6 @@
 package io.kfleet.owner.service.repos
 
-import io.kfleet.owner.service.configuration.StoreNames
+import io.kfleet.owner.service.configuration.OWNER_RW_STORE
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.owner
 import org.apache.kafka.streams.state.ReadOnlyKeyValueStore
@@ -33,7 +33,7 @@ class OwnerLocalRepositoryTest {
     @Test
     fun findByIdLocal() {
         given(interactiveQService.getQueryableStore<ReadOnlyKeyValueStore<String, Owner>>(
-                ArgumentMatchers.eq(StoreNames.OWNER_RW_STORE),
+                ArgumentMatchers.eq(OWNER_RW_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 
@@ -53,7 +53,7 @@ class OwnerLocalRepositoryTest {
     @Test
     fun findByIdLocalNotFound() {
         given(interactiveQService.getQueryableStore<ReadOnlyKeyValueStore<String, Owner>>(
-                ArgumentMatchers.eq(StoreNames.OWNER_RW_STORE),
+                ArgumentMatchers.eq(OWNER_RW_STORE),
                 ArgumentMatchers.any())
         ).willReturn(store)
 
