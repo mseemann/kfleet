@@ -21,7 +21,7 @@ class CarEventsTest : BehaviorSpec({
 
             Then("carid should be the message key") {
                 carRegisteredEvent.should {
-                    it.asKeyValue().key == carRegisteredEvent.getCarId()
+                    it.asKeyValue().key === carRegisteredEvent.getCarId()
                 }
             }
 
@@ -52,7 +52,7 @@ class CarEventsTest : BehaviorSpec({
 
             Then("carid should be the message key") {
                 carDeregisteredEvent.should {
-                    it.asKeyValue().key == carDeregisteredEvent.getCarId()
+                    it.asKeyValue().key === carDeregisteredEvent.getCarId()
                 }
             }
 

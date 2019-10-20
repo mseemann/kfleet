@@ -24,7 +24,7 @@ class TravelerEventsTest : BehaviorSpec({
 
             Then("travelerId should be the message key") {
                 travelerCreatedEvent.should {
-                    it.asKeyValue().key == travelerCreatedEvent.getTravelerId()
+                    it.asKeyValue().key === travelerCreatedEvent.getTravelerId()
                 }
             }
 
@@ -56,7 +56,7 @@ class TravelerEventsTest : BehaviorSpec({
 
             Then("traveler should be the message key") {
                 travelerDeletedEvent.should {
-                    it.asKeyValue().key == travelerDeletedEvent.getTravelerId()
+                    it.asKeyValue().key === travelerDeletedEvent.getTravelerId()
                 }
             }
 

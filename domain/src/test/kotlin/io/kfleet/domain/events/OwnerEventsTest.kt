@@ -23,7 +23,7 @@ class OwnerEventsTest : BehaviorSpec({
 
             Then("ownerId should be the message key") {
                 ownerCreatedEvent.should {
-                    it.asKeyValue().key == ownerCreatedEvent.getOwnerId()
+                    it.asKeyValue().key === ownerCreatedEvent.getOwnerId()
                 }
             }
 
@@ -57,7 +57,7 @@ class OwnerEventsTest : BehaviorSpec({
 
             Then("ownerId should be the message key") {
                 ownerUpdatesEvent.should {
-                    it.asKeyValue().key == ownerUpdatesEvent.getOwnerId()
+                    it.asKeyValue().key === ownerUpdatesEvent.getOwnerId()
                 }
             }
 
@@ -89,7 +89,7 @@ class OwnerEventsTest : BehaviorSpec({
 
             Then("ownerId should be the message key") {
                 ownerDeletedEvent.should {
-                    it.asKeyValue().key == ownerDeletedEvent.getOwnerId()
+                    it.asKeyValue().key === ownerDeletedEvent.getOwnerId()
                 }
             }
 
