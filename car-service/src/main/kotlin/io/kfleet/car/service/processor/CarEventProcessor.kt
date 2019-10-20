@@ -1,8 +1,9 @@
 package io.kfleet.car.service.processor
 
-import io.kfleet.car.service.configuration.StoreNames
-import io.kfleet.car.service.configuration.TopicBindingNames
-import io.kfleet.car.service.configuration.TopicNames
+import io.kfleet.car.service.configuration.CARS
+import io.kfleet.car.service.configuration.CAR_EVENTS_IN
+import io.kfleet.car.service.configuration.CAR_RW_STORE
+import io.kfleet.car.service.configuration.DLQ
 import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarProcessor
 import io.kfleet.common.createSerdeWithAvroRegistry
@@ -32,7 +33,7 @@ private val log = KotlinLogging.logger {}
 
 interface CarEventsProcessorBinding {
 
-    @Input(TopicBindingNames.CAR_EVENTS_IN)
+    @Input(CAR_EVENTS_IN)
     fun inputCarEvents(): KStream<String, SpecificRecord>
 
 }
@@ -48,7 +49,7 @@ class CarEventProcessor(
     private val carSerde by lazy { createSerdeWithAvroRegistry<Car>(endpoint)() }
 
     private val carStateStore = Stores
-            .keyValueStoreBuilder(Stores.persistentKeyValueStore(StoreNames.CAR_RW_STORE),
+            .keyValueStoreBuilder(Stores.persistentKeyValueStore(CAR_RW_STORE),
                     Serdes.StringSerde(),
                     carSerde)
 
@@ -61,7 +62,7 @@ class CarEventProcessor(
 
 
     @StreamListener
-    fun processEvents(@Input(TopicBindingNames.CAR_EVENTS_IN) carEventStream: KStream<String, SpecificRecord>) {
+    fun processEvents(@Input(CAR_EVENTS_IN) carEventStream: KStream<String, SpecificRecord>) {
 
         streamsBuilder.addStateStore(carStateStore)
 
@@ -71,19 +72,19 @@ class CarEventProcessor(
                         Predicate<String, SpecificRecord> { _, _ -> true }
                 )
 
-        unknownMessages.to(TopicNames.DLQ)
+        unknownMessages.to(DLQ)
 
         val carResults = carEvents
-                .transform(mapToCarAndEvent, StoreNames.CAR_RW_STORE)
+                .transform(mapToCarAndEvent, CAR_RW_STORE)
                 .flatMap { _, eventAndCar -> carProcessor.processEvent(eventAndCar) }
 
         carResults.foreach { k, v -> log.debug { "$k -> $v" } }
 
         carResults
                 .filter { _, value -> value is Car }
-                .through(TopicNames.CARS)
+                .through(CARS)
                 .mapValues { v -> v as Car }
-                .process(writeCarToState, StoreNames.CAR_RW_STORE)
+                .process(writeCarToState, CAR_RW_STORE)
 
     }
 
@@ -94,7 +95,7 @@ class CarEventProcessor(
             override fun init(context: ProcessorContext) {
                 @Suppress("UNCHECKED_CAST")
                 carStore = context
-                        .getStateStore(StoreNames.CAR_RW_STORE) as KeyValueStore<String, Car>
+                        .getStateStore(CAR_RW_STORE) as KeyValueStore<String, Car>
             }
 
             override fun transform(ownerId: String, value: SpecificRecord): KeyValue<String, CarAndEvent> {
@@ -115,7 +116,7 @@ class CarEventProcessor(
             override fun init(context: ProcessorContext) {
                 @Suppress("UNCHECKED_CAST")
                 carStore = context
-                        .getStateStore(StoreNames.CAR_RW_STORE) as KeyValueStore<String, Car>
+                        .getStateStore(CAR_RW_STORE) as KeyValueStore<String, Car>
             }
 
             override fun process(key: String, value: Car) {

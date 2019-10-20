@@ -1,7 +1,7 @@
 package io.kfleet.owner.service.repos
 
 import io.kfleet.commands.CommandResponse
-import io.kfleet.owner.service.configuration.StoreNames
+import io.kfleet.owner.service.configuration.OWNER_COMMANDS_RESPONSE_STORE
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.apache.kafka.streams.state.ReadOnlyWindowStore
 import org.springframework.cloud.stream.binder.kafka.streams.InteractiveQueryService
@@ -30,6 +30,6 @@ class CommandsResponseLocalRepository(private val interactiveQueryService: Inter
     }
 
     private fun commandResponseStore(): ReadOnlyWindowStore<String, CommandResponse> = interactiveQueryService
-            .getQueryableStore(StoreNames.OWNER_COMMANDS_RESPONSE_STORE, QueryableStoreTypes.windowStore<String, CommandResponse>())
+            .getQueryableStore(OWNER_COMMANDS_RESPONSE_STORE, QueryableStoreTypes.windowStore<String, CommandResponse>())
 
 }

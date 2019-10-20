@@ -4,29 +4,29 @@ import org.apache.kafka.clients.admin.NewTopic
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-object TopicNames {
-    const val CARS = "cars"
-    const val CAR_EVENTS = "car_events"
-    const val DLQ = "dlq"
-}
+// TopicNames
+const val CARS = "cars"
+const val CAR_EVENTS = "car_events"
+const val DLQ = "dlq"
 
-object TopicBindingNames {
-    const val CAR_EVENTS_IN = "car_events_in"
-}
 
-object StoreNames {
-    const val CAR_RW_STORE = "car_store"
-}
+// TopicBindingNames
+const val CAR_EVENTS_IN = "car_events_in"
+
+
+// StoreNames
+const val CAR_RW_STORE = "car_store"
+
 
 @Configuration
 class Topics {
-    
-    @Bean
-    fun carsTopic() = NewTopic(TopicNames.CARS, 3, 3)
 
     @Bean
-    fun carEventTopic() = NewTopic(TopicNames.CAR_EVENTS, 3, 3)
+    fun carsTopic() = NewTopic(CARS, 3, 3)
 
     @Bean
-    fun dlqTopic() = NewTopic(TopicNames.DLQ, 3, 3)
+    fun carEventTopic() = NewTopic(CAR_EVENTS, 3, 3)
+
+    @Bean
+    fun dlqTopic() = NewTopic(DLQ, 3, 3)
 }

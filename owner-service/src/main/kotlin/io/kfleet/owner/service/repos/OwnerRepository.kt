@@ -3,8 +3,9 @@ package io.kfleet.owner.service.repos
 import io.kfleet.common.WebClientUtil
 import io.kfleet.domain.events.owner.OwnerCreatedEvent
 import io.kfleet.owner.service.commands.*
-import io.kfleet.owner.service.configuration.StoreNames
-import io.kfleet.owner.service.configuration.TopicBindingNames
+import io.kfleet.owner.service.configuration.OWNER_COMMANDS_OUT
+import io.kfleet.owner.service.configuration.OWNER_EVENTS_IN
+import io.kfleet.owner.service.configuration.OWNER_RW_STORE
 import io.kfleet.owner.service.domain.*
 import io.kfleet.owner.service.rpclayer.RPC_OWNER
 import io.kfleet.owner.service.web.NewCar
@@ -38,17 +39,17 @@ private val log = KotlinLogging.logger {}
 
 interface OwnersBindings {
 
-    @Output(TopicBindingNames.OWNER_COMMANDS_OUT)
+    @Output(OWNER_COMMANDS_OUT)
     fun ownersCommands(): MessageChannel
 
-    @Input(TopicBindingNames.OWNER_EVENTS_IN)
+    @Input(OWNER_EVENTS_IN)
     fun ownerEvents(): SubscribableChannel
 }
 
 @Component
 @EnableBinding(OwnersBindings::class)
 class OwnerRepository(
-        @Output(TopicBindingNames.OWNER_COMMANDS_OUT) private val outputOwnerCommands: MessageChannel,
+        @Output(OWNER_COMMANDS_OUT) private val outputOwnerCommands: MessageChannel,
         private val interactiveQueryService: InteractiveQueryService,
         private val webClientUtil: WebClientUtil) {
 
@@ -154,12 +155,12 @@ class OwnerRepository(
     }
 
     fun findById(ownerId: String): Mono<Owner> {
-        val hostInfo = interactiveQueryService.getHostInfo(StoreNames.OWNER_RW_STORE, ownerId, StringSerializer())
+        val hostInfo = interactiveQueryService.getHostInfo(OWNER_RW_STORE, ownerId, StringSerializer())
         return webClientUtil.doGet(hostInfo, "$RPC_OWNER/$ownerId", Owner::class.java)
     }
 
     // just an example: how to listen to a topic
-    @StreamListener(TopicBindingNames.OWNER_EVENTS_IN)
+    @StreamListener(OWNER_EVENTS_IN)
     fun process(message: Message<OwnerCreatedEvent>) {
         log.debug { "owner event: $message" }
     }
