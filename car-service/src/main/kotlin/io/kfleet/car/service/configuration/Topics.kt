@@ -14,9 +14,13 @@ object TopicBindingNames {
     const val CAR_EVENTS_IN = "car_events_in"
 }
 
+object StoreNames {
+    const val CAR_RW_STORE = "car_store"
+}
+
 @Configuration
 class Topics {
-
+    
     @Bean
     fun carsTopic() = NewTopic(TopicNames.CARS, 3, 3)
 

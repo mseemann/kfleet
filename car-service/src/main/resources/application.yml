@@ -11,11 +11,14 @@ spring.cloud.stream.default.producer:
   useNativeEncoding: true
 
 spring.cloud.stream.bindings:
-  cars_out:
-    destination: cars
   cars:
     destination: cars
   car_events_in:
+    destination: car_events
+  # Simulations
+  cars_out:
+    destination: cars
+  car_events_out:
     destination: car_events
 
 spring.cloud.stream.kafka.streams.binder.configuration:
@@ -54,6 +57,11 @@ spring.cloud.stream.kafka.streams.bindings:
       applicationId: car-service-car-events
       startOffset: earliest
 
+spring.cloud.stream.kafka.bindings:
+  car_events:
+    producer:
+      sync: true
+
 #error if not at least 3 broker: Number of alive brokers '1' does not meet the required replication factor '3' for the transactions state topic
 spring.cloud.stream.kafka.streams.binder.configuration.processing.guarantee: exactly_once
 
@@ -74,3 +82,4 @@ logging.level.org.springframework.cloud.stream.binding: ERROR
 
 
 cars.service.simulation.enabled: false
+cars.service.simulation.events.enabled: false

@@ -2,10 +2,15 @@ package io.kfleet.car.service.processors
 
 import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
+import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
+import io.kfleet.car.service.simulation.CarEventOutBindings
 import io.kfleet.car.service.simulation.CarsOutBindings
+import io.kfleet.common.customRetry
 import io.kfleet.common.headers
+import io.kfleet.domain.events.carDeregisteredEvent
+import io.kfleet.domain.events.carRegisteredEvent
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS
 import org.awaitility.kotlin.await
@@ -29,11 +34,15 @@ import kotlin.test.expect
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
-class ProcessorIntegrationTests {
+class CarStateCountProcessorTest {
 
     @Autowired
     @Output(CarsOutBindings.CARS)
     lateinit var carOuputChannel: MessageChannel
+
+    @Autowired
+    @Output(CarEventOutBindings.CARS)
+    lateinit var carEventOutputChannel: MessageChannel
 
     @Autowired
     lateinit var carsRepository: CarsRepository
@@ -59,7 +68,7 @@ class ProcessorIntegrationTests {
 
 
         await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
-            val respCar = carsRepository.findById("$carId").block()
+            val respCar = carsRepository.findById("$carId").customRetry().block()
 
             expect(car.getState()) { respCar!!.getState() }
         }
@@ -78,6 +87,33 @@ class ProcessorIntegrationTests {
         }
 
     }
-}
 
+    @Test
+    fun submitRegisterEvent() {
+        val carId = 10
+        val carEvent = carRegisteredEvent { setCarId("$carId") }
+        val message = MessageBuilder.createMessage(carEvent, headers(carId))
+
+        carEventOutputChannel.send(message)
+
+
+        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
+            val respCar = carsRepository.findById("$carId").customRetry().block()
+
+            expect(CarState.FREE) { respCar!!.getState() }
+        }
+
+        val carDeregEvent = carDeregisteredEvent { setCarId("$carId") }
+        val deregMessage = MessageBuilder.createMessage(carDeregEvent, headers(carId))
+
+        carEventOutputChannel.send(deregMessage)
+
+        await withPollInterval FIVE_HUNDRED_MILLISECONDS untilAsserted {
+            val respCar = carsRepository.findById("$carId").customRetry().block()
+
+            expect(CarState.OUT_OF_POOL) { respCar!!.getState() }
+        }
+
+    }
+}
 

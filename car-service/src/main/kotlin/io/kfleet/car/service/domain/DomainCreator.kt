@@ -1,12 +1,15 @@
 package io.kfleet.car.service.domain
 
 
-import io.kfleet.car.service.domain.Car
-import io.kfleet.car.service.domain.CarState
-import io.kfleet.car.service.domain.GeoPosition
+import org.apache.avro.specific.SpecificRecord
+import org.apache.kafka.streams.KeyValue
 import kotlin.random.Random
 
 fun car(buildCar: Car.Builder.() -> Unit): Car = Car.newBuilder().apply { buildCar() }.build()
+
+fun Car.asKeyValue(): KeyValue<String, SpecificRecord?> {
+    return KeyValue(this.getId(), this)
+}
 
 object CarFactory {
 
