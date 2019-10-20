@@ -1,0 +1,12 @@
+{
+  "namespace": "io.kfleet.domain.events.traveler",
+  "type": "record",
+  "name": "TravelerDeletedEvent",
+  "javaAnnotation": "io.kfleet.domain.events.TravelerEvent",
+  "fields": [
+    {
+      "name": "travelerId",
+      "type": "string"
+    }
+  ]
+}

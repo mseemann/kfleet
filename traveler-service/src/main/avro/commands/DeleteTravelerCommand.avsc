@@ -1,0 +1,16 @@
+{
+  "namespace": "io.kfleet.traveler.service.commands",
+  "type": "record",
+  "javaAnnotation": "io.kfleet.traveler.service.domain.TravelerCommand",
+  "name": "DeleteTravelerCommand",
+  "fields": [
+    {
+      "name": "commandId",
+      "type": "string"
+    },
+    {
+      "name": "travelerId",
+      "type": "string"
+    }
+  ]
+}

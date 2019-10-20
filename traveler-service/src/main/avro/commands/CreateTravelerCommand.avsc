@@ -1,0 +1,24 @@
+{
+  "namespace": "io.kfleet.traveler.service.commands",
+  "type": "record",
+  "javaAnnotation": "io.kfleet.traveler.service.domain.TravelerCommand",
+  "name": "CreateTravelerCommand",
+  "fields": [
+    {
+      "name": "commandId",
+      "type": "string"
+    },
+    {
+      "name": "travelerId",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "email",
+      "type": "string"
+    }
+  ]
+}

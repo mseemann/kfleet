@@ -1,0 +1,10 @@
+{
+  "namespace" : "io.kfleet.traveler.service.domain",
+  "type" : "record",
+  "name" : "Traveler",
+  "fields" : [
+    {"name":"id", "type":"string"},
+    {"name":"name", "type":"string"},
+    {"name":"email", "type": "string"}
+  ]
+}

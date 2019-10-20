@@ -1,0 +1,20 @@
+{
+  "namespace": "io.kfleet.domain.events.traveler",
+  "type": "record",
+  "name": "TravelerCreatedEvent",
+  "javaAnnotation": "io.kfleet.domain.events.TravelerEvent",
+  "fields": [
+    {
+      "name": "travelerId",
+      "type": "string"
+    },
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "email",
+      "type": "string"
+    }
+  ]
+}

@@ -5,8 +5,9 @@ include("common")
 include("test-common")
 include("owner-service")
 include("car-service")
+include("traveler-service")
 
-// make the avro plugihn available
+// make the avro plugin available
 pluginManagement {
     repositories {
         gradlePluginPortal()
