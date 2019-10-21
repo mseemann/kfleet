@@ -6,24 +6,31 @@ A technology preview how to manage a fleet of autonomous vehicles with Kafka
 
 get insights from kafka:
 
+``` bash
 docker run -it --net=host --rm confluentinc/cp-ksql-cli:5.3.0 http://localhost:8088
 
 show topics;
 
 print `topic`;
+```
 
 exit ksql cli: CTRL+d
 
-
 start kafka and ksql server
 
+``` bash
 docker-compose up
+```
 
-docker exec -it kfleet_broker1_1 bash 
+``` bash
+docker exec -it kfleet_broker1_1 bash `
+
 kafka-topics --zookeeper zookeeper:2181 --list
-kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
-kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
 
+kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
+
+kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
+``
 ``` bash
 docker run --tty \
            --network kfleet_default \
@@ -61,18 +68,18 @@ docker run --tty \
 - "When source code is executed sequentially, the code is easier to understand and debug. When concurrency is used, code may get executed in parallel or in some irregular order." [5]
 - "Tell don't ask!"
 
-### Using the interactive query service to provide a REST-Interface 
-Kafka Streams provide a ReadOnlyKeyValueStore that is a thread safe way to access a state store. 
-The store is available through Spring Cloud Streams InteractiveQueryService. We can use this
-service to find a specific record by key, all records in the store or a reange of records - if we are quering
+### Using the interactive query service to provide a REST-Interface to the state store
+Kafka Streams provide a _ReadOnlyKeyValueStore_ that is a thread safe way to access a state store. 
+The store is available through Spring Cloud Streams _InteractiveQueryService_. We can use this
+service to find a specific record by key, all records in the store or a range of records - if we are quering
 for a range of keys (lexicographically).
-This sound great. But we should remind our self that a state store is bound to the current streaming 
+This sounds great. But we should remind our self that a state store is bound to the current streaming 
 application instance and if we want to scale our application we need to start more instances of our 
 application (up to the number of partitions our topic has).
 If we provide the host and port of our application (`application.server`-property) we can query all
-hosts that are part of our streaming app cluster or we can determin the host a given key is stored.
+hosts that are part of our streaming app cluster or we can determine the host a given key is stored.
 
-To conclude: if we hav only one streaming application instance we can query a record by key in the 
+To conclude: if we have only one streaming application instance we can query a record by key in the 
 easiest possible way:
 ``` kotlin
 override fun findByIdLocal(id: String): Mono<Car> {
@@ -83,9 +90,9 @@ private fun carsStore(): ReadOnlyKeyValueStore<String, Car> = interactiveQuerySe
         .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
 
 ```
-If we have more than one instance of our streaming application running we need to decide wether the
+If we have more than one instance of our streaming application running we need to decide whether the
 record is stored locally or can only be queries from another application instance. If the key is stored
-locally we query the local store if not we need a remote call to query the reocord:
+locally we query the local store. If not, we need a remote call to query the reocord:
 
 ``` kotlin
 override fun findById(id: String): Mono<Car> {
@@ -104,7 +111,7 @@ override fun findById(id: String): Mono<Car> {
 }
 ```
 
-The WebClient uses a special rest endpoint that queires the local store directly. The provided solution is the
+The _WebClient_ uses a special rest endpoint that queries the local store directly. The provided solution is the
 fastest one because it runs a local key lookup in the local store if the key is processed by the same application
 instance. Only if the key is processed by another application instance a remote call is necessary.
 The disadvantage is that the provided code is more complicated and not very concise.
