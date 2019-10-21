@@ -24,25 +24,17 @@ class CarEventEmitterTest {
 
         ReflectionTestUtils.setField(carEventEmitter, "simulationEnabled", true)
 
-
-        StepVerifier.create(carEventEmitter.emitCarEvents(true).take(1))
-                .expectNextMatches {
-                    when (val p = it.payload) {
-                        is CarRegisteredEvent -> p.getCarId() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
-                        else -> throw RuntimeException("unknown car event")
+        for (i in 1..10) {
+            StepVerifier.create(carEventEmitter.emitCarEvents().take(1))
+                    .expectNextMatches {
+                        when (val p = it.payload) {
+                            is CarRegisteredEvent -> p.getCarId() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
+                            is CarDeregisteredEvent -> p.getCarId() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
+                            else -> throw RuntimeException("unknown car event")
+                        }
                     }
-                }
-                .expectComplete()
-                .verify()
-
-        StepVerifier.create(carEventEmitter.emitCarEvents(false).take(1))
-                .expectNextMatches {
-                    when (val p = it.payload) {
-                        is CarDeregisteredEvent -> p.getCarId() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
-                        else -> throw RuntimeException("unknown car event")
-                    }
-                }
-                .expectComplete()
-                .verify()
+                    .expectComplete()
+                    .verify()
+        }
     }
 }
