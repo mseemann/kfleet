@@ -30,7 +30,8 @@ kafka-topics --zookeeper zookeeper:2181 --list
 kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
 
 kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
-``
+```
+
 ``` bash
 docker run --tty \
            --network kfleet_default \
@@ -59,7 +60,9 @@ docker run --tty \
   Headers: %h\n'
 ```
 
+```json
 {"id":"1","state":"FREE","geoPosition":{"lat":59.83977184696787,"lng":10.70939965449577},"stateOfCharge":49.76350057919342}
+```
 
 ### Thoughts and findings
 - *In domain-driven design (DDD), an aggregate defines a consistency boundary" [3]
