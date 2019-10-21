@@ -138,6 +138,65 @@ class TravelerPorcessorTest {
     }
 
     @Test
+    fun carRequestSucceededTest() {
+
+        val travelerId = "1"
+
+        val command = carRequestCommand {
+            commandId = "65823"
+            setTravelerId(travelerId)
+            from = geoPosition {
+                lat = 1.0
+                lng = 1.0
+            }
+            to = geoPosition {
+                lat = 1.0
+                lng = 1.0
+            }
+            requestTime = "2019-10-21T19:00:00"
+        }
+
+        val traveler = traveler {
+            id = travelerId
+            name = "name"
+            email = "a@a.com"
+        }
+
+        val result = travelerProcessor.processCommand(CommandAndTraveler(command, traveler))
+
+        expect(0, { result.count() })
+        // TODO
+    }
+
+    @Test
+    fun carRequestRejectedTest() {
+        val travelerId = "1"
+        val commandId = "1a"
+
+        val command = carRequestCommand {
+            setCommandId(commandId)
+            setTravelerId(travelerId)
+            from = geoPosition {
+                lat = 1.0
+                lng = 1.0
+            }
+            to = geoPosition {
+                lat = 1.0
+                lng = 1.0
+            }
+            requestTime = "2019-10-21T19:00:00"
+        }
+
+        val result = travelerProcessor.processCommand(CommandAndTraveler(command, null))
+
+        expect(1) { result.count() }
+        expect(commandId) { result[0].key }
+        expect(CommandStatus.REJECTED) { (result[0].value as CommandResponse).getStatus() }
+        assertNull((result[0].value as CommandResponse).getRessourceId())
+        expect("Traveler with id $travelerId did not exist") { (result[0].value as CommandResponse).getReason() }
+    }
+
+    @Test
     fun testUnknownCommandException() {
         // this is not a traveler command! did you see it?
         val command = ownerCreatedEvent {

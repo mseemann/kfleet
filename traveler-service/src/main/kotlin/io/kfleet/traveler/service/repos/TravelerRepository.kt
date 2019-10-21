@@ -1,14 +1,15 @@
 package io.kfleet.traveler.service.repos
 
 import io.kfleet.common.WebClientUtil
+import io.kfleet.traveler.service.commands.CarRequestCommand
 import io.kfleet.traveler.service.commands.CreateTravelerCommand
 import io.kfleet.traveler.service.commands.DeleteTravelerCommand
 import io.kfleet.traveler.service.configuration.TRAVELER_COMMANDS_OUT
 import io.kfleet.traveler.service.configuration.TRAVELER_RW_STORE
-import io.kfleet.traveler.service.domain.Traveler
-import io.kfleet.traveler.service.domain.createTravelerCommand
-import io.kfleet.traveler.service.domain.deleteTravelerCommand
+import io.kfleet.traveler.service.domain.*
 import io.kfleet.traveler.service.rpclayer.RPC_TRAVELER
+import io.kfleet.traveler.service.web.CarRequest
+import io.kfleet.traveler.service.web.DeleteTravelerParams
 import io.kfleet.traveler.service.web.NewTraveler
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
@@ -20,13 +21,9 @@ import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.util.*
-
-interface TravelerParams {
-    val travelerId: String
-}
-
-data class DeleteTravelerParams(override val travelerId: String) : TravelerParams
 
 
 private val log = KotlinLogging.logger {}
@@ -49,7 +46,7 @@ class TravelerRepository(
 
         val travelerCommand = createTravelerCommand {
             commandId = UUID.randomUUID().toString()
-            travelerId = createTravelerParams.id
+            travelerId = createTravelerParams.travelerId
             name = createTravelerParams.name
             email = createTravelerParams.email
         }
@@ -92,4 +89,33 @@ class TravelerRepository(
         return webClientUtil.doGet(hostInfo, "$RPC_TRAVELER/$travelerId", Traveler::class.java)
     }
 
+    fun submitCarRequestTravelerCommand(carRequest: CarRequest): Mono<CarRequestCommand> {
+        val carRequestCommand = carRequestCommand {
+            commandId = UUID.randomUUID().toString()
+            travelerId = carRequest.travelerId
+            from = geoPosition {
+                lat = carRequest.from.lat
+                lng = carRequest.from.lng
+            }
+            to = geoPosition {
+                lat = carRequest.to.lat
+                lng = carRequest.to.lng
+            }
+            requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
+                    .withZone(ZoneOffset.UTC)
+                    .format(carRequest.requestTime.toInstant())
+        }
+
+        val msg = MessageBuilder
+                .withPayload(carRequestCommand)
+                .setHeader(KafkaHeaders.MESSAGE_KEY, carRequestCommand.getTravelerId())
+                .build()
+
+        return try {
+            // this works because cloud stream is configured as sync for this topic
+            if (outputTravelerCommands.send(msg)) Mono.just(carRequestCommand) else Mono.error(RuntimeException("CarRequestCommand coud not be send."))
+        } catch (e: RuntimeException) {
+            Mono.error(e)
+        }
+    }
 }

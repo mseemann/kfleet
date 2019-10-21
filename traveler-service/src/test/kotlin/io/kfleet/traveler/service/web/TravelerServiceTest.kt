@@ -3,12 +3,8 @@ package io.kfleet.traveler.service.web
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
-import io.kfleet.traveler.service.domain.Traveler
-import io.kfleet.traveler.service.domain.createTravelerCommand
-import io.kfleet.traveler.service.domain.deleteTravelerCommand
-import io.kfleet.traveler.service.domain.traveler
+import io.kfleet.traveler.service.domain.*
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
-import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerRepository
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -20,6 +16,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.expect
 
@@ -70,7 +69,7 @@ class TravelerServiceTest {
     fun createTraveler() {
 
         val params = NewTraveler(
-                id = "1",
+                travelerId = "1",
                 name = "testName",
                 email = "a@a.com"
         )
@@ -110,7 +109,7 @@ class TravelerServiceTest {
     @Test
     fun createTravelerBadRequest() {
         val params = NewTraveler(
-                id = "1",
+                travelerId = "1",
                 name = "",
                 email = "a@a.com"
         )
@@ -125,7 +124,7 @@ class TravelerServiceTest {
     @Test
     fun createTravelerBadRequestTravelerExists() {
         val params = NewTraveler(
-                id = "1",
+                travelerId = "1",
                 name = "testName",
                 email = "a@a.com")
 
@@ -213,5 +212,62 @@ class TravelerServiceTest {
         assertEquals("travelerId invalid", result.responseBody)
     }
 
+    @Test
+    fun requestACar() {
 
+        val requestACar = CarRequest(
+                travelerId = "1",
+                from = CarRequestGeoPosition(lat = 1.0, lng = 1.0),
+                to = CarRequestGeoPosition(lat = 1.0, lng = 1.0),
+                requestTime = Date(),
+                id = "111")
+
+        val requestCarCommand = carRequestCommand {
+            commandId = "c1"
+            travelerId = "1"
+            from = geoPosition {
+                lat = requestACar.from.lat
+                lng = requestACar.from.lng
+            }
+            to = geoPosition {
+                lat = requestACar.to.lat
+                lng = requestACar.to.lng
+            }
+            requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
+                    .withZone(ZoneOffset.UTC)
+                    .format(requestACar.requestTime.toInstant())
+        }
+
+        BDDMockito
+                .given(repo.submitCarRequestTravelerCommand(requestACar))
+                .willReturn(Mono.just(requestCarCommand))
+
+        BDDMockito
+                .given(commandResponseRepo.findCommandResponse(requestCarCommand.getCommandId()))
+                .willReturn(Mono.just(CommandResponse(requestCarCommand.getCommandId(), requestCarCommand.getTravelerId(), CommandStatus.SUCCEEDED, null)))
+
+        webClient.post().uri("/traveler/requestACar").body(BodyInserters.fromObject(requestACar))
+                .exchange()
+                .expectStatus().isNoContent
+
+    }
+
+
+    @Test
+    fun requestACarBadRequest() {
+        val requestACar = CarRequest(
+                travelerId = "",
+                from = CarRequestGeoPosition(lat = 1.0, lng = 1.0),
+                to = CarRequestGeoPosition(lat = 1.0, lng = 1.0),
+                requestTime = Date(),
+                id = "111")
+
+        val result = webClient.post().uri("/traveler/requestACar")
+                .body(BodyInserters.fromObject(requestACar))
+                .exchange()
+                .expectStatus().isBadRequest
+                .expectBody(String::class.java)
+                .returnResult()
+        assertEquals("travelerId invalid", result.responseBody)
+    }
 }

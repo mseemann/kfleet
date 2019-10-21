@@ -6,6 +6,7 @@ import io.kfleet.domain.commandResponse
 import io.kfleet.domain.events.asKeyValue
 import io.kfleet.domain.events.travelerCreatedEvent
 import io.kfleet.domain.events.travelerDeletedEvent
+import io.kfleet.traveler.service.commands.CarRequestCommand
 import io.kfleet.traveler.service.commands.CreateTravelerCommand
 import io.kfleet.traveler.service.commands.DeleteTravelerCommand
 import io.kfleet.traveler.service.processors.CommandAndTraveler
@@ -39,6 +40,8 @@ fun createTravelerCommand(buildCreateTravelerCommand: CreateTravelerCommand.Buil
 fun deleteTravelerCommand(buildDeleteTravelerCommand: DeleteTravelerCommand.Builder.() -> Unit): DeleteTravelerCommand =
         DeleteTravelerCommand.newBuilder().apply { buildDeleteTravelerCommand() }.build()
 
+fun carRequestCommand(buildCarRequestCommand: CarRequestCommand.Builder.() -> Unit): CarRequestCommand =
+        CarRequestCommand.newBuilder().apply { buildCarRequestCommand() }.build()
 
 @Component
 class TravelerProcessor {
@@ -50,6 +53,7 @@ class TravelerProcessor {
         return when (val command = commandAndTraveler.command) {
             is CreateTravelerCommand -> createTraveler(command, commandAndTraveler.traveler)
             is DeleteTravelerCommand -> deleteTraveler(command, commandAndTraveler.traveler)
+            is CarRequestCommand -> requestACar(command, commandAndTraveler.traveler)
             else -> throw RuntimeException("unsupported command: ${command::class}")
         }
 
@@ -107,6 +111,15 @@ class TravelerProcessor {
                         status = CommandStatus.SUCCEEDED
                     }.asKeyValue()
             )
+        }
+    }
+
+    private fun requestACar(command: CarRequestCommand, traveler: Traveler?): List<KeyValue<String, SpecificRecord?>> {
+        return if (traveler == null) {
+            listOf(responseTravelerNotExist(command.getCommandId(), command.getTravelerId()))
+        } else {
+            // TODO
+            listOf()
         }
     }
 

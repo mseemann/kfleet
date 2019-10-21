@@ -2,10 +2,14 @@ package io.kfleet.traveler.service.repos
 
 
 import io.kfleet.common.WebClientUtil
+import io.kfleet.traveler.service.commands.CarRequestCommand
 import io.kfleet.traveler.service.commands.CreateTravelerCommand
 import io.kfleet.traveler.service.commands.DeleteTravelerCommand
 import io.kfleet.traveler.service.domain.Traveler
 import io.kfleet.traveler.service.domain.traveler
+import io.kfleet.traveler.service.web.CarRequest
+import io.kfleet.traveler.service.web.CarRequestGeoPosition
+import io.kfleet.traveler.service.web.DeleteTravelerParams
 import io.kfleet.traveler.service.web.NewTraveler
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.state.HostInfo
@@ -22,6 +26,7 @@ import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import java.util.*
 import kotlin.test.expect
 
 
@@ -45,10 +50,17 @@ class TravelerRepositoryTest {
     }
 
     private val createTravelerParams = NewTraveler(
-            id = "1",
+            travelerId = "1",
             name = "testName",
             email = "a@a.com")
     private val deleteTravelerParams = DeleteTravelerParams(travelerId = "1")
+
+    private val carRequest = CarRequest(
+            travelerId = "",
+            from = CarRequestGeoPosition(lat = 1.0, lng = 1.0),
+            to = CarRequestGeoPosition(lat = 1.0, lng = 1.0),
+            requestTime = Date(),
+            id = "111")
 
     @Test
     fun sendCreateTravelerCommand() {
@@ -58,15 +70,15 @@ class TravelerRepositoryTest {
         val result = travelerRepo.submitCreateTravelerCommand(createTravelerParams)
 
         val returnedCommand = result.block()!!
-        expect(createTravelerParams.id) { returnedCommand.getTravelerId() }
+        expect(createTravelerParams.travelerId) { returnedCommand.getTravelerId() }
         expect(createTravelerParams.name) { returnedCommand.getName() }
         expect(createTravelerParams.email) { returnedCommand.getEmail() }
 
         val sendMessage = capture.value
         val command = sendMessage.payload as CreateTravelerCommand
         val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
-        expect(createTravelerParams.id) { messageKey }
-        expect(createTravelerParams.id) { command.getTravelerId() }
+        expect(createTravelerParams.travelerId) { messageKey }
+        expect(createTravelerParams.travelerId) { command.getTravelerId() }
         expect(createTravelerParams.name) { command.getName() }
     }
 
@@ -152,6 +164,33 @@ class TravelerRepositoryTest {
                 .expectNext(traveler)
                 .verifyComplete()
 
+    }
+
+    @Test
+    fun sendCarRequestCommand() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willReturn(true)
+
+        val result = travelerRepo.submitCarRequestTravelerCommand(carRequest)
+
+        val returnedCommand = result.block()!!
+        expect(carRequest.travelerId) { returnedCommand.getTravelerId() }
+
+        val sendMessage = capture.value
+        val command = sendMessage.payload as CarRequestCommand
+        val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
+        expect(carRequest.travelerId) { messageKey }
+        expect(carRequest.travelerId) { command.getTravelerId() }
+    }
+
+    @Test
+    fun sendCarREquestCommandFailure() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willReturn(false)
+
+        StepVerifier.create(travelerRepo.submitCarRequestTravelerCommand(carRequest))
+                .expectErrorMessage("CarRequestCommand coud not be send.")
+                .verify()
     }
 
 }

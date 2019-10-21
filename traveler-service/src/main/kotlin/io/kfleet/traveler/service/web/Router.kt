@@ -13,6 +13,7 @@ class TravelerRoutes(private val travelerService: TravelerService) {
             GET("/{id}", travelerService::travelerById)
             POST("", travelerService::createTraveler)
             DELETE("/{travelerId}", travelerService::deleteTraveler)
+            POST("/requestACar", travelerService::requestACar)
         }
     }
 

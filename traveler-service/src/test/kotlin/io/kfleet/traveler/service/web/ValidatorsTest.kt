@@ -1,19 +1,19 @@
 package io.kfleet.traveler.service.web
 
 
-import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import org.junit.jupiter.api.Test
 import reactor.test.StepVerifier
+import java.util.*
 
 class ValidatorsTest {
 
     @Test
     fun validateCreateTravelerParams() {
-        val params = NewTraveler(id = "1", name = "testName", email = "a@a.com")
+        val params = NewTraveler(travelerId = "1", name = "testName", email = "a@a.com")
 
         StepVerifier.create(validateNewTraveler(params))
                 .expectNextMatches {
-                    it.name == "testName" && it.id == "1" && it.email == "a@a.com"
+                    it.name == "testName" && it.travelerId == "1" && it.email == "a@a.com"
                 }
                 .expectComplete()
                 .verify()
@@ -21,7 +21,7 @@ class ValidatorsTest {
 
     @Test
     fun validateErrorCreateTravelerParamsName() {
-        val params = NewTraveler(id = "1", name = "", email = "a@a.com")
+        val params = NewTraveler(travelerId = "1", name = "", email = "a@a.com")
 
         StepVerifier.create(validateNewTraveler(params))
                 .expectErrorMatches() {
@@ -32,7 +32,7 @@ class ValidatorsTest {
 
     @Test
     fun validateErrorCreateTravelerParamsId() {
-        val params = NewTraveler(id = "", name = "test", email = "a@a.com")
+        val params = NewTraveler(travelerId = "", name = "test", email = "a@a.com")
 
         StepVerifier.create(validateNewTraveler(params))
                 .expectErrorMatches() {
@@ -43,7 +43,7 @@ class ValidatorsTest {
 
     @Test
     fun validateErrorCreateTravelerParamsEmail() {
-        val params = NewTraveler(id = "1", name = "test", email = "")
+        val params = NewTraveler(travelerId = "1", name = "test", email = "")
 
         StepVerifier.create(validateNewTraveler(params))
                 .expectErrorMatches() {
@@ -58,6 +58,22 @@ class ValidatorsTest {
         val params = DeleteTravelerParams(travelerId = "")
 
         StepVerifier.create(validate(params))
+                .expectErrorMatches() {
+                    it.message == "travelerId invalid"
+                }
+                .verify()
+    }
+
+    @Test
+    fun validateCarRequestTravelerId() {
+        val params = CarRequest(
+                travelerId = "",
+                from = CarRequestGeoPosition(1.0, 1.0),
+                to = CarRequestGeoPosition(1.0, 1.0),
+                requestTime = Date(),
+                id = "111")
+
+        StepVerifier.create(validateCarRequest(params))
                 .expectErrorMatches() {
                     it.message == "travelerId invalid"
                 }

@@ -4,7 +4,6 @@ import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
-import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
@@ -14,8 +13,21 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
 import java.time.Duration
+import java.util.*
 
-data class NewTraveler(val id: String, val name: String, val email: String)
+interface TravelerParams {
+    val travelerId: String
+}
+
+data class DeleteTravelerParams(override val travelerId: String) : TravelerParams
+data class NewTraveler(override val travelerId: String, val name: String, val email: String) : TravelerParams
+data class CarRequestGeoPosition(val lat: Double, val lng: Double)
+data class CarRequest(
+        val id: String,
+        override val travelerId: String,
+        val from: CarRequestGeoPosition,
+        val to: CarRequestGeoPosition,
+        val requestTime: Date) : TravelerParams
 
 @Component
 class TravelerService(
@@ -27,10 +39,7 @@ class TravelerService(
     // goes wrong the client can query for the travelerid later and check if the traveler
     // is created or not. In most cases this call will return the created traveler.
     fun createTraveler(request: ServerRequest): Mono<ServerResponse> {
-
-        val newTraveler = request.bodyToMono<NewTraveler>()
-        println(newTraveler)
-        return newTraveler
+        return request.bodyToMono<NewTraveler>()
                 .flatMap { validateNewTraveler(it) }
                 .flatMap { travelerRepository.submitCreateTravelerCommand(it) }
                 .delayElement(Duration.ofMillis(200))
@@ -83,5 +92,14 @@ class TravelerService(
                 }
     }
 
+    fun requestACar(request: ServerRequest): Mono<ServerResponse> {
+        return request.bodyToMono<CarRequest>()
+                .flatMap { validateCarRequest(it) }
+                .flatMap { travelerRepository.submitCarRequestTravelerCommand(it) }
+                .delayElement(Duration.ofMillis(200))
+                .flatMap { findCommand(it.getCommandId()) }
+                .flatMap { mapCommandResponse(it) { ServerResponse.noContent().build() } }
+                .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
+    }
 }
 

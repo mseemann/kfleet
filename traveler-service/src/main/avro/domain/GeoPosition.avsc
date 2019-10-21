@@ -1,5 +1,5 @@
 {
-  "namespace": "io.kfleet.car.service.domain",
+  "namespace": "io.kfleet.traveler.service.domain",
   "type": "record",
   "name": "GeoPosition",
   "fields": [

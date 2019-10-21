@@ -4,8 +4,8 @@ package io.kfleet.traveler.service.processors
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
-import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerRepository
+import io.kfleet.traveler.service.web.DeleteTravelerParams
 import io.kfleet.traveler.service.web.NewTraveler
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
@@ -36,7 +36,7 @@ class ProcessorIntegrationTests {
         val travelerEmail = "a@a.com"
         val travelerId = "1"
         val createTravelerParams = NewTraveler(
-                id = travelerId,
+                travelerId = travelerId,
                 name = travelerName,
                 email = travelerEmail)
 
@@ -66,7 +66,7 @@ class ProcessorIntegrationTests {
     fun submitCreateTravelerCommandRejected() {
         val travelerId = "2"
         val createTravelerParams = NewTraveler(
-                id = travelerId,
+                travelerId = travelerId,
                 name = "test2",
                 email = "test@a.com")
 
@@ -92,7 +92,7 @@ class ProcessorIntegrationTests {
     fun submitDeleteTravelerCommand() {
         val travelerId = "1"
         val createTravelerParams = NewTraveler(
-                id = travelerId,
+                travelerId = travelerId,
                 name = "test",
                 email = "a@a.com")
 
