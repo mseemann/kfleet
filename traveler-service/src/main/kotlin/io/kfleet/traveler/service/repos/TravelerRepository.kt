@@ -9,6 +9,7 @@ import io.kfleet.traveler.service.domain.Traveler
 import io.kfleet.traveler.service.domain.createTravelerCommand
 import io.kfleet.traveler.service.domain.deleteTravelerCommand
 import io.kfleet.traveler.service.rpclayer.RPC_TRAVELER
+import io.kfleet.traveler.service.web.NewTraveler
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -25,7 +26,6 @@ interface TravelerParams {
     val travelerId: String
 }
 
-data class CreateTravelerParams(override val travelerId: String, val travelerName: String, val travelerEmail: String) : TravelerParams
 data class DeleteTravelerParams(override val travelerId: String) : TravelerParams
 
 
@@ -45,13 +45,13 @@ class TravelerRepository(
         private val interactiveQueryService: InteractiveQueryService,
         private val webClientUtil: WebClientUtil) {
 
-    fun submitCreateTravelerCommand(createTravelerParams: CreateTravelerParams): Mono<CreateTravelerCommand> {
+    fun submitCreateTravelerCommand(createTravelerParams: NewTraveler): Mono<CreateTravelerCommand> {
 
         val travelerCommand = createTravelerCommand {
             commandId = UUID.randomUUID().toString()
-            travelerId = createTravelerParams.travelerId
-            name = createTravelerParams.travelerName
-            email = createTravelerParams.travelerEmail
+            travelerId = createTravelerParams.id
+            name = createTravelerParams.name
+            email = createTravelerParams.email
         }
 
         val msg = MessageBuilder

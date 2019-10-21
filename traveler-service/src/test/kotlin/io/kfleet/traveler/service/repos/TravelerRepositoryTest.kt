@@ -6,6 +6,7 @@ import io.kfleet.traveler.service.commands.CreateTravelerCommand
 import io.kfleet.traveler.service.commands.DeleteTravelerCommand
 import io.kfleet.traveler.service.domain.Traveler
 import io.kfleet.traveler.service.domain.traveler
+import io.kfleet.traveler.service.web.NewTraveler
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.kafka.streams.state.HostInfo
 import org.junit.jupiter.api.BeforeAll
@@ -43,10 +44,10 @@ class TravelerRepositoryTest {
         MockitoAnnotations.initMocks(this)
     }
 
-    private val createTravelerParams = CreateTravelerParams(
-            travelerId = "1",
-            travelerName = "testName",
-            travelerEmail = "a@a.com")
+    private val createTravelerParams = NewTraveler(
+            id = "1",
+            name = "testName",
+            email = "a@a.com")
     private val deleteTravelerParams = DeleteTravelerParams(travelerId = "1")
 
     @Test
@@ -57,16 +58,16 @@ class TravelerRepositoryTest {
         val result = travelerRepo.submitCreateTravelerCommand(createTravelerParams)
 
         val returnedCommand = result.block()!!
-        expect(createTravelerParams.travelerId) { returnedCommand.getTravelerId() }
-        expect(createTravelerParams.travelerName) { returnedCommand.getName() }
-        expect(createTravelerParams.travelerEmail) { returnedCommand.getEmail() }
+        expect(createTravelerParams.id) { returnedCommand.getTravelerId() }
+        expect(createTravelerParams.name) { returnedCommand.getName() }
+        expect(createTravelerParams.email) { returnedCommand.getEmail() }
 
         val sendMessage = capture.value
         val command = sendMessage.payload as CreateTravelerCommand
         val messageKey = sendMessage.headers[KafkaHeaders.MESSAGE_KEY]
-        expect(createTravelerParams.travelerId) { messageKey }
-        expect(createTravelerParams.travelerId) { command.getTravelerId() }
-        expect(createTravelerParams.travelerName) { command.getName() }
+        expect(createTravelerParams.id) { messageKey }
+        expect(createTravelerParams.id) { command.getTravelerId() }
+        expect(createTravelerParams.name) { command.getName() }
     }
 
     @Test

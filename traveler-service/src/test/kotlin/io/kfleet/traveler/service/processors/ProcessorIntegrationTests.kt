@@ -4,9 +4,9 @@ package io.kfleet.traveler.service.processors
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
-import io.kfleet.traveler.service.repos.CreateTravelerParams
 import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerRepository
+import io.kfleet.traveler.service.web.NewTraveler
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
@@ -35,10 +35,10 @@ class ProcessorIntegrationTests {
         val travelerName = "test"
         val travelerEmail = "a@a.com"
         val travelerId = "1"
-        val createTravelerParams = CreateTravelerParams(
-                travelerId = travelerId,
-                travelerName = travelerName,
-                travelerEmail = travelerEmail)
+        val createTravelerParams = NewTraveler(
+                id = travelerId,
+                name = travelerName,
+                email = travelerEmail)
 
         val command = repo.submitCreateTravelerCommand(createTravelerParams).block()
         assertNotNull(command)
@@ -65,10 +65,10 @@ class ProcessorIntegrationTests {
     @Test
     fun submitCreateTravelerCommandRejected() {
         val travelerId = "2"
-        val createTravelerParams = CreateTravelerParams(
-                travelerId = travelerId,
-                travelerName = "test2",
-                travelerEmail = "test@a.com")
+        val createTravelerParams = NewTraveler(
+                id = travelerId,
+                name = "test2",
+                email = "test@a.com")
 
         val commandSucceeded = repo.submitCreateTravelerCommand(createTravelerParams).block()
         assertNotNull(commandSucceeded)
@@ -91,10 +91,10 @@ class ProcessorIntegrationTests {
     @Test
     fun submitDeleteTravelerCommand() {
         val travelerId = "1"
-        val createTravelerParams = CreateTravelerParams(
-                travelerId = travelerId,
-                travelerName = "test",
-                travelerEmail = "a@a.com")
+        val createTravelerParams = NewTraveler(
+                id = travelerId,
+                name = "test",
+                email = "a@a.com")
 
         val command = repo.submitCreateTravelerCommand(createTravelerParams).block()
         assertNotNull(command)

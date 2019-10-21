@@ -1,6 +1,6 @@
 package io.kfleet.traveler.service.web
 
-import io.kfleet.traveler.service.repos.CreateTravelerParams
+
 import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerParams
 import reactor.core.publisher.Mono
@@ -8,14 +8,18 @@ import reactor.core.publisher.Mono
 private fun <T : TravelerParams> validateTravelerId(travelerParams: T): Mono<T> =
         if (travelerParams.travelerId == "") Mono.error(IllegalArgumentException("travelerId invalid")) else Mono.just(travelerParams)
 
-private fun validateTravelerName(createTravelerParams: CreateTravelerParams): Mono<CreateTravelerParams> =
-        if (createTravelerParams.travelerName == "") Mono.error(IllegalArgumentException("travelerName invalid")) else Mono.just(createTravelerParams)
-
-private fun validateTravelerEmail(createTravelerParams: CreateTravelerParams): Mono<CreateTravelerParams> =
-        if (createTravelerParams.travelerEmail == "") Mono.error(IllegalArgumentException("travelerEmail invalid")) else Mono.just(createTravelerParams)
+private fun validateTravelerId(newTraveler: NewTraveler): Mono<NewTraveler> =
+        if (newTraveler.id == "") Mono.error(IllegalArgumentException("travelerId invalid")) else Mono.just(newTraveler)
 
 
-fun validate(newTravelerParams: CreateTravelerParams): Mono<CreateTravelerParams> =
+private fun validateTravelerName(newTraveler: NewTraveler): Mono<NewTraveler> =
+        if (newTraveler.name == "") Mono.error(IllegalArgumentException("travelerName invalid")) else Mono.just(newTraveler)
+
+private fun validateTravelerEmail(newTraveler: NewTraveler): Mono<NewTraveler> =
+        if (newTraveler.email == "") Mono.error(IllegalArgumentException("travelerEmail invalid")) else Mono.just(newTraveler)
+
+
+fun validateNewTraveler(newTravelerParams: NewTraveler): Mono<NewTraveler> =
         Mono.just(newTravelerParams)
                 .flatMap { validateTravelerId(it) }
                 .flatMap { validateTravelerName(it) }

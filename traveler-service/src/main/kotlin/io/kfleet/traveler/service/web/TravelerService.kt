@@ -4,7 +4,6 @@ import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
-import io.kfleet.traveler.service.repos.CreateTravelerParams
 import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerRepository
 import org.springframework.http.HttpStatus
@@ -12,9 +11,11 @@ import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
 import java.time.Duration
 
+data class NewTraveler(val id: String, val name: String, val email: String)
 
 @Component
 class TravelerService(
@@ -26,15 +27,11 @@ class TravelerService(
     // goes wrong the client can query for the travelerid later and check if the traveler
     // is created or not. In most cases this call will return the created traveler.
     fun createTraveler(request: ServerRequest): Mono<ServerResponse> {
-        val travelerId = request.pathVariable("travelerId")
-        val travelerName = request.pathVariable("travelerName")
-        val travelerEmail = request.pathVariable("travelerEmail")
 
-        return Mono.just(CreateTravelerParams(
-                travelerId = travelerId.trim(),
-                travelerName = travelerName.trim(),
-                travelerEmail = travelerEmail.trim()))
-                .flatMap { validate(it) }
+        val newTraveler = request.bodyToMono<NewTraveler>()
+        println(newTraveler)
+        return newTraveler
+                .flatMap { validateNewTraveler(it) }
                 .flatMap { travelerRepository.submitCreateTravelerCommand(it) }
                 .delayElement(Duration.ofMillis(200))
                 .flatMap { findCommand(it.getCommandId()) }

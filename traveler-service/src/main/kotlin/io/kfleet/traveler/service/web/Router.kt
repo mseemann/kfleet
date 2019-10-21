@@ -11,7 +11,7 @@ class TravelerRoutes(private val travelerService: TravelerService) {
     fun travelerApis() = router {
         ("/traveler").nest {
             GET("/{id}", travelerService::travelerById)
-            POST("/{travelerId}/{travelerName}/{travelerEmail}", travelerService::createTraveler)
+            POST("", travelerService::createTraveler)
             DELETE("/{travelerId}", travelerService::deleteTraveler)
         }
     }

@@ -8,7 +8,6 @@ import io.kfleet.traveler.service.domain.createTravelerCommand
 import io.kfleet.traveler.service.domain.deleteTravelerCommand
 import io.kfleet.traveler.service.domain.traveler
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
-import io.kfleet.traveler.service.repos.CreateTravelerParams
 import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import io.kfleet.traveler.service.repos.TravelerRepository
 import org.junit.jupiter.api.Test
@@ -19,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import kotlin.test.assertEquals
 import kotlin.test.expect
@@ -69,10 +69,10 @@ class TravelerServiceTest {
     @Test
     fun createTraveler() {
 
-        val params = CreateTravelerParams(
-                travelerId = "1",
-                travelerName = "testName",
-                travelerEmail = "a@a.com"
+        val params = NewTraveler(
+                id = "1",
+                name = "testName",
+                email = "a@a.com"
         )
         val traveler = traveler {
             id = "1"
@@ -97,7 +97,7 @@ class TravelerServiceTest {
         BDDMockito.given(repo.findById(traveler.getId())).willReturn(Mono.just(traveler))
 
 
-        val response = webClient.post().uri("/traveler/1/testName/a@a.com")
+        val response = webClient.post().uri("/traveler").body(BodyInserters.fromObject(params))
                 .exchange()
                 .expectStatus().isCreated
                 .expectBody(Traveler::class.java)
@@ -109,7 +109,12 @@ class TravelerServiceTest {
 
     @Test
     fun createTravelerBadRequest() {
-        val result = webClient.post().uri("/traveler/1/ /a@a.com")
+        val params = NewTraveler(
+                id = "1",
+                name = "",
+                email = "a@a.com"
+        )
+        val result = webClient.post().uri("/traveler").body(BodyInserters.fromObject(params))
                 .exchange()
                 .expectStatus().isBadRequest
                 .expectBody(String::class.java)
@@ -119,10 +124,10 @@ class TravelerServiceTest {
 
     @Test
     fun createTravelerBadRequestTravelerExists() {
-        val params = CreateTravelerParams(
-                travelerId = "1",
-                travelerName = "testName",
-                travelerEmail = "a@a.com")
+        val params = NewTraveler(
+                id = "1",
+                name = "testName",
+                email = "a@a.com")
 
         val createTravelerCommand = createTravelerCommand {
             commandId = "c1"
@@ -140,7 +145,7 @@ class TravelerServiceTest {
                 .willReturn(Mono.just(CommandResponse(createTravelerCommand.getCommandId(), createTravelerCommand.getTravelerId(), CommandStatus.REJECTED, "exists")))
 
 
-        val response = webClient.post().uri("/traveler/1/testName/a@a.com")
+        val response = webClient.post().uri("/traveler").body(BodyInserters.fromObject(params))
                 .exchange()
                 .expectStatus().isBadRequest
                 .expectBody(String::class.java)

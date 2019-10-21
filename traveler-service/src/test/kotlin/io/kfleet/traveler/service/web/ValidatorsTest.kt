@@ -1,7 +1,6 @@
 package io.kfleet.traveler.service.web
 
 
-import io.kfleet.traveler.service.repos.CreateTravelerParams
 import io.kfleet.traveler.service.repos.DeleteTravelerParams
 import org.junit.jupiter.api.Test
 import reactor.test.StepVerifier
@@ -10,11 +9,11 @@ class ValidatorsTest {
 
     @Test
     fun validateCreateTravelerParams() {
-        val params = CreateTravelerParams(travelerId = "1", travelerName = "testName", travelerEmail = "a@a.com")
+        val params = NewTraveler(id = "1", name = "testName", email = "a@a.com")
 
-        StepVerifier.create(validate(params))
+        StepVerifier.create(validateNewTraveler(params))
                 .expectNextMatches {
-                    it.travelerName == "testName" && it.travelerId == "1" && it.travelerEmail == "a@a.com"
+                    it.name == "testName" && it.id == "1" && it.email == "a@a.com"
                 }
                 .expectComplete()
                 .verify()
@@ -22,9 +21,9 @@ class ValidatorsTest {
 
     @Test
     fun validateErrorCreateTravelerParamsName() {
-        val params = CreateTravelerParams(travelerId = "1", travelerName = "", travelerEmail = "a@a.com")
+        val params = NewTraveler(id = "1", name = "", email = "a@a.com")
 
-        StepVerifier.create(validate(params))
+        StepVerifier.create(validateNewTraveler(params))
                 .expectErrorMatches() {
                     it.message == "travelerName invalid"
                 }
@@ -33,9 +32,9 @@ class ValidatorsTest {
 
     @Test
     fun validateErrorCreateTravelerParamsId() {
-        val params = CreateTravelerParams(travelerId = "", travelerName = "test", travelerEmail = "a@a.com")
+        val params = NewTraveler(id = "", name = "test", email = "a@a.com")
 
-        StepVerifier.create(validate(params))
+        StepVerifier.create(validateNewTraveler(params))
                 .expectErrorMatches() {
                     it.message == "travelerId invalid"
                 }
@@ -44,9 +43,9 @@ class ValidatorsTest {
 
     @Test
     fun validateErrorCreateTravelerParamsEmail() {
-        val params = CreateTravelerParams(travelerId = "1", travelerName = "test", travelerEmail = "")
+        val params = NewTraveler(id = "1", name = "test", email = "")
 
-        StepVerifier.create(validate(params))
+        StepVerifier.create(validateNewTraveler(params))
                 .expectErrorMatches() {
                     it.message == "travelerEmail invalid"
                 }
