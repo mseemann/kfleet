@@ -39,10 +39,10 @@ class CarEventEmitter {
 
     @StreamEmitter
     @Output(CarEventOutBindings.CARS)
-    fun emitCarEvents(): Flux<Message<SpecificRecord>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepUntil = 2).map {
-
+    fun emitCarEvents(eventType: Boolean? = null): Flux<Message<SpecificRecord>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepUntil = 2).map {
+        val nextType = eventType ?: Random.nextBoolean()
         val carEvent: SpecificRecord =
-                if (Random.nextBoolean())
+                if (nextType)
                     carRegisteredEvent { carId = "$it" }
                 else
                     carDeregisteredEvent { carId = "$it" }
