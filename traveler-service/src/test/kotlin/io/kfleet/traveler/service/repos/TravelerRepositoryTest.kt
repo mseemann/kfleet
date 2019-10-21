@@ -193,4 +193,16 @@ class TravelerRepositoryTest {
                 .verify()
     }
 
+    @Test
+    fun sendCaRRequestCommandUnknownFailure() {
+        val capture = ArgumentCaptor.forClass(Message::class.java)
+        given(outputChannel.send(capture.capture())).willThrow(RuntimeException())
+                // reset throw for the next call
+                .willReturn(true)
+
+        StepVerifier.create(travelerRepo.submitCarRequestTravelerCommand(carRequest))
+                .expectError()
+                .verify()
+    }
+
 }

@@ -11,7 +11,6 @@ import io.kfleet.traveler.service.rpclayer.RPC_TRAVELER
 import io.kfleet.traveler.service.web.CarRequest
 import io.kfleet.traveler.service.web.DeleteTravelerParams
 import io.kfleet.traveler.service.web.NewTraveler
-import mu.KotlinLogging
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
@@ -25,8 +24,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-
-private val log = KotlinLogging.logger {}
 
 interface TravelerBindings {
 
