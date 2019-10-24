@@ -69,4 +69,38 @@ class CarEventsTest : BehaviorSpec({
             }
         }
     }
+
+    Given("car locaiton changed events") {
+        When("a carId and positon is specified") {
+            val carLocationChangedEvent = carLocationChangedEvent {
+                carId = "1"
+                setGeoPosition(geoPosition {
+                    lat = 1.0
+                    lng = 1.0
+                })
+            }
+
+            Then("an event should be created") {
+                carLocationChangedEvent.shouldNotBeNull()
+            }
+
+            Then("carid should be the message key") {
+                carLocationChangedEvent.should {
+                    it.asKeyValue().key === carLocationChangedEvent.getCarId()
+                }
+            }
+
+            Then("the 'isCarLocationEvent' method should return true") {
+                carLocationChangedEvent.isCarLocationEvent().shouldBeTrue()
+            }
+        }
+
+        When("no car id is given") {
+            Then("an exception should be thrown") {
+                shouldThrow<AvroMissingFieldException> {
+                    carLocationChangedEvent {}
+                }
+            }
+        }
+    }
 })

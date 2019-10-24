@@ -1,0 +1,15 @@
+{
+  "namespace": "io.kfleet.domain.events.car",
+  "type": "record",
+  "name": "GeoPosition",
+  "fields": [
+    {
+      "name": "lat",
+      "type": "double"
+    },
+    {
+      "name": "lng",
+      "type": "double"
+    }
+  ]
+}

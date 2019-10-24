@@ -82,7 +82,7 @@ class CarsRepository(
             } catch (ignored: InvalidStateStoreException) {
                 println(ignored)
                 // store not yet ready for querying
-                Thread.sleep(100)
+                Thread.sleep(300)
             }
 
         }

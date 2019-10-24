@@ -1,0 +1,16 @@
+{
+  "namespace": "io.kfleet.domain.events.car",
+  "type": "record",
+  "name": "CarLocationChangedEvent",
+  "javaAnnotation": "io.kfleet.domain.events.CarLocationEvent",
+  "fields": [
+    {
+      "name": "carId",
+      "type": "string"
+    },
+    {
+      "name": "geoPosition",
+      "type": "GeoPosition"
+    }
+  ]
+}
