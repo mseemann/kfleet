@@ -16,7 +16,7 @@ import reactor.core.publisher.Flux
 
 private val logger = KotlinLogging.logger {}
 
-private const val CAR_COUNT = 10
+const val CAR_COUNT = 10
 
 interface CarsOutBindings {
 

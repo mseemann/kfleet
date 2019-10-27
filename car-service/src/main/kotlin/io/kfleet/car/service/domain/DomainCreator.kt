@@ -1,6 +1,7 @@
 package io.kfleet.car.service.domain
 
-
+import io.kfleet.domain.events.GeoPositionFactory
+import io.kfleet.domain.events.car.GeoPositionCarLocation
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 import kotlin.random.Random
@@ -11,27 +12,24 @@ fun Car.asKeyValue(): KeyValue<String, SpecificRecord?> {
     return KeyValue(this.getId(), this)
 }
 
+fun GeoPositionCarLocation.toCarLocation(): GeoPositionCar {
+    return geoPositionCar {
+        lat = this.lat
+        lng = this.lng
+    }
+}
+
+
 object CarFactory {
 
     fun createRandom(id: Int) = Car(
             "$id",
             Random.nextDouble(0.0, 100.0),
             CarState.values()[Random.nextInt(CarState.values().size)],
-            GeoPositionFactory.createRandom()
+            GeoPositionFactory.createRandom().toCarLocation()
     )
 }
 
-fun geoPosition(buildGeoPosition: GeoPosition.Builder.() -> Unit): GeoPosition =
-        GeoPosition.newBuilder().apply { buildGeoPosition() }.build()
 
-object GeoPositionFactory {
-
-    val OsloLatRange = arrayOf(59.7984951859, 60.0334203198)
-    val OsloLngRange = arrayOf(10.3772388202, 10.9805373651)
-
-    fun createRandom() = GeoPosition(
-            Random.nextDouble(OsloLatRange[0], OsloLatRange[1]),
-            Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
-    )
-
-}
+fun geoPositionCar(buildGeoPosition: GeoPositionCar.Builder.() -> Unit): GeoPositionCar =
+        GeoPositionCar.newBuilder().apply { buildGeoPosition() }.build()

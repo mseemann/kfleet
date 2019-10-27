@@ -1,7 +1,7 @@
 {
   "namespace": "io.kfleet.domain.events.car",
   "type": "record",
-  "name": "GeoPosition",
+  "name": "GeoPositionCarLocation",
   "fields": [
     {
       "name": "lat",

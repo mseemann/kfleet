@@ -5,7 +5,7 @@ import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
-import org.apache.avro.AvroMissingFieldException
+import org.apache.avro.AvroRuntimeException
 
 class CommandResponseTest : BehaviorSpec({
 
@@ -31,7 +31,7 @@ class CommandResponseTest : BehaviorSpec({
 
         When("only the command id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     commandResponse {
                         commandId = "1"
                     }

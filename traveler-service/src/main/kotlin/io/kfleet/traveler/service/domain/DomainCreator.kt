@@ -1,5 +1,7 @@
 package io.kfleet.traveler.service.domain
 
+import io.kfleet.traveler.service.commands.GeoPositionCarRequest
 
-fun geoPosition(buildGeoPosition: GeoPosition.Builder.() -> Unit): GeoPosition =
-        GeoPosition.newBuilder().apply { buildGeoPosition() }.build()
+
+fun geoPositionCarRequest(buildGeoPosition: GeoPositionCarRequest.Builder.() -> Unit): GeoPositionCarRequest =
+        GeoPositionCarRequest.newBuilder().apply { buildGeoPosition() }.build()

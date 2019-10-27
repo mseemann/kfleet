@@ -5,7 +5,7 @@ import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
-import org.apache.avro.AvroMissingFieldException
+import org.apache.avro.AvroRuntimeException
 
 class OwnerEventsTest : BehaviorSpec({
 
@@ -34,7 +34,7 @@ class OwnerEventsTest : BehaviorSpec({
 
         When("only the owner id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     ownerCreatedEvent {
                         ownerId = "1"
                     }
@@ -68,7 +68,7 @@ class OwnerEventsTest : BehaviorSpec({
 
         When("only the owner id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     ownerUpdatedEvent {
                         ownerId = "1"
                     }
@@ -100,7 +100,7 @@ class OwnerEventsTest : BehaviorSpec({
 
         When("only owner id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     ownerDeletedEvent {}
                 }
             }

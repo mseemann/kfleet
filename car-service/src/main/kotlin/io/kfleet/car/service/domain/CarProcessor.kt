@@ -1,6 +1,7 @@
 package io.kfleet.car.service.domain
 
 import io.kfleet.car.service.processor.CarAndEvent
+import io.kfleet.domain.events.GeoPositionFactory
 import io.kfleet.domain.events.car.CarDeregisteredEvent
 import io.kfleet.domain.events.car.CarRegisteredEvent
 import mu.KotlinLogging
@@ -32,7 +33,7 @@ class CarProcessor {
                         id = event.getCarId()
                         state = CarState.FREE
                         stateOfCharge = 1.0
-                        geoPosition = GeoPositionFactory.createRandom()
+                        geoPosition = GeoPositionFactory.createRandom().toCarLocation() // FIXME initialize with proper value
                     }.asKeyValue()
             )
         }

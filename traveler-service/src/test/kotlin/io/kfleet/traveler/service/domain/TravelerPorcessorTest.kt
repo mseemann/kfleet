@@ -11,6 +11,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 import kotlin.test.expect
+import io.kfleet.traveler.service.domain.geoPositionCarRequest
 
 
 class TravelerPorcessorTest {
@@ -145,11 +146,11 @@ class TravelerPorcessorTest {
         val command = carRequestCommand {
             commandId = "65823"
             setTravelerId(travelerId)
-            from = geoPosition {
+            from = geoPositionCarRequest {
                 lat = 1.0
                 lng = 1.0
             }
-            to = geoPosition {
+            to = geoPositionCarRequest {
                 lat = 1.0
                 lng = 1.0
             }
@@ -176,11 +177,11 @@ class TravelerPorcessorTest {
         val command = carRequestCommand {
             setCommandId(commandId)
             setTravelerId(travelerId)
-            from = geoPosition {
+            from = geoPositionCarRequest {
                 lat = 1.0
                 lng = 1.0
             }
-            to = geoPosition {
+            to = geoPositionCarRequest {
                 lat = 1.0
                 lng = 1.0
             }

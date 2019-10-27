@@ -1,11 +1,9 @@
-package io.kfleet.owner.service.domain
+package io.kfleet.car.service.domain
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kfleet.car.service.domain.Car
-import io.kfleet.car.service.domain.CarState
-import io.kfleet.car.service.domain.GeoPositionFactory
 import io.kfleet.common.configuration.MixInIgnoreAvroSchemaProperties
+import io.kfleet.domain.events.GeoPositionFactory
 import org.apache.avro.specific.SpecificRecord
 import org.junit.jupiter.api.Test
 import kotlin.random.Random
@@ -20,7 +18,7 @@ class JsonTest {
         mapper.addMixIn(SpecificRecord::class.java, MixInIgnoreAvroSchemaProperties::class.java)
 
 
-        val car = Car("1", Random.nextDouble(0.0, 100.0), CarState.FREE, GeoPositionFactory.createRandom())
+        val car = Car("1", Random.nextDouble(0.0, 100.0), CarState.FREE, GeoPositionFactory.createRandom().toCarLocation())
 
         val serialized = mapper.writeValueAsString(car)
 

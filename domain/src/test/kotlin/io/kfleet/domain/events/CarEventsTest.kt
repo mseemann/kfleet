@@ -5,7 +5,7 @@ import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
-import org.apache.avro.AvroMissingFieldException
+import org.apache.avro.AvroRuntimeException
 
 class CarEventsTest : BehaviorSpec({
 
@@ -32,7 +32,7 @@ class CarEventsTest : BehaviorSpec({
 
         When("no car id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     carRegisteredEvent {}
                 }
             }
@@ -63,7 +63,7 @@ class CarEventsTest : BehaviorSpec({
 
         When("no car id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     carDeregisteredEvent {}
                 }
             }
@@ -74,10 +74,7 @@ class CarEventsTest : BehaviorSpec({
         When("a carId and positon is specified") {
             val carLocationChangedEvent = carLocationChangedEvent {
                 carId = "1"
-                setGeoPosition(geoPosition {
-                    lat = 1.0
-                    lng = 1.0
-                })
+                geoPosition = GeoPositionFactory.createRandom()
             }
 
             Then("an event should be created") {
@@ -97,7 +94,7 @@ class CarEventsTest : BehaviorSpec({
 
         When("no car id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     carLocationChangedEvent {}
                 }
             }

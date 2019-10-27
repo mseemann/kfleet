@@ -18,7 +18,6 @@ import kotlin.random.Random
 
 private val logger = KotlinLogging.logger {}
 
-private const val CAR_COUNT = 10
 
 interface CarEventOutBindings {
 

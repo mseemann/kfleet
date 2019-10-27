@@ -4,7 +4,7 @@ import io.kfleet.car.service.configuration.JacksonObjectMapper
 import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.domain.car
-import io.kfleet.car.service.domain.geoPosition
+import io.kfleet.car.service.domain.geoPositionCar
 import io.kfleet.car.service.repos.CarsRepository
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
@@ -29,10 +29,10 @@ class CarsServiceTest {
         id = "1"
         state = CarState.FREE
         stateOfCharge = 0.5
-        geoPosition = geoPosition {
+        setGeoPosition(geoPositionCar {
             lng = 1.0
             lat = 2.0
-        }
+        })
     }
 
     @Autowired

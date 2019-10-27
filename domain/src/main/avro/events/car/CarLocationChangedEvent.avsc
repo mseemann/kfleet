@@ -10,7 +10,7 @@
     },
     {
       "name": "geoPosition",
-      "type": "GeoPosition"
+      "type": "GeoPositionCarLocation"
     }
   ]
 }

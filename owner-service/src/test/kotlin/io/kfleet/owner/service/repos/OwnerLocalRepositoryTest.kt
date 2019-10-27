@@ -1,5 +1,6 @@
 package io.kfleet.owner.service.repos
 
+
 import io.kfleet.owner.service.configuration.OWNER_RW_STORE
 import io.kfleet.owner.service.domain.Owner
 import io.kfleet.owner.service.domain.owner

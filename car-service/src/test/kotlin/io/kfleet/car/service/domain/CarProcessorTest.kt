@@ -1,6 +1,7 @@
 package io.kfleet.car.service.domain
 
 import io.kfleet.car.service.processor.CarAndEvent
+import io.kfleet.domain.events.GeoPositionFactory
 import io.kfleet.domain.events.carDeregisteredEvent
 import io.kfleet.domain.events.carRegisteredEvent
 import io.kfleet.domain.events.ownerCreatedEvent
@@ -39,7 +40,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.OUT_OF_POOL
-            geoPosition = GeoPositionFactory.createRandom()
+            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
             stateOfCharge = 100.0
         }
 
@@ -62,7 +63,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.FREE
-            geoPosition = GeoPositionFactory.createRandom()
+            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
             stateOfCharge = 100.0
         }
 
@@ -95,7 +96,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.OUT_OF_POOL
-            geoPosition = GeoPositionFactory.createRandom()
+            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
             stateOfCharge = 100.0
         }
 
@@ -115,7 +116,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.FREE
-            geoPosition = GeoPositionFactory.createRandom()
+            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
             stateOfCharge = 100.0
         }
 

@@ -1,7 +1,7 @@
 {
-  "namespace": "io.kfleet.traveler.service.domain",
+  "namespace": "io.kfleet.traveler.service.commands",
   "type": "record",
-  "name": "GeoPosition",
+  "name": "GeoPositionCarRequest",
   "fields": [
     {
       "name": "lat",

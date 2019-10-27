@@ -5,7 +5,7 @@ import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
-import org.apache.avro.AvroMissingFieldException
+import org.apache.avro.AvroRuntimeException
 
 class TravelerEventsTest : BehaviorSpec({
 
@@ -35,7 +35,7 @@ class TravelerEventsTest : BehaviorSpec({
 
         When("only the traveler id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     travelerCreatedEvent {
                         travelerId = "1"
                     }
@@ -67,7 +67,7 @@ class TravelerEventsTest : BehaviorSpec({
 
         When(" no traveler id is given") {
             Then("an exception should be thrown") {
-                shouldThrow<AvroMissingFieldException> {
+                shouldThrow<AvroRuntimeException> {
                     travelerDeletedEvent {}
                 }
             }

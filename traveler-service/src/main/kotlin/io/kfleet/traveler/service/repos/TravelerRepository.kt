@@ -87,14 +87,16 @@ class TravelerRepository(
     }
 
     fun submitCarRequestTravelerCommand(carRequest: CarRequest): Mono<CarRequestCommand> {
+
         val carRequestCommand = carRequestCommand {
             commandId = UUID.randomUUID().toString()
             travelerId = carRequest.travelerId
-            from = geoPosition {
+            from = geoPositionCarRequest {
+                // TODO extension funciton to map
                 lat = carRequest.from.lat
                 lng = carRequest.from.lng
             }
-            to = geoPosition {
+            to = geoPositionCarRequest {
                 lat = carRequest.to.lat
                 lng = carRequest.to.lng
             }
