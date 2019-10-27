@@ -13,9 +13,9 @@ fun geoPositionCarLocation(buildGeoPosition: GeoPositionCarLocation.Builder.() -
 
 object GeoPositionFactory {
 
-    fun createRandom() = GeoPositionCarLocation(
-            Random.nextDouble(OsloLatRange[0], OsloLatRange[1]),
-            Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
-    )
+    fun createRandom() = geoPositionCarLocation {
+        lat = Random.nextDouble(OsloLatRange[0], OsloLatRange[1])
+        lng = Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
+    }
 
 }
