@@ -21,11 +21,11 @@ private val logger = KotlinLogging.logger {}
 interface CarsLocationEventsOutBindings {
 
     companion object {
-        const val CARS_LOCATION = "cars_location_out"
+        const val CARS_LOCATION = "car_locations_out"
     }
 
     @Output(CARS_LOCATION)
-    fun cars(): MessageChannel
+    fun carsLocationChangedEvents(): MessageChannel
 
 }
 
@@ -37,7 +37,7 @@ class CarLocationChangedEventEmitter {
 
     @StreamEmitter
     @Output(CarsLocationEventsOutBindings.CARS_LOCATION)
-    fun emitCarLocations(): Flux<Message<CarLocationChangedEvent>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepUntil = 2).map {
+    fun emitCarLocations(): Flux<Message<CarLocationChangedEvent>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepFrom = 2, sleepUntil = 5).map {
         val carLocationChangedEvent = carLocationChangedEvent {
             carId = "$it"
             geoPosition = GeoPositionFactory.createRandom()
