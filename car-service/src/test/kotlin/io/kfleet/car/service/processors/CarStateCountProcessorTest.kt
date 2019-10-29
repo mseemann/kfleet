@@ -6,11 +6,11 @@ import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.simulation.CarEventOutBindings
+import io.kfleet.car.service.simulation.CarsLocationEventsOutBindings
 import io.kfleet.car.service.simulation.CarsOutBindings
 import io.kfleet.common.customRetry
 import io.kfleet.common.headers
-import io.kfleet.domain.events.carDeregisteredEvent
-import io.kfleet.domain.events.carRegisteredEvent
+import io.kfleet.domain.events.*
 import org.apache.kafka.streams.state.QueryableStoreTypes
 import org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS
 import org.awaitility.kotlin.await
@@ -43,6 +43,10 @@ class CarStateCountProcessorTest {
     @Autowired
     @Output(CarEventOutBindings.CARS)
     lateinit var carEventOutputChannel: MessageChannel
+
+    @Autowired
+    @Output(CarsLocationEventsOutBindings.CARS_LOCATION)
+    lateinit var carLocationEventOutputChannel: MessageChannel
 
     @Autowired
     lateinit var carsRepository: CarsRepository
@@ -113,6 +117,26 @@ class CarStateCountProcessorTest {
 
             expect(CarState.OUT_OF_POOL) { respCar!!.getState() }
         }
+
+    }
+
+    @Test
+    fun submitCarLocationEvent() {
+
+        val carId = 10
+        val carEvent = carLocationChangedEvent {
+            setCarId("$carId")
+            geoPosition = geoPositionCarLocation {
+                lat = OsloLatRange.get(1)
+                lng = OsloLngRange.get(0)
+            }
+        }
+        val message = MessageBuilder.createMessage(carEvent, headers(carId))
+
+        carLocationEventOutputChannel.send(message)
+
+        // FIXME store lookup!
+        Thread.sleep(5000)
 
     }
 }

@@ -89,4 +89,4 @@ logging.level.org.springframework.cloud.stream.binding: ERROR
 
 cars.service.simulation.enabled: false
 cars.service.simulation.events.enabled: false
-cars.service.simulation.location.events.enabled: true
+cars.service.simulation.location.events.enabled: false

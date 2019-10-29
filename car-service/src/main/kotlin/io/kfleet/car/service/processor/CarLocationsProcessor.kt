@@ -48,7 +48,8 @@ class CarLocationsProcessor() {
                         { CarPositionAggregate() },
                         { quadrant, carId, a -> a.add(quadrant, carId) },
                         { quadrant, carId, a -> a.sub(quadrant, carId) },
-                        Materialized.`as`<String, CarPositionAggregate, KeyValueStore<Bytes, ByteArray>>(CarLocationsProcessorBinding.CAR_LOCATION_STORE)
+                        Materialized.`as`<String, CarPositionAggregate, KeyValueStore<Bytes, ByteArray>>
+                        (CarLocationsProcessorBinding.CAR_LOCATION_STORE)
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(CarPositionAggregateSerde())
                 )
@@ -110,7 +111,7 @@ class CarPositionAggregate : Serializable {
 
     val serialVersionUID = 1L
 
-    private val quadrants = mutableMapOf<String, Set<String>>()
+    val quadrants = mutableMapOf<String, Set<String>>()
 
     fun add(quadrant: String, carId: String): CarPositionAggregate {
         log.debug { "add $carId to $quadrant" }
