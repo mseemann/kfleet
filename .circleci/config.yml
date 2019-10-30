@@ -1,7 +1,9 @@
 version: 2
-executorType: machine
+
 jobs:
   build:
+    executorType: machine
+    
     working_directory: ~/repo
 
     environment:
