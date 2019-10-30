@@ -26,3 +26,34 @@ jobs:
 
       - run: ./gradlew test jacocoTestReport --stacktrace
       - run: bash <(curl -s https://codecov.io/bash)
+  build-traveler-ui:
+    docker:
+      - image: circleci/node:10-stretch-browsers
+        environment:
+          CHROME_BIN: "/usr/bin/google-chrome"
+
+      working_directory: ~/repo
+
+      steps:
+        - checkout
+
+        - restore_cache:
+            keys:
+              - node-10-dependencies-{{ checksum "traveler-ui/package-lock.json" }}
+
+        - run: npm version
+        - run: npm ci
+
+        - save_cache:
+            paths:
+              - node_modules
+            key: node-10-dependencies-{{ checksum "traveler-ui/package-lock.json" }}
+
+        - run: cd traveler-ui && npm run test:unit
+        - run: cd traveler-ui && npm run build
+
+        - store_artifacts:
+            path: ~/repo/traveler-ui/coverage
+
+        - store_artifacts:
+            path: ~/repo/traveler-ui/dist
