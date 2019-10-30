@@ -77,7 +77,19 @@
     "last 2 versions"
   ],
   "jest": {
-    "preset": "@vue/cli-plugin-unit-jest/presets/typescript"
+    "preset": "@vue/cli-plugin-unit-jest/presets/typescript",
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      ",**/*.{vue}",
+      "!**/node_modules/**",
+      "!<rootDir>/dist/**",
+      "!<rootDir>/src/plugins/**",
+      "!<rootDir>/tests/unit/**"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ]
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

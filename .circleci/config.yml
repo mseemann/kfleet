@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     executorType: machine
-    
+
     working_directory: ~/repo
 
     environment:
@@ -52,8 +52,10 @@ jobs:
             - traveler-ui/node_modules
           key: node-10-dependencies-{{ checksum "traveler-ui/package-lock.json" }}
 
+      - run: cd traveler-ui && npm run lint
       - run: cd traveler-ui && npm run test:unit
       - run: cd traveler-ui && npm run build
+      - run: bash <(curl -s https://codecov.io/bash)
 
       - store_artifacts:
           path: ~/repo/traveler-ui/coverage
