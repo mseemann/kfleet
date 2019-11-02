@@ -3,6 +3,7 @@ package io.kfleet.domain.events
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.should
+import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
 import org.apache.avro.AvroRuntimeException
@@ -22,9 +23,7 @@ class OwnerEventsTest : BehaviorSpec({
             }
 
             Then("ownerId should be the message key") {
-                ownerCreatedEvent.should {
-                    it.asKeyValue().key === ownerCreatedEvent.getOwnerId()
-                }
+                ownerCreatedEvent.asKeyValue().key.shouldBe(ownerCreatedEvent.getOwnerId())
             }
 
             Then("the 'isOwnerEvent' method should return true") {
@@ -56,9 +55,7 @@ class OwnerEventsTest : BehaviorSpec({
             }
 
             Then("ownerId should be the message key") {
-                ownerUpdatesEvent.should {
-                    it.asKeyValue().key === ownerUpdatesEvent.getOwnerId()
-                }
+                ownerUpdatesEvent.asKeyValue().key.shouldBe(ownerUpdatesEvent.getOwnerId())
             }
 
             Then("the 'isOwnerEvent' method should return true") {

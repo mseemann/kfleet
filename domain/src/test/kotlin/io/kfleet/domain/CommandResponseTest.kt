@@ -2,7 +2,7 @@ package io.kfleet.domain
 
 import io.kfleet.commands.CommandStatus
 import io.kotlintest.matchers.types.shouldNotBeNull
-import io.kotlintest.should
+import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
 import org.apache.avro.AvroRuntimeException
@@ -23,9 +23,7 @@ class CommandResponseTest : BehaviorSpec({
             }
 
             Then("commandId should be the message key") {
-                commandResponse.should {
-                    it.asKeyValue().key == commandResponse.getCommandId()
-                }
+                commandResponse.asKeyValue().key.shouldBe(commandResponse.getCommandId())
             }
         }
 

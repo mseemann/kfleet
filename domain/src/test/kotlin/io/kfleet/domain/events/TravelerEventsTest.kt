@@ -2,7 +2,7 @@ package io.kfleet.domain.events
 
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.types.shouldNotBeNull
-import io.kotlintest.should
+import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
 import org.apache.avro.AvroRuntimeException
@@ -23,9 +23,7 @@ class TravelerEventsTest : BehaviorSpec({
             }
 
             Then("travelerId should be the message key") {
-                travelerCreatedEvent.should {
-                    it.asKeyValue().key === travelerCreatedEvent.getTravelerId()
-                }
+                travelerCreatedEvent.asKeyValue().key.shouldBe(travelerCreatedEvent.getTravelerId())
             }
 
             Then("the 'isTravelerEvent' method should return true") {
@@ -55,9 +53,7 @@ class TravelerEventsTest : BehaviorSpec({
             }
 
             Then("traveler should be the message key") {
-                travelerDeletedEvent.should {
-                    it.asKeyValue().key === travelerDeletedEvent.getTravelerId()
-                }
+                travelerDeletedEvent.asKeyValue().key.shouldBe(travelerDeletedEvent.getTravelerId())
             }
 
             Then("the 'isTravelerEvent' method should return true") {
