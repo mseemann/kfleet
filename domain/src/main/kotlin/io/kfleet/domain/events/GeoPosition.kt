@@ -20,6 +20,6 @@ object GeoPositionFactory {
 }
 
 fun GeoPositionCarLocation.toQuadrantIndex(): String {
-    return QuadTree.index(lng = this.getLng(), lat = this.getLat())
+    return QuadTree.encodedIndexPath(lng = this.getLng(), lat = this.getLat())
 }
 

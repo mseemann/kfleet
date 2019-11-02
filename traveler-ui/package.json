@@ -11,16 +11,19 @@
     "test:e2e:interactive": "vue-cli-service test:e2e"
   },
   "dependencies": {
+    "leaflet": "^1.5.1",
     "register-service-worker": "^1.6.2",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.1.0",
     "vue-router": "^3.0.6",
+    "vue2-leaflet": "^2.2.1",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.4",
     "@types/jest": "^24.0.11",
+    "@types/leaflet": "^1.5.5",
     "@vue/cli-plugin-e2e-cypress": "^4.0.5",
     "@vue/cli-plugin-eslint": "^4.0.5",
     "@vue/cli-plugin-pwa": "^4.0.5",
@@ -50,10 +53,11 @@
     },
     "extends": [
       "plugin:vue/essential",
-      "@vue/prettier",
       "@vue/typescript"
     ],
-    "rules": {},
+    "rules": {
+      "no-console": "off"
+    },
     "parserOptions": {
       "parser": "@typescript-eslint/parser"
     },

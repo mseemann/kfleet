@@ -29,7 +29,7 @@ kafka-topics --zookeeper zookeeper:2181 --list
 
 kafka-topics --zookeeper zookeeper:2181 --describe --topic cars
 
-kafka-console-consumer --bootstrap-server broker:29092 --topic cars --from-beginning --property print.key=true
+kafka-console-consumer --bootstrap-server broker1:29092 --topic cars --from-beginning --property print.key=true
 ```
 
 ``` bash
@@ -150,3 +150,9 @@ override fun findById(id: String): Mono<Car> {
 [4] [Every Company is Becoming ~~a~~ Software ~~Company~~](https://www.confluent.io/blog/every-company-is-becoming-software)
 
 [5] [How To Write Less Code and Get More Done.](https://medium.com/@rsrajan1/how-to-write-less-code-and-get-more-done-40006282817d)
+
+[6] [https://github.com/Yolean/kubernetes-kafka](https://github.com/Yolean/kubernetes-kafka)
+
+[7] [https://www.matsim.org/](https://www.matsim.org/)
+
+[8] [Sinusoidal](https://github.com/geotools/geotools/blob/master/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Sinusoidal.java)

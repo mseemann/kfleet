@@ -2,7 +2,7 @@ package io.kfleet.domain.events
 
 import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.types.shouldNotBeNull
-import io.kotlintest.should
+import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
 import io.kotlintest.specs.BehaviorSpec
 import org.apache.avro.AvroRuntimeException
@@ -20,9 +20,7 @@ class CarEventsTest : BehaviorSpec({
             }
 
             Then("carid should be the message key") {
-                carRegisteredEvent.should {
-                    it.asKeyValue().key === carRegisteredEvent.getCarId()
-                }
+                carRegisteredEvent.asKeyValue().key.shouldBe(carRegisteredEvent.getCarId())
             }
 
             Then("the 'isCarEvent' method should return true") {
@@ -51,9 +49,7 @@ class CarEventsTest : BehaviorSpec({
             }
 
             Then("carid should be the message key") {
-                carDeregisteredEvent.should {
-                    it.asKeyValue().key === carDeregisteredEvent.getCarId()
-                }
+                carDeregisteredEvent.asKeyValue().key.shouldBe(carDeregisteredEvent.getCarId())
             }
 
             Then("the 'isCarEvent' method should return true") {
@@ -82,9 +78,7 @@ class CarEventsTest : BehaviorSpec({
             }
 
             Then("carid should be the message key") {
-                carLocationChangedEvent.should {
-                    it.asKeyValue().key === carLocationChangedEvent.getCarId()
-                }
+                carLocationChangedEvent.asKeyValue().key.shouldBe(carLocationChangedEvent.getCarId())
             }
 
             Then("the 'isCarLocationEvent' method should return true") {
