@@ -5,10 +5,10 @@
                 :bounds="rectangle.bounds"
                 :l-style="rectangle.style">
         </l-rectangle>
-        <!--l-rectangle
+        <l-rectangle
                 :bounds="bounds"
                 :key="index"
-                :l-style="rectangle.style" v-for="(bounds, index) in quadTreeBounds"></l-rectangle-->
+                :l-style="rectangle.style" v-for="(bounds, index) in quadTreeBounds"></l-rectangle>
         <l-rectangle
                 :bounds="area.bounds"
                 :l-style="area.style">
