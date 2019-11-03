@@ -124,12 +124,14 @@ class CarStateCountProcessorTest {
     fun submitCarLocationEvent() {
 
         val carId = 10
+        val pos = geoPositionCarLocation {
+            lat = OsloLatRange.get(1)
+            lng = OsloLngRange.get(0)
+        }
         val carEvent = carLocationChangedEvent {
             setCarId("$carId")
-            geoPosition = geoPositionCarLocation {
-                lat = OsloLatRange.get(1)
-                lng = OsloLngRange.get(0)
-            }
+            geoPosition = pos
+            geoPositionIndex = pos.toQuadrantIndex()
         }
         val message = MessageBuilder.createMessage(carEvent, headers(carId))
 

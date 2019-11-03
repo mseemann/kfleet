@@ -27,7 +27,7 @@ interface CarStateCountProcessorBinding {
 }
 
 @EnableBinding(CarStateCountProcessorBinding::class)
-class CarStateCountProcessor() {
+class CarStateCountProcessor {
 
     @StreamListener
     fun carStateUpdates(@Input(CarStateCountProcessorBinding.CARS) carTable: KTable<String, Car>) {
