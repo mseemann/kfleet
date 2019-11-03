@@ -3,12 +3,16 @@ package io.kfleet.domain
 // x = lng, y = lat
 // origin: lower left
 // numbering of the quadrants is clockwise - starting north west
-// thre is no projection that creates an equal area - so every quadrant
+// there is no projection that creates an equal area - so every quadrant
 // has different sizes - but this is ok for this poc.
 
 enum class Quadrant(val label: String) {
     R("0"), NW("1"), NE("2"), SE("3"), SW("4")
 }
+
+private const val INDEX_PATH_LENGTH = 12
+
+private val rootNode = Node(x = -180.0, y = -90.0, w = 360.0, h = 180.0, quadrant = Quadrant.R)
 
 class Node(val x: Double, val y: Double, val w: Double, val h: Double, val quadrant: Quadrant) {
 
@@ -21,8 +25,6 @@ class Node(val x: Double, val y: Double, val w: Double, val h: Double, val quadr
     private val ne = lazy { Node(midX, midY, w2, h2, Quadrant.NE) }
     private val se = lazy { Node(midX, y, w2, h2, Quadrant.SE) }
     private val sw = lazy { Node(x, y, w2, h2, Quadrant.SW) }
-
-    private val childs = mutableListOf<Node>()
 
     fun quadrantForPosition(lat: Double, lng: Double): Node {
         return if (lng < midX) {
@@ -41,32 +43,30 @@ class Node(val x: Double, val y: Double, val w: Double, val h: Double, val quadr
         if (box.outside(boundingBox()) || boundingBox().outside(box)) {
             return false
         }
-        return true;
+        return true
     }
 
-    fun intersectingQuadrants(box: Box, level: Int, maxLevel: Int): List<Node> {
+    private fun buildIntersectionPaths(parent: TreeNode, box: Box, level: Int, maxLevel: Int) {
         arrayOf(nw, ne, se, sw).forEach {
             if (it.value.intersectsWith(box)) {
-                childs.add(it.value)
+                val child = TreeNode(it.value)
+                parent.childs.add(child)
                 if (level + 1 <= maxLevel)
-                    it.value.intersectingQuadrants(box, level + 1, maxLevel)
+                    it.value.buildIntersectionPaths(child, box, level + 1, maxLevel)
             }
         }
-        return childs
+    }
+
+    fun buildIntersectionPaths(box: Box): TreeNode {
+        val treeRoot = TreeNode(rootNode)
+        buildIntersectionPaths(treeRoot, box, 1, INDEX_PATH_LENGTH)
+        return treeRoot
     }
 
     override fun toString(): String {
         return "Node(x=$x, y=$y, w=$w, h=$h, quadrant=${quadrant.name})"
     }
 
-    private fun printTree(level: Int) {
-        println(" ".repeat(level) + childs.map { it.quadrant.label })
-        childs.forEach { it.printTree(level + 1) }
-    }
-
-    fun printTree() {
-        this.printTree(1)
-    }
 
 }
 
@@ -84,15 +84,15 @@ class Box(val lng1: Double, val lat1: Double, val lng2: Double, val lat2: Double
 
     fun inside(oBox: Box): Boolean {
         if (oBox.lng1 >= lng1 && oBox.lng2 <= lng2 && oBox.lat1 >= lat1 && oBox.lat2 <= lat2) {
-            return true;
+            return true
         }
-        return false;
+        return false
     }
 
     fun outside(oBox: Box): Boolean {
-        if (lng2 < oBox.lng1 || lng1 > oBox.lng2) return true;
-        if (lat2 < oBox.lat1 || lat1 > oBox.lat2) return true;
-        return false;
+        if (lng2 < oBox.lng1 || lng1 > oBox.lng2) return true
+        if (lat2 < oBox.lat1 || lat1 > oBox.lat2) return true
+        return false
     }
 
 
@@ -118,13 +118,44 @@ class Box(val lng1: Double, val lat1: Double, val lng2: Double, val lat2: Double
     }
 }
 
+class TreeNode(val node: Node) {
+
+    val childs = mutableListOf<TreeNode>()
+
+    private fun auxPrintTree(level: Int) {
+        if (childs.isEmpty()) {
+            return
+        }
+        println(" ".repeat(level) + "$level " + childs.map { it.node.quadrant.label })
+        childs.forEach { it.auxPrintTree(level + 1) }
+    }
+
+    fun printTree() = auxPrintTree(1)
+
+    private fun auxGetIndexPaths(): List<List<String>> {
+        if (childs.isEmpty()) {
+            return listOf(listOf(node.quadrant.label))
+        }
+
+        var l = listOf<List<String>>()
+        childs.forEach {
+            var x = it.auxGetIndexPaths()
+            x = x.map { it.plus(listOf(node.quadrant.label)) }
+            l = l.plus(x)
+        }
+        return l
+    }
+
+    fun getIndexPaths(): List<String> = auxGetIndexPaths().map {
+        // remove the rootnode
+        // reverse - becuase the nodes are collected from the leafs upwards
+        it.minus(it.last()).reversed().joinToString("/")
+    }
+}
 
 class QuadTree {
 
     companion object {
-        private const val INDEX_PATH_LENGTH = 12
-
-        private val rootNode = Node(x = -180.0, y = -90.0, w = 360.0, h = 180.0, quadrant = Quadrant.R)
 
         fun encodedIndexPath(lng: Double, lat: Double): String {
             val quadrants = indexPath(lng = lng, lat = lat)
@@ -133,7 +164,7 @@ class QuadTree {
 
         fun indexPath(lng: Double, lat: Double): List<Node> {
             val quadrants = mutableListOf<Node>()
-            var currentNode = rootNode;
+            var currentNode = rootNode
             for (i in 1..INDEX_PATH_LENGTH) {
                 val q = currentNode.quadrantForPosition(lng = lng, lat = lat)
                 quadrants.add(q)
@@ -143,22 +174,18 @@ class QuadTree {
         }
 
         fun getIntersectingIndexes(lng: Double, lat: Double, withDistanceInKilometers: Double): List<String> {
-            // create a bounding box for the parameters (x=lng, y=lat, w, h)
             val box = GeoTools.surroundingBox(lng = lng, lat = lat, withDistanceInKilometers = withDistanceInKilometers)
 
-            // find all quads up to level INDEX_PATH_LENGTH that intersect with this bounding box
-            val intersectingQuadrants = rootNode.intersectingQuadrants(box, 1, INDEX_PATH_LENGTH)
+            val treeRoot = rootNode.buildIntersectionPaths(box)
 
-            rootNode.printTree()
+            treeRoot.printTree()
 
-
-
-            return listOf()
+            return treeRoot.getIndexPaths()
         }
 
 
-        fun boundingBoxes(ndoes: List<Node>): List<Box> {
-            return ndoes.map { it.boundingBox() }
+        fun boundingBoxes(nodes: List<Node>): List<Box> {
+            return nodes.map { it.boundingBox() }
         }
     }
 

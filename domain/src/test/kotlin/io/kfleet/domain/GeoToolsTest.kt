@@ -3,6 +3,7 @@ package io.kfleet.domain
 import io.kfleet.domain.events.OsloLatRange
 import io.kfleet.domain.events.OsloLngRange
 import org.junit.jupiter.api.Test
+import kotlin.test.assertTrue
 import kotlin.test.expect
 
 class GeoToolsTest {
@@ -15,7 +16,7 @@ class GeoToolsTest {
         val nodes = QuadTree.indexPath(lng = lng, lat = lat)
         expect(12) { nodes.size }
 
-        val boxes = QuadTree.boundingBoxes(nodes);
+        val boxes = QuadTree.boundingBoxes(nodes)
         boxes.forEach { println(it) }
 
         val firstNode = nodes.get(0)
@@ -59,7 +60,7 @@ class GeoToolsTest {
         val quadrantAndNodes = QuadTree.indexPath(lng = lng, lat = lat)
         expect(12) { quadrantAndNodes.size }
 
-        val boxes = QuadTree.boundingBoxes(quadrantAndNodes);
+        val boxes = QuadTree.boundingBoxes(quadrantAndNodes)
         boxes.forEach { println(it) }
 
         val index = QuadTree.encodedIndexPath(lng = lng, lat = lat)
@@ -83,8 +84,25 @@ class GeoToolsTest {
     }
 
     @Test
-    fun testIndexPathsForBoundingBoxRoot() {
+    fun testIndexPathsForBoundingBox() {
         val paths = QuadTree.getIntersectingIndexes(lng = 10.6088, lat = 59.9134, withDistanceInKilometers = 5.0)
-        expect(0) { paths.size }
+        expect(4) { paths.size }
+
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/1") }
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/2") }
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/3") }
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/4") }
+
+    }
+
+    @Test
+    fun testIndexPathsForBoundingBoxWithSplitReagion() {
+        val paths = QuadTree.getIntersectingIndexes(lng = 10.5088, lat = 59.9134, withDistanceInKilometers = 5.0)
+        expect(4) { paths.size }
+
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/1") }
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/4") }
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/4/3/2/2") }
+        assertTrue { paths.contains("2/1/4/1/4/2/3/2/4/3/2/3") }
     }
 }
