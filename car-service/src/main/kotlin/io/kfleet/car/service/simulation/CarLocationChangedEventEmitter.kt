@@ -5,6 +5,7 @@ import io.kfleet.common.randomDelayFluxer
 import io.kfleet.domain.events.GeoPositionFactory
 import io.kfleet.domain.events.car.CarLocationChangedEvent
 import io.kfleet.domain.events.carLocationChangedEvent
+import io.kfleet.domain.events.toQuadrantIndex
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -38,9 +39,11 @@ class CarLocationChangedEventEmitter {
     @StreamEmitter
     @Output(CarsLocationEventsOutBindings.CARS_LOCATION)
     fun emitCarLocations(): Flux<Message<CarLocationChangedEvent>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepFrom = 2, sleepUntil = 5).map {
+        val position = GeoPositionFactory.createRandom()
         val carLocationChangedEvent = carLocationChangedEvent {
             carId = "$it"
-            geoPosition = GeoPositionFactory.createRandom()
+            geoPosition = position
+            geoPositionIndex = position.toQuadrantIndex()
         }
         logger.debug { "emit: $carLocationChangedEvent" }
         MessageBuilder.createMessage(carLocationChangedEvent, headers(it))

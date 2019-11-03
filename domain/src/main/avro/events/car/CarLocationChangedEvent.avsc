@@ -11,6 +11,10 @@
     {
       "name": "geoPosition",
       "type": "GeoPositionCarLocation"
+    },
+    {
+      "name": "geoPositionIndex",
+      "type": "string"
     }
   ]
 }

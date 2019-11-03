@@ -1,7 +1,6 @@
 package io.kfleet.car.service.processor
 
 import io.kfleet.domain.events.car.CarLocationChangedEvent
-import io.kfleet.domain.events.toQuadrantIndex
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.Deserializer
 import org.apache.kafka.common.serialization.Serde
@@ -41,7 +40,7 @@ class CarLocationsProcessor() {
 
         carLocations
                 .groupBy({ _, carLocationChangedEvent ->
-                    KeyValue(carLocationChangedEvent.getGeoPosition().toQuadrantIndex(),
+                    KeyValue(carLocationChangedEvent.getGeoPositionIndex(),
                             carLocationChangedEvent.getCarId())
                 }, Serialized.with(Serdes.String(), Serdes.String()))
                 .aggregate(
