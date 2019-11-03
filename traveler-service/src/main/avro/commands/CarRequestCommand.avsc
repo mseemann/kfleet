@@ -17,6 +17,10 @@
       "type": "GeoPositionCarRequest"
     },
     {
+      "name": "fromGeoIndex",
+      "type": "string"
+    },
+    {
       "name": "to",
       "type": "GeoPositionCarRequest"
     },

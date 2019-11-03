@@ -21,7 +21,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.expect
-import io.kfleet.traveler.service.domain.geoPositionCarRequest
 
 @WebFluxTest(TravelerService::class)
 @Import(TravelerRoutes::class)
@@ -223,17 +222,13 @@ class TravelerServiceTest {
                 requestTime = Date(),
                 id = "111")
 
+        val fromPos = requestACar.from.toGeoPositionCarRequest()
         val requestCarCommand = carRequestCommand {
             commandId = "c1"
             travelerId = "1"
-            from = geoPositionCarRequest {
-                lat = requestACar.from.lat
-                lng = requestACar.from.lng
-            }
-            to = geoPositionCarRequest {
-                lat = requestACar.to.lat
-                lng = requestACar.to.lng
-            }
+            from = fromPos
+            fromGeoIndex = fromPos.toQuadrantIndex()
+            to = requestACar.to.toGeoPositionCarRequest()
             requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
                     .withZone(ZoneOffset.UTC)
                     .format(requestACar.requestTime.toInstant())

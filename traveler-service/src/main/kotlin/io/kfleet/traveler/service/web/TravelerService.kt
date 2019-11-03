@@ -3,6 +3,8 @@ package io.kfleet.traveler.service.web
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.common.customRetry
+import io.kfleet.traveler.service.commands.GeoPositionCarRequest
+import io.kfleet.traveler.service.domain.geoPositionCarRequest
 import io.kfleet.traveler.service.repos.CommandsResponseRepository
 import io.kfleet.traveler.service.repos.TravelerRepository
 import org.springframework.http.HttpStatus
@@ -28,6 +30,14 @@ data class CarRequest(
         val from: CarRequestGeoPosition,
         val to: CarRequestGeoPosition,
         val requestTime: Date) : TravelerParams
+
+fun CarRequestGeoPosition.toGeoPositionCarRequest(): GeoPositionCarRequest {
+    return geoPositionCarRequest {
+        lat = this.lat
+        lng = this.lng
+    }
+}
+
 
 @Component
 class TravelerService(

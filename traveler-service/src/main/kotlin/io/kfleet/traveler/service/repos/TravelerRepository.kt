@@ -11,6 +11,7 @@ import io.kfleet.traveler.service.rpclayer.RPC_TRAVELER
 import io.kfleet.traveler.service.web.CarRequest
 import io.kfleet.traveler.service.web.DeleteTravelerParams
 import io.kfleet.traveler.service.web.NewTraveler
+import io.kfleet.traveler.service.web.toGeoPositionCarRequest
 import org.apache.kafka.common.serialization.StringSerializer
 import org.springframework.cloud.stream.annotation.EnableBinding
 import org.springframework.cloud.stream.annotation.Output
@@ -88,18 +89,13 @@ class TravelerRepository(
 
     fun submitCarRequestTravelerCommand(carRequest: CarRequest): Mono<CarRequestCommand> {
 
+        val fromPos = carRequest.from.toGeoPositionCarRequest()
         val carRequestCommand = carRequestCommand {
             commandId = UUID.randomUUID().toString()
             travelerId = carRequest.travelerId
-            from = geoPositionCarRequest {
-                // TODO extension funciton to map
-                lat = carRequest.from.lat
-                lng = carRequest.from.lng
-            }
-            to = geoPositionCarRequest {
-                lat = carRequest.to.lat
-                lng = carRequest.to.lng
-            }
+            from = fromPos
+            fromGeoIndex = fromPos.toQuadrantIndex()
+            to = carRequest.to.toGeoPositionCarRequest()
             requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
                     .withZone(ZoneOffset.UTC)
                     .format(carRequest.requestTime.toInstant())
