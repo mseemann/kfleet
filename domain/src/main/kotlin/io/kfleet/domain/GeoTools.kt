@@ -41,6 +41,38 @@ class Node(val x: Double, val y: Double, val w: Double, val h: Double) {
 
 class Box(val lng1: Double, val lat1: Double, val lng2: Double, val lat2: Double) {
 
+    val heightInKilometers: Double
+        get() {
+            return haversine(lat1 = lat1, lon1 = lng1, lat2 = lat2, lon2 = lng1)
+        }
+
+    val widthInKilometers: Double
+        get() {
+            return haversine(lat1 = lat1, lon1 = lng1, lat2 = lat1, lon2 = lng2)
+        }
+
+
+    private fun haversine(lat1: Double, lon1: Double,
+                          lat2: Double, lon2: Double): Double {
+        var lat1 = lat1
+        var lat2 = lat2
+        // distance between latitudes and longitudes
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLon = Math.toRadians(lon2 - lon1)
+
+        // convert to radians
+        lat1 = Math.toRadians(lat1)
+        lat2 = Math.toRadians(lat2)
+
+        // apply formulae
+        val a = Math.pow(Math.sin(dLat / 2), 2.0) + Math.pow(Math.sin(dLon / 2), 2.0) *
+                Math.cos(lat1) *
+                Math.cos(lat2)
+        val rad = 6371.0
+        val c = 2 * Math.asin(Math.sqrt(a))
+        return rad * c
+    }
+
     override fun toString(): String {
         return "[[$lat1, $lng1], [$lat2, $lng2]]"
     }
@@ -70,14 +102,15 @@ class QuadTree {
             return quadrants
         }
 
-        fun getIndexesArround(lng: Double, lat: Double, withMinDistanceInKilometers: Double): List<String> {
+        fun getIntersectingIndexes(lng: Double, lat: Double, withDistanceInKilometers: Double): List<String> {
             // create a bounding box for the parameters (x=lng, y=lat, w, h)
-            //val box = Box()
+            val box = GeoTools.surroundingBox(lng = lng, lat = lat, withDistanceInKilometers = withDistanceInKilometers)
 
             // find all quads at level INDEX_PATH_LENGTH that intersect with this bounding box
 
             return listOf()
         }
+
 
         fun boundingBoxes(quadrantAndNodes: List<QuadrantAndNode>): List<Box> {
             return quadrantAndNodes.map { it.node.boundingBox() }
@@ -85,24 +118,23 @@ class QuadTree {
     }
 
 }
-//
-//fun haversine(lat1: Double, lon1: Double,
-//              lat2: Double, lon2: Double): Double {
-//    var lat1 = lat1
-//    var lat2 = lat2
-//    // distance between latitudes and longitudes
-//    val dLat = Math.toRadians(lat2 - lat1)
-//    val dLon = Math.toRadians(lon2 - lon1)
-//
-//    // convert to radians
-//    lat1 = Math.toRadians(lat1)
-//    lat2 = Math.toRadians(lat2)
-//
-//    // apply formulae
-//    val a = Math.pow(Math.sin(dLat / 2), 2.0) + Math.pow(Math.sin(dLon / 2), 2.0) *
-//            Math.cos(lat1) *
-//            Math.cos(lat2)
-//    val rad = 6371.0
-//    val c = 2 * Math.asin(Math.sqrt(a))
-//    return rad * c
-//}
+
+class GeoTools {
+
+    companion object {
+
+        fun surroundingBox(lng: Double, lat: Double, withDistanceInKilometers: Double): Box {
+            val rLat = Math.toRadians(lat)
+            val degreesInLatDirection = withDistanceInKilometers / 111.111
+            val degreesInLngDirection = withDistanceInKilometers / Math.cos(rLat) / 111.111
+
+            val x = lng - degreesInLngDirection / 2
+            val y = lat - degreesInLatDirection / 2
+            val w = degreesInLngDirection
+            val h = degreesInLatDirection
+
+            return Box(lng1 = x, lat1 = y, lng2 = x + w, lat2 = y + h)
+        }
+    }
+}
+

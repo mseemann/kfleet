@@ -5,10 +5,14 @@
                 :bounds="rectangle.bounds"
                 :l-style="rectangle.style">
         </l-rectangle>
-        <l-rectangle
+        <!--l-rectangle
                 :bounds="bounds"
                 :key="index"
-                :l-style="rectangle.style" v-for="(bounds, index) in quadTreeBounds"></l-rectangle>
+                :l-style="rectangle.style" v-for="(bounds, index) in quadTreeBounds"></l-rectangle-->
+        <l-rectangle
+                :bounds="area.bounds"
+                :l-style="area.style">
+        </l-rectangle>
     </l-map>
 </template>
 
@@ -30,6 +34,10 @@
                 rectangle: {
                     bounds: [[59.7984951859, 10.3772388202], [60.0334203198, 10.9805373651]],
                     style: {color: 'blue', weight: 1}
+                },
+                area: {
+                    bounds: [[59.86839995499996, 10.58903480521315], [59.95840004500005, 10.768565194786854]],
+                    style: {color: 'red', weight: 1}
                 },
                 quadTreeBounds: [
                     [[-90.0, -180.0], [0.0, 0.0]],

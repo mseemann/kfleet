@@ -67,8 +67,21 @@ class GeoToolsTest {
     }
 
     @Test
+    fun testBoundingBoxes() {
+        val distance: Long = 10
+        val boxOslo = GeoTools.surroundingBox(lat = 59.9134, lng = 10.6788, withDistanceInKilometers = distance.toDouble())
+        expect(distance) { Math.round(boxOslo.heightInKilometers) }
+        expect(distance) { Math.round(boxOslo.widthInKilometers) }
+
+        val boxSaoPaulo = GeoTools.surroundingBox(lat = -23.5, lng = -46.616667, withDistanceInKilometers = distance.toDouble())
+        expect(distance) { Math.round(boxSaoPaulo.heightInKilometers) }
+        expect(distance) { Math.round(boxSaoPaulo.widthInKilometers) }
+
+    }
+
+    @Test
     fun testIndexPathsForBoundingBoxRoot() {
-        val paths = QuadTree.getIndexesArround(lng = 0.0, lat = 0.0, withMinDistanceInKilometers = 0.0)
+        val paths = QuadTree.getIntersectingIndexes(lng = 0.0, lat = 0.0, withDistanceInKilometers = 0.0)
         expect(0) { paths.size }
     }
 }
