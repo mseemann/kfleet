@@ -1,4 +1,4 @@
-package io.kfleet.domain
+package io.kfleet.geo
 
 import io.kfleet.domain.events.OsloLatRange
 import io.kfleet.domain.events.OsloLngRange

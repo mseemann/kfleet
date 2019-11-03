@@ -1,8 +1,8 @@
 package io.kfleet.domain.events
 
 
-import io.kfleet.domain.QuadTree
 import io.kfleet.domain.events.car.GeoPositionCarLocation
+import io.kfleet.geo.QuadTree
 import kotlin.random.Random
 
 val OsloLatRange = arrayOf(59.7984951859, 60.0334203198)
