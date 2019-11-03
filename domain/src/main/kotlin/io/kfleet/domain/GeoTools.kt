@@ -7,24 +7,24 @@ package io.kfleet.domain
 // has different sizes - but this is ok for this poc.
 
 enum class Quadrant(val label: String) {
-    NW("1"), NE("2"), SE("3"), SW("4")
+    R("0"), NW("1"), NE("2"), SE("3"), SW("4")
 }
 
-data class QuadrantAndNode(val quadrant: Quadrant, val node: Node)
-
-class Node(val x: Double, val y: Double, val w: Double, val h: Double) {
+class Node(val x: Double, val y: Double, val w: Double, val h: Double, val quadrant: Quadrant) {
 
     private val w2 = w / 2
     private val h2 = h / 2
     private val midX = x + w2
     private val midY = y + h2
 
-    private val nw = lazy { QuadrantAndNode(Quadrant.NW, Node(x, midY, w2, h2)) }
-    private val ne = lazy { QuadrantAndNode(Quadrant.NE, Node(midX, midY, w2, h2)) }
-    private val se = lazy { QuadrantAndNode(Quadrant.SE, Node(midX, y, w2, h2)) }
-    private val sw = lazy { QuadrantAndNode(Quadrant.SW, Node(x, y, w2, h2)) }
+    private val nw = lazy { Node(x, midY, w2, h2, Quadrant.NW) }
+    private val ne = lazy { Node(midX, midY, w2, h2, Quadrant.NE) }
+    private val se = lazy { Node(midX, y, w2, h2, Quadrant.SE) }
+    private val sw = lazy { Node(x, y, w2, h2, Quadrant.SW) }
 
-    fun quadrantForPosition(lat: Double, lng: Double): QuadrantAndNode {
+    private val childs = mutableListOf<Node>()
+
+    fun quadrantForPosition(lat: Double, lng: Double): Node {
         return if (lng < midX) {
             if (lat < midY) sw.value else nw.value
         } else {
@@ -34,40 +34,38 @@ class Node(val x: Double, val y: Double, val w: Double, val h: Double) {
 
     fun boundingBox() = Box(lng1 = x, lat1 = y, lng2 = x + w, lat2 = y + h)
 
-    fun intersectsWith(box: Box): Boolean {
-        println(box)
-        println(boundingBox())
+    private fun intersectsWith(box: Box): Boolean {
         if (box.inside(boundingBox()) || boundingBox().inside(box)) {
-            println("inside = true")
             return true
         }
         if (box.outside(boundingBox()) || boundingBox().outside(box)) {
-            println("ouside = false")
             return false
         }
-        println("not inside not outside = true")
         return true;
     }
 
-    fun intersectingQuadrants(box: Box): List<QuadrantAndNode> {
-        val result = mutableListOf<QuadrantAndNode>()
-        if (nw.value.node.intersectsWith(box)) {
-            result.add(nw.value)
+    fun intersectingQuadrants(box: Box, level: Int, maxLevel: Int): List<Node> {
+        arrayOf(nw, ne, se, sw).forEach {
+            if (it.value.intersectsWith(box)) {
+                childs.add(it.value)
+                if (level + 1 <= maxLevel)
+                    it.value.intersectingQuadrants(box, level + 1, maxLevel)
+            }
         }
-        if (ne.value.node.intersectsWith(box)) {
-            result.add(ne.value)
-        }
-        if (se.value.node.intersectsWith(box)) {
-            result.add(se.value)
-        }
-        if (sw.value.node.intersectsWith(box)) {
-            result.add(sw.value)
-        }
-        return result
+        return childs
     }
 
     override fun toString(): String {
-        return "Node(x=$x, y=$y, w=$w, h=$h)"
+        return "Node(x=$x, y=$y, w=$w, h=$h, quadrant=${quadrant.name})"
+    }
+
+    private fun printTree(level: Int) {
+        println(" ".repeat(level) + childs.map { it.quadrant.label })
+        childs.forEach { it.printTree(level + 1) }
+    }
+
+    fun printTree() {
+        this.printTree(1)
     }
 
 }
@@ -124,22 +122,22 @@ class Box(val lng1: Double, val lat1: Double, val lng2: Double, val lat2: Double
 class QuadTree {
 
     companion object {
-        const val INDEX_PATH_LENGTH = 11
+        private const val INDEX_PATH_LENGTH = 12
 
-        private val rootNode = Node(x = -180.0, y = -90.0, w = 360.0, h = 180.0)
+        private val rootNode = Node(x = -180.0, y = -90.0, w = 360.0, h = 180.0, quadrant = Quadrant.R)
 
         fun encodedIndexPath(lng: Double, lat: Double): String {
             val quadrants = indexPath(lng = lng, lat = lat)
             return quadrants.map { it.quadrant.label }.joinToString("/")
         }
 
-        fun indexPath(lng: Double, lat: Double): List<QuadrantAndNode> {
-            val quadrants = mutableListOf<QuadrantAndNode>()
+        fun indexPath(lng: Double, lat: Double): List<Node> {
+            val quadrants = mutableListOf<Node>()
             var currentNode = rootNode;
             for (i in 1..INDEX_PATH_LENGTH) {
                 val q = currentNode.quadrantForPosition(lng = lng, lat = lat)
                 quadrants.add(q)
-                currentNode = q.node
+                currentNode = q
             }
             return quadrants
         }
@@ -149,20 +147,18 @@ class QuadTree {
             val box = GeoTools.surroundingBox(lng = lng, lat = lat, withDistanceInKilometers = withDistanceInKilometers)
 
             // find all quads up to level INDEX_PATH_LENGTH that intersect with this bounding box
-            val intersectingQuadrants = rootNode.intersectingQuadrants(box)
-            println(intersectingQuadrants)
-            intersectingQuadrants.forEach {
-                val x = it.node.intersectingQuadrants(box)
-                println(x)
-            }
+            val intersectingQuadrants = rootNode.intersectingQuadrants(box, 1, INDEX_PATH_LENGTH)
+
+            rootNode.printTree()
+
 
 
             return listOf()
         }
 
 
-        fun boundingBoxes(quadrantAndNodes: List<QuadrantAndNode>): List<Box> {
-            return quadrantAndNodes.map { it.node.boundingBox() }
+        fun boundingBoxes(ndoes: List<Node>): List<Box> {
+            return ndoes.map { it.boundingBox() }
         }
     }
 

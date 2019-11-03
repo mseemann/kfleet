@@ -12,17 +12,17 @@ class GeoToolsTest {
         val lat = OsloLatRange.get(1)
         val lng = OsloLngRange.get(0)
 
-        val quadrantAndNodes = QuadTree.indexPath(lng = lng, lat = lat)
-        expect(11) { quadrantAndNodes.size }
+        val nodes = QuadTree.indexPath(lng = lng, lat = lat)
+        expect(12) { nodes.size }
 
-        val boxes = QuadTree.boundingBoxes(quadrantAndNodes);
+        val boxes = QuadTree.boundingBoxes(nodes);
         boxes.forEach { println(it) }
 
-        val firstNode = quadrantAndNodes.get(0).node
-        expect(Node(0.0, 0.0, w = 180.0, h = 90.0).toString()) { firstNode.toString() }
+        val firstNode = nodes.get(0)
+        expect(Node(0.0, 0.0, w = 180.0, h = 90.0, quadrant = Quadrant.NE).toString()) { firstNode.toString() }
 
         val index = QuadTree.encodedIndexPath(lng = lng, lat = lat)
-        expect("2/1/4/1/4/2/3/2/4/2/2") { index }
+        expect("2/1/4/1/4/2/3/2/4/2/2/4") { index }
     }
 
     @Test
@@ -31,7 +31,7 @@ class GeoToolsTest {
         val lng = OsloLngRange.get(1)
 
         val index = QuadTree.encodedIndexPath(lng = lng, lat = lat)
-        expect("2/1/4/1/4/2/3/2/3/2/1") { index }
+        expect("2/1/4/1/4/2/3/2/3/2/1/4") { index }
     }
 
     @Test
@@ -40,7 +40,7 @@ class GeoToolsTest {
         val lng = OsloLngRange.get(1)
 
         val index = QuadTree.encodedIndexPath(lng = lng, lat = lat)
-        expect("2/1/4/1/4/2/3/2/3/3/4") { index }
+        expect("2/1/4/1/4/2/3/2/3/3/4/4") { index }
     }
 
     @Test
@@ -49,7 +49,7 @@ class GeoToolsTest {
         val lng = OsloLngRange.get(0)
 
         val index = QuadTree.encodedIndexPath(lng = lng, lat = lat)
-        expect("2/1/4/1/4/2/3/2/4/3/3") { index }
+        expect("2/1/4/1/4/2/3/2/4/3/3/4") { index }
     }
 
     @Test
@@ -57,13 +57,13 @@ class GeoToolsTest {
         val lng = -46.616667
         val lat = -23.5
         val quadrantAndNodes = QuadTree.indexPath(lng = lng, lat = lat)
-        expect(11) { quadrantAndNodes.size }
+        expect(12) { quadrantAndNodes.size }
 
         val boxes = QuadTree.boundingBoxes(quadrantAndNodes);
         boxes.forEach { println(it) }
 
         val index = QuadTree.encodedIndexPath(lng = lng, lat = lat)
-        expect("4/2/4/2/2/2/2/4/2/3/4") { index }
+        expect("4/2/4/2/2/2/2/4/2/3/4/2") { index }
     }
 
     @Test
@@ -84,7 +84,7 @@ class GeoToolsTest {
 
     @Test
     fun testIndexPathsForBoundingBoxRoot() {
-        val paths = QuadTree.getIntersectingIndexes(lng = 10.6788, lat = 59.9134, withDistanceInKilometers = 5.0)
+        val paths = QuadTree.getIntersectingIndexes(lng = 10.6088, lat = 59.9134, withDistanceInKilometers = 5.0)
         expect(0) { paths.size }
     }
 }
