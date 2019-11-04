@@ -7,6 +7,7 @@ import io.kfleet.domain.events.asKeyValue
 import io.kfleet.domain.events.rideRequestedEvent
 import io.kfleet.domain.events.travelerCreatedEvent
 import io.kfleet.domain.events.travelerDeletedEvent
+import io.kfleet.geo.QuadTree
 import io.kfleet.traveler.service.commands.CarRequestCommand
 import io.kfleet.traveler.service.commands.CreateTravelerCommand
 import io.kfleet.traveler.service.commands.DeleteTravelerCommand
@@ -15,6 +16,7 @@ import mu.KotlinLogging
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 import org.springframework.stereotype.Component
+import java.util.*
 import kotlin.reflect.full.findAnnotation
 
 private val log = KotlinLogging.logger {}
@@ -104,7 +106,7 @@ class TravelerProcessor {
                     travelerDeletedEvent {
                         travelerId = command.getTravelerId()
                     }.asKeyValue(),
-                    
+
                     commandResponse {
                         commandId = command.getCommandId()
                         ressourceId = command.getTravelerId()
@@ -119,21 +121,32 @@ class TravelerProcessor {
             listOf(responseTravelerNotExist(command.getCommandId(), command.getTravelerId()))
         } else {
             // TODO do we need to store ride requests at traveler level - or at least open ride request
-            listOf(
-                    rideRequestedEvent {
-                        travelerId = command.getTravelerId()
-                        from = command.getFrom().toGeoPositionRideRequest()
-                        fromGeoIndex = command.getFromGeoIndex()
-                        to = command.getTo().toGeoPositionRideRequest()
-                        requestTime = command.getRequestTime()
-                    }.asKeyValue(),
 
+            // send a riderequest to each geoindex quadrant
+            val matchingGeoIndexes = QuadTree.getIntersectingIndexes(
+                    lng = command.getFrom().getLng(),
+                    lat = command.getFrom().getLat(),
+                    withDistanceInKilometers = 5.0)
+            val requestGroupId = UUID.randomUUID().toString()
+            val requests = matchingGeoIndexes.map {
+                rideRequestedEvent {
+                    requestId = UUID.randomUUID().toString()
+                    setRequestGroupId(requestGroupId)
+                    travelerId = command.getTravelerId()
+                    from = command.getFrom().toGeoPositionRideRequest()
+                    fromGeoIndex = it
+                    to = command.getTo().toGeoPositionRideRequest()
+                    requestTime = command.getRequestTime()
+                }.asKeyValue()
+            }
+            
+            listOf(
                     commandResponse {
                         commandId = command.getCommandId()
                         ressourceId = command.getTravelerId()
                         status = CommandStatus.SUCCEEDED
                     }.asKeyValue()
-            )
+            ).plus(requests)
         }
     }
 

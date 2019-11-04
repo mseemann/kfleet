@@ -22,8 +22,8 @@ class RideRequestedEventEmitterTest {
         ReflectionTestUtils.setField(rideRequestedEventEmitter, "simulationEnabled", true)
 
 
-        StepVerifier.create(rideRequestedEventEmitter.emitRideRequestEvents().take(1))
-                .expectNextMatches {
+        StepVerifier.create(rideRequestedEventEmitter.emitRideRequestEvents().take(4))
+                .thenConsumeWhile {
                     it.payload.getFromGeoIndex() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
                 }
                 .expectComplete()

@@ -5,6 +5,14 @@
   "name": "RideRequestedEvent",
   "fields": [
     {
+      "name": "requestId",
+      "type": "string"
+    },
+    {
+      "name": "requestGroupId",
+      "type": "string"
+    },
+    {
       "name": "travelerId",
       "type": "string"
     },

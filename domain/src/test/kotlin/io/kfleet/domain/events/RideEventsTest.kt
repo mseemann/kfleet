@@ -13,6 +13,8 @@ class RideEventsTest : BehaviorSpec({
 
         When("all properties are provide") {
             val event = rideRequestedEvent {
+                requestId = "0"
+                requestGroupId = "1"
                 travelerId = "1"
                 requestTime = "T"
                 from = geoPositionRideRequested {

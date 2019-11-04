@@ -5,7 +5,7 @@ import io.kfleet.common.randomDelayFluxer
 import io.kfleet.domain.events.GeoPositionFactory
 import io.kfleet.domain.events.ride.RideRequestedEvent
 import io.kfleet.domain.events.rideRequestedEvent
-import io.kfleet.domain.events.toQuadrantIndex
+import io.kfleet.geo.QuadTree
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cloud.stream.annotation.EnableBinding
@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
@@ -42,19 +43,35 @@ class RideRequestedEventEmitter {
 
     @StreamEmitter
     @Output(RideRequestedEventsOutBindings.RIDE_REQUEST_EVENTS)
-    fun emitRideRequestEvents(): Flux<Message<RideRequestedEvent>> = if (simulationEnabled == true) randomDelayFluxer(TRAVELER_COUNT, sleepFrom = 10, sleepUntil = 15).map {
+    fun emitRideRequestEvents(): Flux<Message<RideRequestedEvent>> = if (simulationEnabled == true) randomDelayFluxer(TRAVELER_COUNT, sleepFrom = 10, sleepUntil = 15).flatMap { id ->
+
         val position = GeoPositionFactory.createRandomRideRequetsedLocation()
-        val geoIndex = position.toQuadrantIndex()
-        val rideRequestedEvent = rideRequestedEvent {
-            travelerId = "$it"
-            from = position
-            fromGeoIndex = geoIndex
-            to = GeoPositionFactory.createRandomRideRequetsedLocation()
-            requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
-                    .withZone(ZoneOffset.UTC)
-                    .format(ZonedDateTime.now())
+
+        val matchingGeoIndexes = QuadTree.getIntersectingIndexes(
+                lng = position.getLng(),
+                lat = position.getLat(),
+                withDistanceInKilometers = 5.0)
+        val requestGroupId = UUID.randomUUID().toString()
+
+        Flux.create<Message<RideRequestedEvent>> { sink ->
+
+            matchingGeoIndexes.forEach {
+                val rideRequestedEvent = rideRequestedEvent {
+                    setRequestGroupId(requestGroupId)
+                    requestId = UUID.randomUUID().toString()
+                    travelerId = "$id"
+                    from = position
+                    fromGeoIndex = it
+                    to = GeoPositionFactory.createRandomRideRequetsedLocation()
+                    requestTime = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmX")
+                            .withZone(ZoneOffset.UTC)
+                            .format(ZonedDateTime.now())
+                }
+                logger.debug { "emit: $rideRequestedEvent" }
+                val message = MessageBuilder.createMessage(rideRequestedEvent, headers(it))
+                sink.next(message)
+            }
         }
-        logger.debug { "emit: $rideRequestedEvent" }
-        MessageBuilder.createMessage(rideRequestedEvent, headers(geoIndex))
+
     } else Flux.empty()
 }

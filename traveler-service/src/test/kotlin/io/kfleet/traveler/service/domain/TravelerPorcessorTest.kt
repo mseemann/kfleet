@@ -171,7 +171,7 @@ class TravelerPorcessorTest {
 
         val result = travelerProcessor.processCommand(CommandAndTraveler(command, traveler))
 
-        expect(2, { result.count() })
+        expect(5, { result.count() })
 
         val commandKv = result.filter { it.value is CommandResponse }
         assertNotEquals(travelerId, commandKv[0].key)
@@ -180,14 +180,29 @@ class TravelerPorcessorTest {
         assertNull((commandKv[0].value as CommandResponse).getReason())
 
         val rideRequestedEvents = result.filter { it.value is RideRequestedEvent }
+        expect(4, { rideRequestedEvents.count() })
         val rideRequestedEvent = rideRequestedEvents[0].value as RideRequestedEvent
         expect(travelerId) { rideRequestedEvent.getTravelerId() }
         expect(requestTime) { rideRequestedEvent.getRequestTime() }
-        expect("2/4/4/4/4/4/4/1/3/1/2/3") { rideRequestedEvent.getFromGeoIndex() }
+        expect("2/4/4/4/4/4/4/1/3/1/2/2") { rideRequestedEvent.getFromGeoIndex() }
         expect(latPos) { rideRequestedEvent.getFrom().getLat() }
         expect(lngPos) { rideRequestedEvent.getFrom().getLng() }
         expect(latToPos) { rideRequestedEvent.getTo().getLat() }
         expect(lngToPos) { rideRequestedEvent.getTo().getLng() }
+
+        // all requests have the same group id
+        val requestGroupId = rideRequestedEvent.getRequestGroupId()
+        expect(requestGroupId) { (rideRequestedEvents[1].value as RideRequestedEvent).getRequestGroupId() }
+        expect(requestGroupId) { (rideRequestedEvents[2].value as RideRequestedEvent).getRequestGroupId() }
+        expect(requestGroupId) { (rideRequestedEvents[3].value as RideRequestedEvent).getRequestGroupId() }
+
+        // but different requestIds
+        val requestIds = rideRequestedEvents.map { (it.value as RideRequestedEvent).getRequestId() }.toSet()
+        expect(4) { requestIds.size }
+
+        // and different geoIndexes
+        val geoIndexes = rideRequestedEvents.map { (it.value as RideRequestedEvent).getFromGeoIndex() }.toSet()
+        expect(4) { geoIndexes.size }
     }
 
     @Test
