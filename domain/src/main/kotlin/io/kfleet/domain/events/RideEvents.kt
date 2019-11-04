@@ -2,7 +2,6 @@ package io.kfleet.domain.events
 
 import io.kfleet.domain.events.ride.GeoPositionRideRequestedEvent
 import io.kfleet.domain.events.ride.RideRequestedEvent
-import io.kfleet.geo.QuadTree
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
 import kotlin.reflect.full.findAnnotation
@@ -25,6 +24,4 @@ fun RideRequestedEvent.asKeyValue(): KeyValue<String, SpecificRecord?> {
 fun geoPositionRideRequested(buildGeoPosition: GeoPositionRideRequestedEvent.Builder.() -> Unit): GeoPositionRideRequestedEvent =
         GeoPositionRideRequestedEvent.newBuilder().apply { buildGeoPosition() }.build()
 
-fun GeoPositionRideRequestedEvent.toQuadrantIndex(): String {
-    return QuadTree.encodedIndexPath(lng = this.getLng(), lat = this.getLat())
-}
+

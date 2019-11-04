@@ -2,6 +2,7 @@ package io.kfleet.domain.events
 
 
 import io.kfleet.domain.events.car.GeoPositionCarLocation
+import io.kfleet.domain.events.ride.GeoPositionRideRequestedEvent
 import io.kfleet.geo.QuadTree
 import kotlin.random.Random
 
@@ -28,3 +29,6 @@ fun GeoPositionCarLocation.toQuadrantIndex(): String {
     return QuadTree.encodedIndexPath(lng = this.getLng(), lat = this.getLat())
 }
 
+fun GeoPositionRideRequestedEvent.toQuadrantIndex(): String {
+    return QuadTree.encodedIndexPath(lng = this.getLng(), lat = this.getLat())
+}

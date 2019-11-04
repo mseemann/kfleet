@@ -20,10 +20,7 @@ class RideEventsTest : BehaviorSpec({
                     lng = 1.0
                 }
                 fromGeoIndex = "1/1/2"
-                to = geoPositionRideRequested {
-                    lat = 1.0
-                    lng = 1.0
-                }
+                to = GeoPositionFactory.createRandomRideRequetsedLocation()
             }
             Then("an event should be created") {
                 event.shouldNotBeNull()
