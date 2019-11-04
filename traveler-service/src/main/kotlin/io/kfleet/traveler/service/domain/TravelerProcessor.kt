@@ -126,8 +126,9 @@ class TravelerProcessor {
             val matchingGeoIndexes = QuadTree.getIntersectingIndexes(
                     lng = command.getFrom().getLng(),
                     lat = command.getFrom().getLat(),
-                    withDistanceInKilometers = 5.0)
+                    withDistanceInKilometers = 5.0).getIndexPaths()
             val requestGroupId = UUID.randomUUID().toString()
+
             val requests = matchingGeoIndexes.map {
                 rideRequestedEvent {
                     requestId = UUID.randomUUID().toString()
@@ -139,7 +140,7 @@ class TravelerProcessor {
                     requestTime = command.getRequestTime()
                 }.asKeyValue()
             }
-            
+
             listOf(
                     commandResponse {
                         commandId = command.getCommandId()

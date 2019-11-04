@@ -85,7 +85,9 @@ class GeoToolsTest {
 
     @Test
     fun testIndexPathsForBoundingBox() {
-        val paths = QuadTree.getIntersectingIndexes(lng = 10.6088, lat = 59.9134, withDistanceInKilometers = 5.0)
+        val treeRoot = QuadTree.getIntersectingIndexes(lng = 10.6088, lat = 59.9134, withDistanceInKilometers = 5.0)
+        treeRoot.printTree()
+        val paths = treeRoot.getIndexPaths()
         expect(4) { paths.size }
 
         assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/1") }
@@ -97,7 +99,9 @@ class GeoToolsTest {
 
     @Test
     fun testIndexPathsForBoundingBoxWithSplitReagion() {
-        val paths = QuadTree.getIntersectingIndexes(lng = 10.5088, lat = 59.9134, withDistanceInKilometers = 5.0)
+        val treeRoot = QuadTree.getIntersectingIndexes(lng = 10.5088, lat = 59.9134, withDistanceInKilometers = 5.0)
+        treeRoot.printTree()
+        val paths = treeRoot.getIndexPaths()
         expect(4) { paths.size }
 
         assertTrue { paths.contains("2/1/4/1/4/2/3/2/3/4/1/1") }

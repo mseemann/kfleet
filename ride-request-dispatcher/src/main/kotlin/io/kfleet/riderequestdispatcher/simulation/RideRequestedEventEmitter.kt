@@ -50,7 +50,7 @@ class RideRequestedEventEmitter {
         val matchingGeoIndexes = QuadTree.getIntersectingIndexes(
                 lng = position.getLng(),
                 lat = position.getLat(),
-                withDistanceInKilometers = 5.0)
+                withDistanceInKilometers = 5.0).getIndexPaths()
         val requestGroupId = UUID.randomUUID().toString()
 
         Flux.create<Message<RideRequestedEvent>> { sink ->

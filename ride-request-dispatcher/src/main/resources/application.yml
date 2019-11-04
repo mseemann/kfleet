@@ -67,4 +67,4 @@ logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 logging.level.reactor.netty: INFO
 logging.level.org.springframework.cloud.stream.binding: ERROR
 
-cars.service.simulation.events.enabled: false
+cars.service.simulation.events.enabled: true

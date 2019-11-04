@@ -20,14 +20,10 @@ class QuadTree {
             return quadrants
         }
 
-        fun getIntersectingIndexes(lng: Double, lat: Double, withDistanceInKilometers: Double): List<String> {
+        fun getIntersectingIndexes(lng: Double, lat: Double, withDistanceInKilometers: Double): TreeNode {
             val box = GeoTools.surroundingBox(lng = lng, lat = lat, withDistanceInKilometers = withDistanceInKilometers)
 
-            val treeRoot = rootNode.buildIntersectionPaths(box)
-
-            treeRoot.printTree()
-
-            return treeRoot.getIndexPaths()
+            return rootNode.buildIntersectionPaths(box)
         }
 
 
