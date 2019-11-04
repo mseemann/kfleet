@@ -1,4 +1,4 @@
-package io.kfleet.car.service.simulation
+package io.kfleet.riderequestdispatcher.simulation
 
 import io.kfleet.domain.events.car.CarLocationChangedEvent
 import org.junit.jupiter.api.Test

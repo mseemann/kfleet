@@ -6,6 +6,7 @@ include("test-common")
 include("owner-service")
 include("car-service")
 include("traveler-service")
+include("ride-request-dispatcher")
 
 // make the avro plugin available
 pluginManagement {

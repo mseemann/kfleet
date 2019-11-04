@@ -128,7 +128,7 @@ class TravelerRepositoryTest {
         given(outputChannel.send(capture.capture())).willReturn(false)
 
         StepVerifier.create(travelerRepo.submitDeleteTravelerCommand(deleteTravelerParams))
-                .expectErrorMessage("DeleteTravelerCommand coud not be send.")
+                .expectErrorMessage("DeleteTravelerCommand could not be send.")
                 .verify()
     }
 
@@ -189,7 +189,7 @@ class TravelerRepositoryTest {
         given(outputChannel.send(capture.capture())).willReturn(false)
 
         StepVerifier.create(travelerRepo.submitCarRequestTravelerCommand(carRequest))
-                .expectErrorMessage("CarRequestCommand coud not be send.")
+                .expectErrorMessage("CarRequestCommand could not be send.")
                 .verify()
     }
 

@@ -1,6 +1,6 @@
-package io.kfleet.car.service.processors
+package io.kfleet.riderequestdispatcher.processor
 
-import io.kfleet.car.service.processor.CarPositionAggregate
+
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 import kotlin.test.expect

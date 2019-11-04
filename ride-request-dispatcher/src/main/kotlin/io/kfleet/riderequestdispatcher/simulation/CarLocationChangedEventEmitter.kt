@@ -1,4 +1,4 @@
-package io.kfleet.car.service.simulation
+package io.kfleet.riderequestdispatcher.simulation
 
 import io.kfleet.common.headers
 import io.kfleet.common.randomDelayFluxer
@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux
 
 private val logger = KotlinLogging.logger {}
 
+const val CAR_COUNT = 10
 
 interface CarsLocationEventsOutBindings {
 

@@ -76,7 +76,7 @@ class TravelerRepository(
 
         return try {
             // this works because cloud stream is configured as sync for this topic
-            if (outputTravelerCommands.send(msg)) Mono.just(travelerCommand) else Mono.error(RuntimeException("DeleteTravelerCommand coud not be send."))
+            if (outputTravelerCommands.send(msg)) Mono.just(travelerCommand) else Mono.error(RuntimeException("DeleteTravelerCommand could not be send."))
         } catch (e: RuntimeException) {
             Mono.error(e)
         }
@@ -108,7 +108,7 @@ class TravelerRepository(
 
         return try {
             // this works because cloud stream is configured as sync for this topic
-            if (outputTravelerCommands.send(msg)) Mono.just(carRequestCommand) else Mono.error(RuntimeException("CarRequestCommand coud not be send."))
+            if (outputTravelerCommands.send(msg)) Mono.just(carRequestCommand) else Mono.error(RuntimeException("CarRequestCommand could not be send."))
         } catch (e: RuntimeException) {
             Mono.error(e)
         }

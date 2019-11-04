@@ -1,4 +1,4 @@
-package io.kfleet.car.service.processor
+package io.kfleet.riderequestdispatcher.processor
 
 import io.kfleet.domain.events.car.CarLocationChangedEvent
 import mu.KotlinLogging
