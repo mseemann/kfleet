@@ -70,7 +70,7 @@ class CarEventsTest : BehaviorSpec({
         When("a carId and positon is specified") {
             val carLocationChangedEvent = carLocationChangedEvent {
                 carId = "1"
-                geoPosition = GeoPositionFactory.createRandom()
+                geoPosition = GeoPositionFactory.createRandomCarLocation()
                 geoPositionIndex = "1/1/2..."
             }
 

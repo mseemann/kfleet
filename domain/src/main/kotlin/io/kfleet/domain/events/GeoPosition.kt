@@ -13,7 +13,12 @@ fun geoPositionCarLocation(buildGeoPosition: GeoPositionCarLocation.Builder.() -
 
 object GeoPositionFactory {
 
-    fun createRandom() = geoPositionCarLocation {
+    fun createRandomCarLocation() = geoPositionCarLocation {
+        lat = Random.nextDouble(OsloLatRange[0], OsloLatRange[1])
+        lng = Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
+    }
+
+    fun createRandomRideRequetsedLocation() = geoPositionRideRequested {
         lat = Random.nextDouble(OsloLatRange[0], OsloLatRange[1])
         lng = Random.nextDouble(OsloLngRange[0], OsloLngRange[1])
     }

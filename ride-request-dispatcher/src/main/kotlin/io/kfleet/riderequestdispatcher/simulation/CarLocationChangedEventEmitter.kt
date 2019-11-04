@@ -34,13 +34,13 @@ interface CarsLocationEventsOutBindings {
 @EnableBinding(CarsLocationEventsOutBindings::class)
 class CarLocationChangedEventEmitter {
 
-    @Value("\${cars.service.simulation.location.events.enabled}")
+    @Value("\${cars.service.simulation.events.enabled}")
     val simulationEnabled: Boolean? = null
 
     @StreamEmitter
     @Output(CarsLocationEventsOutBindings.CARS_LOCATION)
     fun emitCarLocations(): Flux<Message<CarLocationChangedEvent>> = if (simulationEnabled == true) randomDelayFluxer(CAR_COUNT, sleepFrom = 2, sleepUntil = 5).map {
-        val position = GeoPositionFactory.createRandom()
+        val position = GeoPositionFactory.createRandomCarLocation()
         val carLocationChangedEvent = carLocationChangedEvent {
             carId = "$it"
             geoPosition = position

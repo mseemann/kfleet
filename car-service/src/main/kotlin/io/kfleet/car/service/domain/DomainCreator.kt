@@ -28,7 +28,7 @@ object CarFactory {
             "$id",
             Random.nextDouble(0.0, 100.0),
             CarState.values()[Random.nextInt(CarState.values().size)],
-            GeoPositionFactory.createRandom().toCarLocation()
+            GeoPositionFactory.createRandomCarLocation().toCarLocation()
     )
 }
 

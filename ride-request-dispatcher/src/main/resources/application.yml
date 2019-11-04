@@ -15,6 +15,8 @@ spring.cloud.stream.bindings:
     destination: car_locations
   car_locations_out:
     destination: car_locations
+  ride_request_events_out:
+    destination: ride_request_events
 
 spring.cloud.stream.kafka.streams.binder.configuration:
   schema.registry.url: ${spring.cloud.stream.schema-registry-client.endpoint}
@@ -65,4 +67,4 @@ logging.level.org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 logging.level.reactor.netty: INFO
 logging.level.org.springframework.cloud.stream.binding: ERROR
 
-cars.service.simulation.location.events.enabled: false
+cars.service.simulation.events.enabled: false

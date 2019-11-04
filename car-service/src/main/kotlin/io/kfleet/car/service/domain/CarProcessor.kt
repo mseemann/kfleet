@@ -33,7 +33,7 @@ class CarProcessor {
                         id = event.getCarId()
                         state = CarState.FREE
                         stateOfCharge = 1.0
-                        geoPosition = GeoPositionFactory.createRandom().toCarLocation() // FIXME initialize with proper value
+                        geoPosition = GeoPositionFactory.createRandomCarLocation().toCarLocation() // FIXME initialize with proper value
                     }.asKeyValue()
             )
         }

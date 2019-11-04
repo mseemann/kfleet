@@ -40,7 +40,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.OUT_OF_POOL
-            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
+            geoPosition = GeoPositionFactory.createRandomCarLocation().toCarLocation()
             stateOfCharge = 100.0
         }
 
@@ -63,7 +63,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.FREE
-            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
+            geoPosition = GeoPositionFactory.createRandomCarLocation().toCarLocation()
             stateOfCharge = 100.0
         }
 
@@ -96,7 +96,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.OUT_OF_POOL
-            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
+            geoPosition = GeoPositionFactory.createRandomCarLocation().toCarLocation()
             stateOfCharge = 100.0
         }
 
@@ -116,7 +116,7 @@ class CarProcessorTest {
         val car = car {
             id = carId
             state = CarState.FREE
-            geoPosition = GeoPositionFactory.createRandom().toCarLocation()
+            geoPosition = GeoPositionFactory.createRandomCarLocation().toCarLocation()
             stateOfCharge = 100.0
         }
 

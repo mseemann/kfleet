@@ -1,6 +1,5 @@
 package io.kfleet.riderequestdispatcher.simulation
 
-import io.kfleet.domain.events.car.CarLocationChangedEvent
 import org.junit.jupiter.api.Test
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.test.util.ReflectionTestUtils
@@ -25,10 +24,7 @@ class CarLocationChangedEventEmitterTest {
         for (i in 1..10) {
             StepVerifier.create(carEventEmitter.emitCarLocations().take(1))
                     .expectNextMatches {
-                        when (val p = it.payload) {
-                            is CarLocationChangedEvent -> p.getCarId() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
-                            else -> throw RuntimeException("unknown car location changed event")
-                        }
+                        it.payload.getCarId() == it.headers.get(KafkaHeaders.MESSAGE_KEY)
                     }
                     .expectComplete()
                     .verify()
