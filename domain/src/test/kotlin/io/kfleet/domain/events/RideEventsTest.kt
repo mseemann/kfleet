@@ -1,5 +1,6 @@
 package io.kfleet.domain.events
 
+import io.kotlintest.matchers.boolean.shouldBeTrue
 import io.kotlintest.matchers.types.shouldNotBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
@@ -30,6 +31,10 @@ class RideEventsTest : BehaviorSpec({
 
             Then("fromGeoIndex should be the message key") {
                 event.asKeyValue().key.shouldBe(event.getFromGeoIndex())
+            }
+
+            Then("the 'isRideEvent' method should return true") {
+                event.isRideEvent().shouldBeTrue()
             }
         }
 
