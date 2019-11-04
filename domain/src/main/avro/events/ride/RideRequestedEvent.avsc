@@ -1,0 +1,28 @@
+{
+  "namespace": "io.kfleet.domain.events.ride",
+  "type": "record",
+  "javaAnnotation": "io.kfleet.domain.events.RideEvent",
+  "name": "RideRequestedEvent",
+  "fields": [
+    {
+      "name": "travelerId",
+      "type": "string"
+    },
+    {
+      "name": "from",
+      "type": "GeoPositionRideRequestedEvent"
+    },
+    {
+      "name": "fromGeoIndex",
+      "type": "string"
+    },
+    {
+      "name": "to",
+      "type": "GeoPositionRideRequestedEvent"
+    },
+    {
+      "name": "requestTime",
+      "type": "string"
+    }
+  ]
+}

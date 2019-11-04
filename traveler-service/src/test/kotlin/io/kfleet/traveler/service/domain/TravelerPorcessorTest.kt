@@ -3,6 +3,7 @@ package io.kfleet.traveler.service.domain
 import io.kfleet.commands.CommandResponse
 import io.kfleet.commands.CommandStatus
 import io.kfleet.domain.events.ownerCreatedEvent
+import io.kfleet.domain.events.ride.RideRequestedEvent
 import io.kfleet.domain.events.traveler.TravelerCreatedEvent
 import io.kfleet.domain.events.traveler.TravelerDeletedEvent
 import io.kfleet.traveler.service.processors.CommandAndTraveler
@@ -141,9 +142,14 @@ class TravelerPorcessorTest {
     fun carRequestSucceededTest() {
 
         val travelerId = "1"
+        val requestTime = "2019-10-21T19:00:00"
+        val latPos = 1.0
+        val lngPos = 1.05
+        val latToPos = 1.1
+        val lngToPos = 1.2
         val fromPos = geoPositionCarRequest {
-            lat = 1.0
-            lng = 1.0
+            lat = latPos
+            lng = lngPos
         }
         val command = carRequestCommand {
             commandId = "65823"
@@ -151,10 +157,10 @@ class TravelerPorcessorTest {
             from = fromPos
             fromGeoIndex = fromPos.toQuadrantIndex()
             to = geoPositionCarRequest {
-                lat = 1.0
-                lng = 1.0
+                lat = latToPos
+                lng = lngToPos
             }
-            requestTime = "2019-10-21T19:00:00"
+            setRequestTime(requestTime)
         }
 
         val traveler = traveler {
@@ -165,8 +171,23 @@ class TravelerPorcessorTest {
 
         val result = travelerProcessor.processCommand(CommandAndTraveler(command, traveler))
 
-        expect(0, { result.count() })
-        // TODO
+        expect(2, { result.count() })
+
+        val commandKv = result.filter { it.value is CommandResponse }
+        assertNotEquals(travelerId, commandKv[0].key)
+        expect(CommandStatus.SUCCEEDED) { (commandKv[0].value as CommandResponse).getStatus() }
+        expect(travelerId) { (commandKv[0].value as CommandResponse).getRessourceId() }
+        assertNull((commandKv[0].value as CommandResponse).getReason())
+
+        val rideRequestedEvents = result.filter { it.value is RideRequestedEvent }
+        val rideRequestedEvent = rideRequestedEvents[0].value as RideRequestedEvent
+        expect(travelerId) { rideRequestedEvent.getTravelerId() }
+        expect(requestTime) { rideRequestedEvent.getRequestTime() }
+        expect("2/4/4/4/4/4/4/1/3/1/2/3") { rideRequestedEvent.getFromGeoIndex() }
+        expect(latPos) { rideRequestedEvent.getFrom().getLat() }
+        expect(lngPos) { rideRequestedEvent.getFrom().getLng() }
+        expect(latToPos) { rideRequestedEvent.getTo().getLat() }
+        expect(lngToPos) { rideRequestedEvent.getTo().getLng() }
     }
 
     @Test

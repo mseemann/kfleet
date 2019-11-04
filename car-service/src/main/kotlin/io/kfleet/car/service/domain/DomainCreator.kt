@@ -13,9 +13,11 @@ fun Car.asKeyValue(): KeyValue<String, SpecificRecord?> {
 }
 
 fun GeoPositionCarLocation.toCarLocation(): GeoPositionCar {
+    val lat = getLat()
+    val lng = getLng()
     return geoPositionCar {
-        lat = this.lat
-        lng = this.lng
+        setLat(lat)
+        setLng(lng)
     }
 }
 

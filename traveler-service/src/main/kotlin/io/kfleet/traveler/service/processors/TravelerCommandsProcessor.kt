@@ -2,6 +2,7 @@ package io.kfleet.traveler.service.processors
 
 import io.kfleet.commands.CommandResponse
 import io.kfleet.common.createSerdeWithAvroRegistry
+import io.kfleet.domain.events.ride.RideRequestedEvent
 import io.kfleet.domain.events.traveler.TravelerCreatedEvent
 import io.kfleet.domain.events.traveler.TravelerDeletedEvent
 import io.kfleet.traveler.service.configuration.*
@@ -101,6 +102,11 @@ class TravelerCommandsProcessor(
                 }
                 .to(TRAVELER_EVENTS)
 
+        processorResult
+                .filter { _, value ->
+                    value is RideRequestedEvent
+                }
+                .to(RIDE_REQUEST_EVENTS)
 
         processorResult
                 .filter { _, value -> value is CommandResponse }

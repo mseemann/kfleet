@@ -1,0 +1,15 @@
+{
+  "namespace": "io.kfleet.domain.events.ride",
+  "type": "record",
+  "name": "GeoPositionRideRequestedEvent",
+  "fields": [
+    {
+      "name": "lat",
+      "type": "double"
+    },
+    {
+      "name": "lng",
+      "type": "double"
+    }
+  ]
+}

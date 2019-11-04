@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration
 const val TRAVELER_COMMANDS = "traveler_commands"
 const val TRAVELER_EVENTS = "traveler_events"
 const val DLQ = "dlq"
+const val RIDE_REQUEST_EVENTS = "ride_request_events"
 
 
 // TopicBindingNames
@@ -33,5 +34,6 @@ class Topics {
     @Bean
     fun travelerEventsTopic() = NewTopic(TRAVELER_EVENTS, 3, 3)
 
-
+    @Bean
+    fun rideRequestEventsTopic() = NewTopic(RIDE_REQUEST_EVENTS, 3, 3)
 }

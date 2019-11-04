@@ -4,6 +4,7 @@ import io.kfleet.commands.CommandStatus
 import io.kfleet.domain.asKeyValue
 import io.kfleet.domain.commandResponse
 import io.kfleet.domain.events.asKeyValue
+import io.kfleet.domain.events.rideRequestedEvent
 import io.kfleet.domain.events.travelerCreatedEvent
 import io.kfleet.domain.events.travelerDeletedEvent
 import io.kfleet.traveler.service.commands.CarRequestCommand
@@ -103,8 +104,7 @@ class TravelerProcessor {
                     travelerDeletedEvent {
                         travelerId = command.getTravelerId()
                     }.asKeyValue(),
-
-
+                    
                     commandResponse {
                         commandId = command.getCommandId()
                         ressourceId = command.getTravelerId()
@@ -118,8 +118,22 @@ class TravelerProcessor {
         return if (traveler == null) {
             listOf(responseTravelerNotExist(command.getCommandId(), command.getTravelerId()))
         } else {
-            // TODO
-            listOf()
+            // TODO do we need to store ride requests at traveler level - or at least open ride request
+            listOf(
+                    rideRequestedEvent {
+                        travelerId = command.getTravelerId()
+                        from = command.getFrom().toGeoPositionRideRequest()
+                        fromGeoIndex = command.getFromGeoIndex()
+                        to = command.getTo().toGeoPositionRideRequest()
+                        requestTime = command.getRequestTime()
+                    }.asKeyValue(),
+
+                    commandResponse {
+                        commandId = command.getCommandId()
+                        ressourceId = command.getTravelerId()
+                        status = CommandStatus.SUCCEEDED
+                    }.asKeyValue()
+            )
         }
     }
 
