@@ -1,5 +1,7 @@
 package io.kfleet.geo
 
+import kotlin.math.*
+
 class Box(val lng1: Double, val lat1: Double, val lng2: Double, val lat2: Double) {
 
     val heightInKilometers: Double
@@ -35,11 +37,11 @@ class Box(val lng1: Double, val lat1: Double, val lng2: Double, val lat2: Double
         val rLat1 = Math.toRadians(lat1)
         val rLat2 = Math.toRadians(lat2)
 
-        val a = Math.pow(Math.sin(dLat / 2), 2.0) + Math.pow(Math.sin(dLon / 2), 2.0) *
-                Math.cos(rLat1) *
-                Math.cos(rLat2)
+        val a = sin(dLat / 2).pow(2.0) + sin(dLon / 2).pow(2.0) *
+                cos(rLat1) *
+                cos(rLat2)
         val rad = 6371.0
-        val c = 2 * Math.asin(Math.sqrt(a))
+        val c = 2 * asin(sqrt(a))
         return rad * c
     }
 

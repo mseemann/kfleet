@@ -6,7 +6,7 @@ class QuadTree {
 
         fun encodedIndexPath(lng: Double, lat: Double): String {
             val quadrants = indexPath(lng = lng, lat = lat)
-            return quadrants.map { it.quadrant.label }.joinToString("/")
+            return quadrants.joinToString("/") { it.quadrant.label }
         }
 
         fun indexPath(lng: Double, lat: Double): List<Node> {

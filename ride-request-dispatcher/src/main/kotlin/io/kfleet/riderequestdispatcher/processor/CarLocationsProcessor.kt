@@ -32,7 +32,7 @@ interface CarLocationsProcessorBinding {
 }
 
 @EnableBinding(CarLocationsProcessorBinding::class)
-class CarLocationsProcessor() {
+class CarLocationsProcessor {
 
 
     @StreamListener
@@ -65,13 +65,12 @@ class CarPositionAggregateSerde : Serde<CarPositionAggregate> {
             }
 
             override fun deserialize(s: String, bytes: ByteArray?): CarPositionAggregate? {
-                if (bytes == null || bytes.size == 0) {
+                if (bytes == null || bytes.isEmpty()) {
                     return null
                 }
 
                 val dataInputStream = ObjectInputStream(ByteArrayInputStream(bytes))
-                val result = dataInputStream.readObject() as CarPositionAggregate
-                return result
+                return dataInputStream.readObject() as CarPositionAggregate
             }
 
             override fun close() {
@@ -116,14 +115,14 @@ class CarPositionAggregate : Serializable {
         log.debug { "add $carId to $quadrant" }
         val carEvents = quadrants.getOrDefault(quadrant, setOf()).toMutableSet()
         carEvents.add(carId)
-        quadrants.put(quadrant, carEvents)
+        quadrants[quadrant] = carEvents
         return this
     }
 
     fun sub(quadrant: String, carId: String): CarPositionAggregate {
         log.debug { "sub $carId from $quadrant" }
         val carEvents = quadrants.getOrDefault(quadrant, setOf())
-        quadrants.put(quadrant, carEvents.minus(carId))
+        quadrants[quadrant] = carEvents.minus(carId)
         return this
     }
 
