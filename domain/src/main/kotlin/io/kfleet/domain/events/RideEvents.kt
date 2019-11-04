@@ -1,5 +1,6 @@
 package io.kfleet.domain.events
 
+import io.kfleet.domain.events.ride.GeoPositionRideRequestedEvent
 import io.kfleet.domain.events.ride.RideRequestedEvent
 import org.apache.avro.specific.SpecificRecord
 import org.apache.kafka.streams.KeyValue
@@ -19,3 +20,6 @@ fun rideRequestedEvent(buildRideRequestedEvent: RideRequestedEvent.Builder.() ->
 fun RideRequestedEvent.asKeyValue(): KeyValue<String, SpecificRecord?> {
     return KeyValue(this.getFromGeoIndex(), this)
 }
+
+fun geoPositionRideRequested(buildGeoPosition: GeoPositionRideRequestedEvent.Builder.() -> Unit): GeoPositionRideRequestedEvent =
+        GeoPositionRideRequestedEvent.newBuilder().apply { buildGeoPosition() }.build()
