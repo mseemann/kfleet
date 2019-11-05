@@ -1,16 +1,16 @@
 plugins {
-    id("org.springframework.boot") version "2.1.9.RELEASE"
-    id("io.spring.dependency-management") version "1.0.8.RELEASE"
-    kotlin("plugin.spring") version "1.3.50"
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
+    kotlin("plugin.spring")
     id("com.commercehub.gradle.plugin.avro") version "0.17.0"
     jacoco
 }
 
 dependencies {
+    compile(kotlin("stdlib-jdk8"))
 
     implementation(project(":common"))
     implementation(project(":domain"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.apache.kafka:kafka-streams")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -36,10 +36,4 @@ dependencies {
     testImplementation("org.awaitility:awaitility-kotlin:4.0.1")
     testImplementation("org.testcontainers:junit-jupiter:1.12.2")
 
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
 }

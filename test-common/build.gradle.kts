@@ -1,7 +1,7 @@
 plugins {
-    id("org.springframework.boot") version "2.1.9.RELEASE" apply false
-    id("io.spring.dependency-management") version "1.0.8.RELEASE"
-    kotlin("plugin.spring") version "1.3.50"
+    id("org.springframework.boot") apply false
+    id("io.spring.dependency-management")
+    kotlin("plugin.spring")
     id("com.commercehub.gradle.plugin.avro") version "0.17.0"
 }
 
@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    compile(kotlin("stdlib-jdk8"))
+
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
 
@@ -19,10 +20,4 @@ dependencies {
     }
 
     implementation("org.testcontainers:junit-jupiter:1.12.2")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
 }

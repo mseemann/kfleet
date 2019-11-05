@@ -1,8 +1,11 @@
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     base
     kotlin("jvm") version "1.3.50"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.3.50" apply false
+    id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     jacoco
 }
 
@@ -34,6 +37,12 @@ allprojects {
 subprojects {
 
     apply(plugin = "kotlin")
+    apply(plugin = "io.spring.dependency-management")
+    the<DependencyManagementExtension>().apply {
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        }
+    }
 
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
@@ -42,6 +51,7 @@ subprojects {
         testImplementation("io.mockk:mockk:1.9.3.kotlin12")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.1")
     }
+
 
     tasks.withType<Test> {
         useJUnitPlatform()

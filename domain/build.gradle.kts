@@ -10,7 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    compile(kotlin("stdlib-jdk8"))
+    
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
     implementation("org.apache.avro:avro:1.9.1")
