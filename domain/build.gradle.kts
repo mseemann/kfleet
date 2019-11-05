@@ -4,9 +4,6 @@ plugins {
     jacoco
 }
 
-
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
 repositories {
     mavenCentral()
     maven(url = "http://packages.confluent.io/maven/")

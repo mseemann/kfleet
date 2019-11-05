@@ -5,9 +5,6 @@ plugins {
     id("com.commercehub.gradle.plugin.avro") version "0.17.0"
 }
 
-
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
 repositories {
     jcenter()
 }

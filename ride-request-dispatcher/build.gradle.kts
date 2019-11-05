@@ -6,8 +6,6 @@ plugins {
     jacoco
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-
 dependencies {
 
     implementation(project(":common"))
