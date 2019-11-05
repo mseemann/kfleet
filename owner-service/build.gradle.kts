@@ -2,7 +2,7 @@ plugins {
     id("org.springframework.boot")
     id("io.spring.dependency-management")
     kotlin("plugin.spring")
-    id("com.commercehub.gradle.plugin.avro") version "0.17.0"
+    id("com.commercehub.gradle.plugin.avro")
     jacoco
 }
 
@@ -23,9 +23,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
     implementation("io.github.microutils:kotlin-logging:1.7.6")
     implementation("org.apache.avro:avro:1.9.1")
-    implementation("io.confluent:kafka-avro-serializer:5.2.2")
-    implementation("io.confluent:kafka-streams-avro-serde:5.2.1")
-    implementation("io.confluent:kafka-schema-registry-client:5.2.1")
+    implementation("io.confluent:kafka-avro-serializer:${property("confluentVersion")}")
+    implementation("io.confluent:kafka-streams-avro-serde:${property("confluentVersion")}")
+    implementation("io.confluent:kafka-schema-registry-client:${property("confluentVersion")}")
 
     testImplementation(project(":test-common"))
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

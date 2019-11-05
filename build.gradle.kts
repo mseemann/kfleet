@@ -6,11 +6,13 @@ plugins {
     kotlin("jvm") version "1.3.50"
     id("org.jetbrains.kotlin.plugin.spring") version "1.3.50" apply false
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
+    id("com.commercehub.gradle.plugin.avro") version "0.17.0" apply false
     jacoco
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 extra["springCloudVersion"] = "Greenwich.SR2"
+extra["confluentVersion"] = "5.2.3"
 
 allprojects {
 

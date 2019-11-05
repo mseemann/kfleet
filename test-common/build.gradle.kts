@@ -2,7 +2,7 @@ plugins {
     id("org.springframework.boot") apply false
     id("io.spring.dependency-management")
     kotlin("plugin.spring")
-    id("com.commercehub.gradle.plugin.avro") version "0.17.0"
+    id("com.commercehub.gradle.plugin.avro")
 }
 
 repositories {
