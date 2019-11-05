@@ -6,6 +6,7 @@ plugins {
     jacoco
 }
 
+extra["springCloudVersion"] = "Greenwich.SR2"
 
 allprojects {
 

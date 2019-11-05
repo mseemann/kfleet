@@ -8,8 +8,6 @@ plugins {
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
-extra["springCloudVersion"] = "Greenwich.SR2"
-
 repositories {
     jcenter()
 }
