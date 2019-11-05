@@ -4,11 +4,6 @@ plugins {
     jacoco
 }
 
-repositories {
-    mavenCentral()
-    maven(url = "http://packages.confluent.io/maven/")
-}
-
 dependencies {
     compile(kotlin("stdlib-jdk8"))
     compile("org.apache.kafka:kafka-streams:2.0.1")

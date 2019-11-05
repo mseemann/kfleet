@@ -37,8 +37,3 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.12.2")
 
 }
-
-avro {
-
-}
-

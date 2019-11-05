@@ -5,10 +5,6 @@ plugins {
     id("com.commercehub.gradle.plugin.avro")
 }
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     compile(kotlin("stdlib-jdk8"))
 

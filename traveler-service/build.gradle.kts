@@ -6,8 +6,6 @@ plugins {
     jacoco
 }
 
-
-
 dependencies {
     compile(kotlin("stdlib-jdk8"))
 
@@ -39,8 +37,3 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.12.2")
 
 }
-
-avro {
-
-}
-
