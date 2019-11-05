@@ -13,6 +13,7 @@ plugins {
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 extra["springCloudVersion"] = "Greenwich.SR2"
 extra["confluentVersion"] = "5.2.3"
+extra["jacksonKotlinVersion"] = "2.9.9"
 
 allprojects {
 

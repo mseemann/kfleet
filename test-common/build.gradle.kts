@@ -13,7 +13,7 @@ dependencies {
     compile(kotlin("stdlib-jdk8"))
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${property("jacksonKotlinVersion")}")
 
     implementation("org.springframework.boot:spring-boot-starter-test:2.1.9.RELEASE") {
         exclude(module = "junit")

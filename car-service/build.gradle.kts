@@ -19,7 +19,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka")
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
     implementation("org.springframework.cloud:spring-cloud-stream-reactive")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.9.8")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${property("jacksonKotlinVersion")}")
     implementation("io.github.microutils:kotlin-logging:1.7.6")
     implementation("org.apache.avro:avro:1.9.1")
     implementation("io.confluent:kafka-avro-serializer:${property("confluentVersion")}")
