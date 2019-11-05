@@ -31,7 +31,7 @@ dependencies {
         exclude(module = "junit")
     }
 
-    testImplementation("io.projectreactor:reactor-test:3.2.11.RELEASE")
+    testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.awaitility:awaitility:4.0.1")
     testImplementation("org.awaitility:awaitility-kotlin:4.0.1")
     testImplementation("org.testcontainers:junit-jupiter:1.12.2")

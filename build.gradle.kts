@@ -52,7 +52,7 @@ subprojects {
         testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
         testImplementation("io.kotlintest:kotlintest-runner-junit5:3.3.2")
         testImplementation("io.mockk:mockk:1.9.3.kotlin12")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.1.1")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
     }
 
 
