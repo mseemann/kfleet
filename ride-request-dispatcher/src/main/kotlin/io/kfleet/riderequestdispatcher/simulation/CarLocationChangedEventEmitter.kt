@@ -46,7 +46,7 @@ class CarLocationChangedEventEmitter {
             geoPosition = position
             geoPositionIndex = position.toQuadrantIndex()
         }
-        logger.debug { "emit: $carLocationChangedEvent" }
+        logger.debug { "emit CarLocationEvent: $carLocationChangedEvent" }
         MessageBuilder.createMessage(carLocationChangedEvent, headers(it))
     } else Flux.empty()
 

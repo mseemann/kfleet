@@ -67,7 +67,7 @@ class RideRequestedEventEmitter {
                             .withZone(ZoneOffset.UTC)
                             .format(ZonedDateTime.now())
                 }
-                logger.debug { "emit: $rideRequestedEvent" }
+                logger.debug { "emit RideRequestEvent: $rideRequestedEvent" }
                 val message = MessageBuilder.createMessage(rideRequestedEvent, headers(it))
                 sink.next(message)
             }
