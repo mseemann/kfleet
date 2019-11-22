@@ -21,7 +21,7 @@ class TravelerLocalRepository(private val interactiveQueryService: InteractiveQu
 
     private fun travelerStore(): ReadOnlyKeyValueStore<String, Traveler> =
             interactiveQueryService
-                    .getQueryableStore(TRAVELER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Traveler>())
+                    .getQueryableStore(TRAVELER_RW_STORE, QueryableStoreTypes.keyValueStore())
 
 
 }

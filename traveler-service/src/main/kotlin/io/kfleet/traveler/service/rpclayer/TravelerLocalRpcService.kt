@@ -21,6 +21,5 @@ class TravelerLocalRpcService(private val travelerRepository: TravelerLocalRepos
                 .onErrorResume { ServerResponse.notFound().build() }
                 .subscribeOn(Schedulers.elastic())
     }
-
-
+    
 }

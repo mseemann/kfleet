@@ -77,8 +77,7 @@ class CarsRepository(
     fun <T> waitForStoreTobeQueryable(storeName: String, queryableStoreType: QueryableStoreType<T>): T {
         while (true) {
             try {
-                val store = kafkaStreamsUtil.getKafakStreams().store(storeName, queryableStoreType)
-                return store
+                return kafkaStreamsUtil.getKafakStreams().store(storeName, queryableStoreType)
             } catch (ignored: InvalidStateStoreException) {
                 println(ignored)
                 // store not yet ready for querying

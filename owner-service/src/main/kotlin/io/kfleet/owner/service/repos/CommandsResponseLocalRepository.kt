@@ -30,6 +30,6 @@ class CommandsResponseLocalRepository(private val interactiveQueryService: Inter
     }
 
     private fun commandResponseStore(): ReadOnlyWindowStore<String, CommandResponse> = interactiveQueryService
-            .getQueryableStore(OWNER_COMMANDS_RESPONSE_STORE, QueryableStoreTypes.windowStore<String, CommandResponse>())
+            .getQueryableStore(OWNER_COMMANDS_RESPONSE_STORE, QueryableStoreTypes.windowStore())
 
 }

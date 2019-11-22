@@ -15,7 +15,7 @@ data class Event(val id: String, val time: String)
 
 @Component
 class CarsWebSocketHandler(val objectMapper: ObjectMapper) : WebSocketHandler {
-    
+
 
     private val eventFlux: Flux<String> = Flux.generate { sink ->
         sink.next(objectMapper.writeValueAsString(Event(randomUUID().toString(), now().toString())))
@@ -29,6 +29,5 @@ class CarsWebSocketHandler(val objectMapper: ObjectMapper) : WebSocketHandler {
                 .send(intervalFlux.map { webSocketSession.textMessage(it) })
                 .and(webSocketSession.receive().map { it.payloadAsText }.log())
     }
-
-
+    
 }

@@ -101,13 +101,12 @@ class OwnerService(
     fun registerACar(request: ServerRequest): Mono<ServerResponse> = request.bodyToMono<NewCar>()
             .flatMap {
                 val ownerId = request.pathVariable("ownerId")
-                val registerCarParams = RegisterCarParams(ownerId = ownerId, newCar = it)
-                Mono.just(registerCarParams)
-                        .flatMap { validate(it) }
-                        .flatMap { ownerRepository.submitRegisterCarCommand(it) }
+                Mono.just(RegisterCarParams(ownerId = ownerId, newCar = it))
+                        .flatMap { params -> validate(params) }
+                        .flatMap { params -> ownerRepository.submitRegisterCarCommand(params) }
                         .delayElement(Duration.ofMillis(200))
-                        .flatMap { findCommand(it.getCommandId()) }
-                        .flatMap { mapCommandResponse(it) { ownerById(it.getRessourceId(), HttpStatus.CREATED) } }
+                        .flatMap { command -> findCommand(command.getCommandId()) }
+                        .flatMap { cResponse -> mapCommandResponse(cResponse) { ownerById(cResponse.getRessourceId(), HttpStatus.CREATED) } }
                         .onErrorResume(IllegalArgumentException::class.java) { e -> toServerResponse(e) }
             }
 

@@ -28,9 +28,9 @@ class CarsLocalRepository(private val interactiveQueryService: InteractiveQueryS
             }.toMono()
 
     private fun carsStore(): ReadOnlyKeyValueStore<String, Car> = interactiveQueryService
-            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
-    
+            .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore())
+
     private fun carStateStore(): ReadOnlyKeyValueStore<String, Long> = interactiveQueryService
-            .getQueryableStore(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore<String, Long>())
+            .getQueryableStore(CarStateCountProcessorBinding.CAR_STATE_STORE, QueryableStoreTypes.keyValueStore())
 
 }

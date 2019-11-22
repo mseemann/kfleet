@@ -12,11 +12,11 @@ private val log = KotlinLogging.logger {}
 class CustomDeserializationExceptionHandler : DeserializationExceptionHandler {
 
     override fun handle(context: ProcessorContext?, record: ConsumerRecord<ByteArray, ByteArray>?, exception: Exception?): DeserializationHandlerResponse {
-        log.warn("${record} ${exception}")
+        log.warn("$record $exception")
         return DeserializationHandlerResponse.CONTINUE
     }
 
     override fun configure(configs: MutableMap<String, *>?) {
-        log.info("${configs}")
+        log.info("$configs")
     }
 }

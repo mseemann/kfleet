@@ -21,6 +21,5 @@ class OwnerLocalRpcService(private val ownerRepository: OwnerLocalRepository) {
                 .onErrorResume { ServerResponse.notFound().build() }
                 .subscribeOn(Schedulers.elastic())
     }
-
-
+    
 }

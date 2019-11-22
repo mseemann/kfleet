@@ -203,7 +203,7 @@ class OwnerProcessor {
             listOf(responseOwnerNotExist(command.getCommandId(), command.getOwnerId()))
         } else {
 
-            val carToDeregister = owner.getCars().filter { it.getId() == command.getCarId() }.firstOrNull()
+            val carToDeregister = owner.getCars().firstOrNull { it.getId() == command.getCarId() }
                     ?: return listOf(responseCarNotExist(command.getCommandId(), command.getCarId()))
 
             owner.setCars(owner.getCars().minus(carToDeregister))

@@ -20,7 +20,7 @@ class OwnerLocalRepository(private val interactiveQueryService: InteractiveQuery
 
     private fun ownerStore(): ReadOnlyKeyValueStore<String, Owner> =
             interactiveQueryService
-                    .getQueryableStore(OWNER_RW_STORE, QueryableStoreTypes.keyValueStore<String, Owner>())
+                    .getQueryableStore(OWNER_RW_STORE, QueryableStoreTypes.keyValueStore())
 
 
 }

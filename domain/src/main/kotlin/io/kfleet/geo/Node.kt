@@ -56,7 +56,7 @@ class Node(val x: Double, val y: Double, val w: Double, val h: Double, val quadr
 }
 
 
-class TreeNode(val node: Node) {
+class TreeNode(private val node: Node) {
 
     val childs = mutableListOf<TreeNode>()
 

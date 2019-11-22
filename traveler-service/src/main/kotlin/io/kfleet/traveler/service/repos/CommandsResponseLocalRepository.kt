@@ -20,6 +20,6 @@ class CommandsResponseLocalRepository(private val interactiveQueryService: Inter
     }
 
     private fun commandResponseStore(): ReadOnlyKeyValueStore<String, CommandResponse> = interactiveQueryService
-            .getQueryableStore(TRAVELER_COMMANDS_RESPONSE_STORE, QueryableStoreTypes.keyValueStore<String, CommandResponse>())
+            .getQueryableStore(TRAVELER_COMMANDS_RESPONSE_STORE, QueryableStoreTypes.keyValueStore())
 
 }
