@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Configuration
 class JacksonObjectMapper {
 
     @Bean
-    fun objectMapper(): ObjectMapper {
-        val mapper = ObjectMapper()
-        mapper.addMixIn(SpecificRecord::class.java, MixInIgnoreAvroSchemaProperties::class.java)
-        return mapper
+    fun objectMapper() = ObjectMapper().apply {
+        addMixIn(SpecificRecord::class.java, MixInIgnoreAvroSchemaProperties::class.java)
     }
+
+    
 }

@@ -45,8 +45,8 @@ class CarLocationsProcessor {
                 }, Serialized.with(Serdes.String(), Serdes.String()))
                 .aggregate(
                         { CarPositionAggregate() },
-                        { quadrant, carId, a -> a.add(quadrant, carId) },
-                        { quadrant, carId, a -> a.sub(quadrant, carId) },
+                        { quadrant, carId, agg -> agg.add(quadrant, carId) },
+                        { quadrant, carId, agg -> agg.sub(quadrant, carId) },
                         Materialized.`as`<String, CarPositionAggregate, KeyValueStore<Bytes, ByteArray>>
                         (CarLocationsProcessorBinding.CAR_LOCATION_STORE)
                                 .withKeySerde(Serdes.String())
