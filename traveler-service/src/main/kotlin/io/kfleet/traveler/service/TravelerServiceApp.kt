@@ -29,8 +29,9 @@ fun main(args: Array<String>) {
 class WebConfiguration : WebFluxConfigurer {
 
     override fun configureHttpMessageCodecs(configurer: ServerCodecConfigurer) {
-        val mapper = jacksonObjectMapper()
-        mapper.addMixIn(SpecificRecord::class.java, MixInIgnoreAvroSchemaProperties::class.java)
+        val mapper = jacksonObjectMapper().apply {
+            addMixIn(SpecificRecord::class.java, MixInIgnoreAvroSchemaProperties::class.java)
+        }
         configurer.defaultCodecs().jackson2JsonEncoder(Jackson2JsonEncoder(mapper))
     }
 }
