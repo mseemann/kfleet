@@ -1,10 +1,10 @@
 package io.kfleet.car.service.rpclayer
 
-import io.kfleet.car.service.configuration.JacksonObjectMapper
 import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
 import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.repos.CarsLocalRepository
+import io.kfleet.common.configuration.ObjectMapperConfig
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono
 import kotlin.test.expect
 
 @WebFluxTest(CarsLocalRpcService::class)
-@Import(JacksonObjectMapper::class, CarsRpcRoutes::class)
+@Import(ObjectMapperConfig::class, CarsRpcRoutes::class)
 class CarsLocalRpcServiceTest {
 
     @Autowired

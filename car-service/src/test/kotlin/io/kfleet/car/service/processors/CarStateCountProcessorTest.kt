@@ -7,6 +7,7 @@ import io.kfleet.car.service.processor.CarStateCountProcessorBinding
 import io.kfleet.car.service.repos.CarsRepository
 import io.kfleet.car.service.simulation.CarEventOutBindings
 import io.kfleet.car.service.simulation.CarsOutBindings
+import io.kfleet.common.configuration.ObjectMapperConfig
 import io.kfleet.common.customRetry
 import io.kfleet.common.headers
 import io.kfleet.domain.events.carDeregisteredEvent
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.cloud.stream.annotation.Output
+import org.springframework.context.annotation.Import
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.test.context.ContextConfiguration
@@ -32,6 +34,7 @@ import kotlin.test.expect
 
 @EnabledIfEnvironmentVariable(named = "ENV", matches = "ci")
 @ExtendWith(SpringExtension::class)
+@Import(ObjectMapperConfig::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
 class CarStateCountProcessorTest {

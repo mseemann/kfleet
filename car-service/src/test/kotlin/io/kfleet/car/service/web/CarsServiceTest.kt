@@ -1,11 +1,11 @@
 package io.kfleet.car.service.web
 
-import io.kfleet.car.service.configuration.JacksonObjectMapper
 import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarState
 import io.kfleet.car.service.domain.car
 import io.kfleet.car.service.domain.geoPositionCar
 import io.kfleet.car.service.repos.CarsRepository
+import io.kfleet.common.configuration.ObjectMapperConfig
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +21,7 @@ import kotlin.test.expect
 
 
 @WebFluxTest(CarsService::class)
-@Import(JacksonObjectMapper::class, CarsRoutes::class)
+@Import(ObjectMapperConfig::class, CarsRoutes::class)
 @AutoConfigureWebTestClient(timeout = "15001") // backof retry is between 1 and 3 seconds; 5 times
 class CarsServiceTest {
 

@@ -2,7 +2,9 @@ package io.kfleet.owner.service.processors
 
 
 import io.kfleet.commands.CommandStatus
+import io.kfleet.common.configuration.ObjectMapperConfig
 import io.kfleet.common.customRetry
+import io.kfleet.owner.service.WebConfiguration
 import io.kfleet.owner.service.domain.CarModel
 import io.kfleet.owner.service.repos.*
 import io.kfleet.owner.service.web.NewCar
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import testing.KafkaContextInitializer
@@ -20,6 +23,7 @@ import kotlin.test.*
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(initializers = [KafkaContextInitializer::class])
+@Import(ObjectMapperConfig::class, WebConfiguration::class)
 class ProcessorIntegrationTests {
 
     @Autowired

@@ -1,6 +1,6 @@
 package io.kfleet.owner.service.repos
 
-import io.kfleet.car.service.configuration.JacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.kfleet.car.service.domain.Car
 import io.kfleet.car.service.domain.CarFactory
 import io.kfleet.car.service.processor.CarStateCountProcessorBinding
@@ -28,7 +28,7 @@ class CarsRepositoryTest {
     lateinit var kafkaStreamsUtil: KafkaStreamsUtil
 
     @Spy
-    val objectMapper = JacksonObjectMapper().objectMapper()
+    val objectMapper = ObjectMapper()
 
     @Mock
     lateinit var kafakStreams: KafkaStreams
