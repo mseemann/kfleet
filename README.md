@@ -3,6 +3,7 @@ A technology preview how to manage a fleet of autonomous vehicles with Kafka
 
 [![CircleCI](https://circleci.com/gh/mseemann/kfleet/tree/master.svg?style=shield)](https://circleci.com/gh/mseemann/kfleet/tree/master)
 [![codecov](https://codecov.io/gh/mseemann/kfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/mseemann/kfleet)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet?ref=badge_shield)
 
 get insights from kafka:
 
@@ -156,3 +157,7 @@ override fun findById(id: String): Mono<Car> {
 [7] [https://www.matsim.org/](https://www.matsim.org/)
 
 [8] [Sinusoidal](https://github.com/geotools/geotools/blob/master/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Sinusoidal.java)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet?ref=badge_large)
