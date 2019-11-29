@@ -25,9 +25,32 @@ class CarsWebSocketHandler(val objectMapper: ObjectMapper) : WebSocketHandler {
             .zipWith(eventFlux, BiFunction<Long, String, String> { _, event -> event })
 
     override fun handle(webSocketSession: WebSocketSession): Mono<Void> {
-        return webSocketSession
-                .send(intervalFlux.map { webSocketSession.textMessage(it) })
-                .and(webSocketSession.receive().map { it.payloadAsText }.log())
+
+        val output = webSocketSession.receive()
+                .doOnNext { message ->
+                    println(message.payloadAsText)
+                    message.payloadAsText
+                }
+                .concatMap { message ->
+                    println("x: $message")
+                    intervalFlux
+                }
+                .map { webSocketSession.textMessage(it) }
+
+        return webSocketSession.send(output);
+
+//
+//        webSocketSession.receive().map {
+//            println(it.payloadAsText)
+//        }
+//
+//
+//        return webSocketSession
+//                .send(intervalFlux.map { webSocketSession.textMessage(it) })
+
     }
-    
+
 }
+
+
+

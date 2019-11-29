@@ -140,6 +140,16 @@ override fun findById(id: String): Mono<Car> {
 }
 ```
 
+### realtime queries - e.g. live queries with a push based update 
+
+- maintain state
+- register query for a state
+- push state changes to the query initializer (client)
+- this can be used to throttle the changes - e.g the client can set a throttle by himself
+- but how to distribute the state maintenance on multiple nodes
+  and combine it to answer queries on one node
+
+
 ### Resources and readings
 
 [1] [Should You Put Several Event Types in the Same Kafka Topic?](https://www.confluent.io/blog/put-several-event-types-kafka-topic/)

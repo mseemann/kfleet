@@ -1,17 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width,initial-scale=1.0" name="viewport">
+    <link href="<%= BASE_URL %>favicon.ico" rel="icon">
     <title>traveler-ui</title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but traveler-ui doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+</head>
+<body>
+<noscript>
+    <strong>We're sorry but traveler-ui doesn't work properly without JavaScript enabled. Please enable it to
+        continue.</strong>
+</noscript>
+<div class="events"></div>
+<script>
+    var clientWebSocket = new WebSocket("ws://localhost:8080/rrd/cars");
+    clientWebSocket.onopen = function () {
+        console.log("clientWebSocket.onopen", clientWebSocket);
+        console.log("clientWebSocket.readyState", "websocketstatus");
+        setInterval(function () {
+            console.log('send a request');
+            clientWebSocket.send("event-me-from-browser");
+        }, 5000, 2);
+
+    };
+    clientWebSocket.onclose = function (error) {
+        console.log("clientWebSocket.onclose", clientWebSocket, error);
+        events("Closing connection");
+    };
+    clientWebSocket.onerror = function (error) {
+        console.log("clientWebSocket.onerror", clientWebSocket, error);
+        events("An error occured");
+    };
+    clientWebSocket.onmessage = function (error) {
+        console.log("clientWebSocket.onmessage", clientWebSocket, error);
+        events(error.data);
+    };
+
+    function events(responseEvent) {
+        document.querySelector(".events").innerHTML += responseEvent + "<br>";
+    }
+</script>
+<div id="app"></div>
+<!-- built files will be auto injected -->
+</body>
 </html>
