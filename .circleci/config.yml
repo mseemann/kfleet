@@ -13,8 +13,8 @@ jobs:
       - checkout
 
       - run:
-        command: fossa analyze
-        working_directory: ~/repo
+          command: fossa analyze
+          working_directory: ~/repo
 
   build:
     executorType: machine
