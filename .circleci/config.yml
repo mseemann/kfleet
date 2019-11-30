@@ -2,8 +2,7 @@ version: 2
 
 jobs:
   fossa:
-    docker:
-      - image: circleci/node:10-stretch-browsers
+    executorType: machine
 
     working_directory: ~/repo
     steps:
