@@ -1,6 +1,21 @@
 version: 2
 
 jobs:
+  fossa:
+    docker:
+      - image: circleci/node:10-stretch-browsers
+
+    working_directory: ~/repo
+    steps:
+      - run: |
+          curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash
+
+      - checkout
+
+      - run:
+        command: fossa analyze
+        working_directory: ~/repo
+
   build:
     executorType: machine
 
@@ -69,3 +84,4 @@ workflows:
     jobs:
       - build
       - build-traveler-ui
+      - fossa

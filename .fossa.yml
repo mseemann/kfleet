@@ -2,45 +2,38 @@
 # Visit https://fossa.com to learn more
 
 version: 2
-cli:
-  server: https://app.fossa.com
-  fetcher: custom
-  project: kfleet
+
 analyze:
   modules:
-  - name: car-service
-    type: gradle
-    target: 'car-service:'
-    path: .
-  - name: common
-    type: gradle
-    target: 'common:'
-    path: .
-  - name: domain
-    type: gradle
-    target: 'domain:'
-    path: .
-  - name: owner-service
-    type: gradle
-    target: 'owner-service:'
-    path: .
-  - name: ride-request-dispatcher
-    type: gradle
-    target: 'ride-request-dispatcher:'
-    path: .
-  - name: test-common
-    type: gradle
-    target: 'test-common:'
-    path: .
-  - name: traveler-service
-    type: gradle
-    target: 'traveler-service:'
-    path: .
-  - name: traveler-ui
-    type: npm
-    target: traveler-ui
-    path: traveler-ui
-  - name: traveler-ui
-    type: npm
-    target: traveler-ui
-    path: traveler-ui
+    - name: car-service
+      type: gradle
+      target: 'car-service:'
+      path: .
+    - name: common
+      type: gradle
+      target: 'common:'
+      path: .
+    - name: domain
+      type: gradle
+      target: 'domain:'
+      path: .
+    - name: owner-service
+      type: gradle
+      target: 'owner-service:'
+      path: .
+    - name: ride-request-dispatcher
+      type: gradle
+      target: 'ride-request-dispatcher:'
+      path: .
+    - name: test-common
+      type: gradle
+      target: 'test-common:'
+      path: .
+    - name: traveler-service
+      type: gradle
+      target: 'traveler-service:'
+      path: .
+    - name: traveler-ui
+      type: npm
+      target: traveler-ui
+      path: traveler-ui
