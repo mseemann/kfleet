@@ -3,7 +3,7 @@ A technology preview how to manage a fleet of autonomous vehicles with Kafka
 
 [![CircleCI](https://circleci.com/gh/mseemann/kfleet/tree/master.svg?style=shield)](https://circleci.com/gh/mseemann/kfleet/tree/master)
 [![codecov](https://codecov.io/gh/mseemann/kfleet/branch/master/graph/badge.svg)](https://codecov.io/gh/mseemann/kfleet)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B14687%2Fgit%40github.com%3Amseemann%2Fkfleet.git.svg?type=shield)](https://app.fossa.com/projects/custom%2B14687%2Fgit%40github.com%3Amseemann%2Fkfleet.git?ref=badge_shield)
 
 get insights from kafka:
 
@@ -170,4 +170,4 @@ override fun findById(id: String): Mono<Car> {
 
 
 ## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fmseemann%2Fkfleet?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B14687%2Fgit%40github.com%3Amseemann%2Fkfleet.git.svg?type=large)](https://app.fossa.com/projects/custom%2B14687%2Fgit%40github.com%3Amseemann%2Fkfleet.git?ref=badge_large)
