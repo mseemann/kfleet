@@ -31,13 +31,13 @@ class CarsWebSocketHandler(val objectMapper: ObjectMapper) : WebSocketHandler {
                     println(message.payloadAsText)
                     message.payloadAsText
                 }
-                .concatMap { message ->
-                    println("x: $message")
-                    intervalFlux
-                }
-                .map { webSocketSession.textMessage(it) }
+//                .concatMap { message ->
+//                    println("x: ${message.payloadAsText}")
+//                    intervalFlux
+//                }
+                .map { msg -> println(msg.payloadAsText); webSocketSession.textMessage(msg.payloadAsText) }
 
-        return webSocketSession.send(output);
+        return webSocketSession.send(output)
 
 //
 //        webSocketSession.receive().map {

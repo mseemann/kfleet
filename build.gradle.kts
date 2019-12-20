@@ -1,5 +1,7 @@
+import com.google.cloud.tools.jib.gradle.JibExtension
 import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.utils.addIfNotNull
 
 plugins {
     base
@@ -7,6 +9,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring") version "1.3.61" apply false
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("com.commercehub.gradle.plugin.avro") version "0.17.0" apply false
+    id("com.google.cloud.tools.jib") version "1.8.0" apply false
     jacoco
 }
 
@@ -41,6 +44,7 @@ subprojects {
 
     apply(plugin = "kotlin")
     apply(plugin = "io.spring.dependency-management")
+
     the<DependencyManagementExtension>().apply {
         imports {
             mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
@@ -75,6 +79,32 @@ subprojects {
 
 }
 
+val tagSet = mutableSetOf("latest")
+tagSet.addIfNotNull(System.getenv("CIRCLE_BRANCH"))
+tagSet.addIfNotNull(System.getenv("CIRCLE_BUILD_NUM"))
+
+subprojects.forEach {
+    it.afterEvaluate {
+        // this is true if the jib plugin is applied to the project - but only after
+        // the gradle project is evaluated
+        if (it.hasProperty("jib")) {
+            (it.property("jib") as JibExtension).apply {
+                from {
+                    image = "openjdk:8-jdk-alpine"
+                }
+                to {
+                    image = "seemann/kfleet.io.${it.name}"
+                    tags = tagSet
+                }
+                container {
+                    jvmFlags = listOf("-Xms512m")
+                    useCurrentTimestamp = true
+                }
+            }
+        }
+    }
+}
+
 dependencies {
 
     // Make the root project archives configuration depend on every subproject
@@ -86,6 +116,4 @@ dependencies {
 jacoco {
     toolVersion = "0.8.5"
 }
-
-
 

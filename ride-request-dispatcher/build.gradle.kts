@@ -4,6 +4,7 @@ plugins {
     kotlin("plugin.spring")
     id("com.commercehub.gradle.plugin.avro")
     jacoco
+    id("com.google.cloud.tools.jib")
 }
 
 dependencies {

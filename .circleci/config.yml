@@ -31,6 +31,9 @@ jobs:
 
       - run: ./gradlew test jacocoTestReport --stacktrace
       - run: bash <(curl -s https://codecov.io/bash)
+      - setup_remote_docker
+      - run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - run: ./gradlew jib
       - run:
           command: fossa analyze
           working_directory: ~/repo
