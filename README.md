@@ -1,4 +1,5 @@
 # kfleet
+
 A technology preview how to manage a fleet of autonomous vehicles with Kafka
 
 [![CircleCI](https://circleci.com/gh/mseemann/kfleet/tree/master.svg?style=shield)](https://circleci.com/gh/mseemann/kfleet/tree/master)
@@ -62,29 +63,41 @@ docker run --tty \
 ```
 
 ```json
-{"id":"1","state":"FREE","geoPosition":{"lat":59.83977184696787,"lng":10.70939965449577},"stateOfCharge":49.76350057919342}
+{
+  "id": "1",
+  "state": "FREE",
+  "geoPosition": {
+    "lat": 59.83977184696787,
+    "lng": 10.70939965449577
+  },
+  "stateOfCharge": 49.76350057919342
+}
 ```
 
 ### Thoughts and findings
+
 - *In domain-driven design (DDD), an aggregate defines a consistency boundary" [3]
-- "Both the sender and the receiver of a command should be in the same bounded context. You should not send a command to another bounded context because you would be instructing that other bounded context, which has separate responsibilities in another consistency boundary, to perform some work for you." [3]
+- "Both the sender and the receiver of a command should be in the same bounded context. You should not send a command to
+  another bounded context because you would be instructing that other bounded context, which has separate
+  responsibilities in another consistency boundary, to perform some work for you." [3]
 - "Commands should be processed once, by a single recipient." [3]
-- "When source code is executed sequentially, the code is easier to understand and debug. When concurrency is used, code may get executed in parallel or in some irregular order." [5]
+- "When source code is executed sequentially, the code is easier to understand and debug. When concurrency is used, code
+  may get executed in parallel or in some irregular order." [5]
 - "Tell don't ask!"
 
 ### Using the interactive query service to provide a REST-Interface to the state store
-Kafka Streams provide a _ReadOnlyKeyValueStore_ that is a thread safe way to access a state store. 
-The store is available through Spring Cloud Streams _InteractiveQueryService_. We can use this
-service to find a specific record by key, all records in the store or a range of records - if we are quering
-for a range of keys (lexicographically).
-This sounds great. But we should remind our self that a state store is bound to the current streaming 
-application instance and if we want to scale our application we need to start more instances of our 
-application (up to the number of partitions our topic has).
-If we provide the host and port of our application (`application.server`-property) we can query all
-hosts that are part of our streaming app cluster or we can determine the host a given key is stored.
 
-To conclude: if we have only one streaming application instance we can query a record by key in the 
-easiest possible way:
+Kafka Streams provide a _ReadOnlyKeyValueStore_ that is a thread safe way to access a state store. The store is
+available through Spring Cloud Streams _InteractiveQueryService_. We can use this service to find a specific record by
+key, all records in the store, or a range of records - if we are querying for a range of keys (lexicographically). This
+sounds great. But we should remind our self that a state store is bound to the current streaming application instance
+and if we want to scale our application we need to start more instances of our application (up to the number of
+partitions our topic has). If we provide the host and port of our application (`application.server`-property) we can
+query all hosts that are part of our streaming app cluster, or we can determine the host a given key is stored.
+
+To conclude: if we have only one streaming application instance we can query a record by key in the easiest possible
+way:
+
 ``` kotlin
 override fun findByIdLocal(id: String): Mono<Car> {
     return carsStore().get(id)?.toMono() ?: Mono.error(Exception("car with id: $id not found"))
@@ -94,9 +107,10 @@ private fun carsStore(): ReadOnlyKeyValueStore<String, Car> = interactiveQuerySe
         .getQueryableStore(CarStateCountProcessorBinding.CAR_STORE, QueryableStoreTypes.keyValueStore<String, Car>())
 
 ```
-If we have more than one instance of our streaming application running we need to decide whether the
-record is stored locally or can only be queries from another application instance. If the key is stored
-locally we query the local store. If not, we need a remote call to query the reocord:
+
+If we have more than one instance of our streaming application running we need to decide whether the record is stored
+locally or can only be queries from another application instance. If the key is stored locally we query the local store.
+If not, we need a remote call to query the record:
 
 ``` kotlin
 override fun findById(id: String): Mono<Car> {
@@ -115,20 +129,19 @@ override fun findById(id: String): Mono<Car> {
 }
 ```
 
-The _WebClient_ uses a special rest endpoint that queries the local store directly. The provided solution is the
-fastest one because it runs a local key lookup in the local store if the key is processed by the same application
-instance. Only if the key is processed by another application instance a remote call is necessary.
-The disadvantage is that the provided code is more complicated and not very concise.
+The _WebClient_ uses a special rest endpoint that queries the local store directly. The provided solution is the fastest
+one because it runs a local key lookup in the local store if the key is processed by the same application instance. Only
+if the key is processed by another application instance a remote call is necessary. The disadvantage is that the
+provided code is more complicated and not very concise.
 
-How to overcome this disadvantage? 
+How to overcome this disadvantage?
 
-We could provide a REST-Proxy that can determine the streaming application for
-a given key. To achive this the REST-Proxy must be very smart because he needs to know how to extract the key for 
-a REST-Call and query the host of the streaming application that processes the given key. This is possible but
-also not a simple solution.
+We could provide a REST-Proxy that can determine the streaming application for a given key. To achieve this the
+REST-Proxy must be very smart because he needs to know how to extract the key for a REST-Call and query the host of the
+streaming application that processes the given key. This is possible but also not a simple solution.
 
-Another way would be to run the remote call in any case. E.g. a http call is necessary for each key lookup. The advantage 
-is a more readable code:
+Another way would be to run the remote call in any case. E.g. a http call is necessary for each key lookup. The
+advantage is a more readable code:
 
 ``` kotlin
 override fun findById(id: String): Mono<Car> {
@@ -140,15 +153,13 @@ override fun findById(id: String): Mono<Car> {
 }
 ```
 
-### realtime queries - e.g. live queries with a push based update 
+### realtime queries - e.g. live queries with a push based update
 
 - maintain state
 - register query for a state
 - push state changes to the query initializer (client)
 - this can be used to throttle the changes - e.g the client can set a throttle by himself
-- but how to distribute the state maintenance on multiple nodes
-  and combine it to answer queries on one node
-
+- but how to distribute the state maintenance on multiple nodes and combine it to answer queries on one node
 
 ### Resources and readings
 
@@ -158,7 +169,8 @@ override fun findById(id: String): Mono<Car> {
 
 [3] [A CQRS and ES deep dive](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/jj591577(v=pandp.10)?redirectedfrom=MSDN)
 
-[4] [Every Company is Becoming ~~a~~ Software ~~Company~~](https://www.confluent.io/blog/every-company-is-becoming-software)
+[4] [Every Company is Becoming ~~a~~ Software ~~
+Company~~](https://www.confluent.io/blog/every-company-is-becoming-software)
 
 [5] [How To Write Less Code and Get More Done.](https://medium.com/@rsrajan1/how-to-write-less-code-and-get-more-done-40006282817d)
 
@@ -168,6 +180,6 @@ override fun findById(id: String): Mono<Car> {
 
 [8] [Sinusoidal](https://github.com/geotools/geotools/blob/master/modules/library/referencing/src/main/java/org/geotools/referencing/operation/projection/Sinusoidal.java)
 
-
 ## License
+
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B14687%2Fgit%40github.com%3Amseemann%2Fkfleet.git.svg?type=large)](https://app.fossa.com/projects/custom%2B14687%2Fgit%40github.com%3Amseemann%2Fkfleet.git?ref=badge_large)

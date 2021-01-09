@@ -14,7 +14,7 @@ import java.util.function.BiFunction
 data class Event(val id: String, val time: String)
 
 @Component
-class CarsWebSocketHandler(val objectMapper: ObjectMapper) : WebSocketHandler {
+class CarsWebSocketHandler(private val objectMapper: ObjectMapper) : WebSocketHandler {
 
 
     private val eventFlux: Flux<String> = Flux.generate { sink ->
