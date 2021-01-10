@@ -8,7 +8,7 @@ plugins {
 }
 
 dependencies {
-    compile(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib-jdk8"))
 
     implementation(project(":common"))
     implementation(project(":domain"))

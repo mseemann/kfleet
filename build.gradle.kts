@@ -105,13 +105,6 @@ subprojects.forEach {
     }
 }
 
-dependencies {
-
-    // Make the root project archives configuration depend on every subproject
-    subprojects.forEach {
-        archives(it)
-    }
-}
 
 jacoco {
     toolVersion = "0.8.5"
