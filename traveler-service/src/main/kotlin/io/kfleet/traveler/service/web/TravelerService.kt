@@ -88,7 +88,7 @@ class TravelerService(
 
 
     private fun toServerResponse(e: IllegalArgumentException) =
-        ServerResponse.badRequest().body(BodyInserters.fromObject(e.message?.let { it } ?: "unknown"))
+        ServerResponse.badRequest().body(BodyInserters.fromObject(e.message ?: "unknown"))
 
 
     fun travelerById(request: ServerRequest): Mono<ServerResponse> {
