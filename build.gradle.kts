@@ -5,8 +5,8 @@ import org.jetbrains.kotlin.utils.addIfNotNull
 
 plugins {
     base
-    kotlin("jvm") version "1.3.61"
-    id("org.jetbrains.kotlin.plugin.spring") version "1.3.61" apply false
+    kotlin("jvm") version "1.4.21"
+    id("org.jetbrains.kotlin.plugin.spring") version "1.4.21" apply false
     id("org.springframework.boot") version "2.1.9.RELEASE" apply false
     id("com.commercehub.gradle.plugin.avro") version "0.17.0" apply false
     id("com.google.cloud.tools.jib") version "1.8.0" apply false
