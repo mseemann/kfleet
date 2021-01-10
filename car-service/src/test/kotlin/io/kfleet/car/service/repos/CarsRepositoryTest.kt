@@ -54,52 +54,58 @@ class CarsRepositoryTest {
     fun findAllCars() {
 
         BDDMockito
-                .given(kafakStreams.allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE))
-                .willReturn(listOf(streamsMetadata))
+            .given(kafakStreams.allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE))
+            .willReturn(listOf(streamsMetadata))
         BDDMockito
-                .given(kafkaStreamsUtil.getKafakStreams())
-                .willReturn(kafakStreams)
+            .given(kafkaStreamsUtil.getKafkaStreams())
+            .willReturn(kafakStreams)
         BDDMockito
-                .given(webclientUtil.doGetFlux(hostInfo, "/rpc/cars/", Car::class.java))
-                .willReturn(Flux.just(car))
+            .given(webclientUtil.doGetFlux(hostInfo, "/rpc/cars/", Car::class.java))
+            .willReturn(Flux.just(car))
 
         StepVerifier.create(carRepo.findAllCars())
-                .expectNext(car)
-                .verifyComplete()
+            .expectNext(car)
+            .verifyComplete()
     }
 
     @Test
     fun findById() {
 
         BDDMockito
-                .given(interactiveQService.getHostInfo(BDDMockito.anyString(), BDDMockito.anyString(), BDDMockito.any<StringSerializer>()))
-                .willReturn(hostInfo)
+            .given(
+                interactiveQService.getHostInfo(
+                    BDDMockito.anyString(),
+                    BDDMockito.anyString(),
+                    BDDMockito.any<StringSerializer>()
+                )
+            )
+            .willReturn(hostInfo)
 
         BDDMockito
-                .given(webclientUtil.doGet(hostInfo, "/rpc/cars/1", Car::class.java))
-                .willReturn(Mono.just(car))
+            .given(webclientUtil.doGet(hostInfo, "/rpc/cars/1", Car::class.java))
+            .willReturn(Mono.just(car))
 
         StepVerifier.create(carRepo.findById(car.getId()))
-                .expectNext(car)
-                .verifyComplete()
+            .expectNext(car)
+            .verifyComplete()
     }
 
     @Test
     fun getCarsStateCounts() {
         BDDMockito
-                .given(kafakStreams.allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE))
-                .willReturn(listOf(streamsMetadata))
+            .given(kafakStreams.allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE))
+            .willReturn(listOf(streamsMetadata))
 
         BDDMockito
-                .given(kafkaStreamsUtil.getKafakStreams())
-                .willReturn(kafakStreams)
+            .given(kafkaStreamsUtil.getKafkaStreams())
+            .willReturn(kafakStreams)
 
         BDDMockito
-                .given(webclientUtil.doGet(hostInfo, "/rpc/cars/stats", String::class.java))
-                .willReturn(Mono.just("{\"FREE\":1}"))
+            .given(webclientUtil.doGet(hostInfo, "/rpc/cars/stats", String::class.java))
+            .willReturn(Mono.just("{\"FREE\":1}"))
 
         StepVerifier.create(carRepo.getCarsStateCounts())
-                .expectNext(mapOf("FREE" to 1L))
-                .verifyComplete()
+            .expectNext(mapOf("FREE" to 1L))
+            .verifyComplete()
     }
 }

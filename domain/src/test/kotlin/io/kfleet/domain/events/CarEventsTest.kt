@@ -19,7 +19,7 @@ class CarEventsTest : BehaviorSpec({
                 carRegisteredEvent.shouldNotBeNull()
             }
 
-            Then("carid should be the message key") {
+            Then("carId should be the message key") {
                 carRegisteredEvent.asKeyValue().key.shouldBe(carRegisteredEvent.getCarId())
             }
 

@@ -25,7 +25,7 @@ import reactor.core.publisher.toMono
 
 @Component
 class KafkaStreamsUtil(private val context: ApplicationContext) {
-    fun getKafakStreams(): KafkaStreams {
+    fun getKafkaStreams(): KafkaStreams {
         val beanNameCreatedBySpring = "&stream-builder-${CarStateCountProcessor::carStateUpdates.name}"
         val streamsBuilderFactoryBean = context.getBean(beanNameCreatedBySpring, StreamsBuilderFactoryBean::class.java)
         return streamsBuilderFactoryBean.kafkaStreams!!
@@ -34,50 +34,52 @@ class KafkaStreamsUtil(private val context: ApplicationContext) {
 
 @Repository
 class CarsRepository(
-        private val interactiveQueryService: InteractiveQueryService,
-        private val mapper: ObjectMapper,
-        private val kafkaStreamsUtil: KafkaStreamsUtil,
-        private val webclientUtil: WebClientUtil
+    private val interactiveQueryService: InteractiveQueryService,
+    private val mapper: ObjectMapper,
+    private val kafkaStreamsUtil: KafkaStreamsUtil,
+    private val webclientUtil: WebClientUtil
 ) {
 
     fun findAllCars(): Flux<Car> {
         return getStreamMetaData()
-                .map {
-                    webclientUtil.doGetFlux(it.hostInfo(), "$RPC_CARS/", Car::class.java)
-                }
-                .flatMap { Flux.concat(it) }
+            .map {
+                webclientUtil.doGetFlux(it.hostInfo(), "$RPC_CARS/", Car::class.java)
+            }
+            .flatMap { Flux.concat(it) }
     }
 
 
     fun findById(id: String): Mono<Car> {
-        val hostInfo = interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
+        val hostInfo =
+            interactiveQueryService.getHostInfo(CarStateCountProcessorBinding.CAR_STORE, id, StringSerializer())
         return webclientUtil.doGet(hostInfo, "$RPC_CARS/$id", Car::class.java)
     }
 
 
     fun getCarsStateCounts(): Mono<Map<String, Long>> {
         return getStreamMetaData()
-                .map {
-                    webclientUtil.doGet(it.hostInfo(), "$RPC_CARS/stats", String::class.java)
-                            .flatMap { rawStats ->
-                                mapper.readValue<Map<String, Long>>(rawStats).toMono()
-                            }
-                }
-                .flatMap { Flux.concat(it) }
-                .reduce(mapOf(), { all, input -> all.plus(input) })
+            .map {
+                webclientUtil.doGet(it.hostInfo(), "$RPC_CARS/stats", String::class.java)
+                    .flatMap { rawStats ->
+                        mapper.readValue<Map<String, Long>>(rawStats).toMono()
+                    }
+            }
+            .flatMap { Flux.concat(it) }
+            .reduce(mapOf(), { all, input -> all.plus(input) })
     }
 
 
     fun getStreamMetaData(): Flux<StreamsMetadata> {
         return Flux.defer {
-            kafkaStreamsUtil.getKafakStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE).toList().toFlux()
+            kafkaStreamsUtil.getKafkaStreams().allMetadataForStore(CarStateCountProcessorBinding.CAR_STORE).toList()
+                .toFlux()
         }
     }
 
     fun <T> waitForStoreTobeQueryable(storeName: String, queryableStoreType: QueryableStoreType<T>): T {
         while (true) {
             try {
-                return kafkaStreamsUtil.getKafakStreams().store(storeName, queryableStoreType)
+                return kafkaStreamsUtil.getKafkaStreams().store(storeName, queryableStoreType)
             } catch (ignored: InvalidStateStoreException) {
                 println(ignored)
                 // store not yet ready for querying
