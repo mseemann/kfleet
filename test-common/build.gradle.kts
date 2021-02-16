@@ -15,5 +15,5 @@ dependencies {
         exclude(module = "junit")
     }
 
-    implementation("org.testcontainers:junit-jupiter:1.12.2")
+    implementation("org.testcontainers:junit-jupiter:${property("testconatinerVersion")}")
 }

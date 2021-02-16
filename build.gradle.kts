@@ -17,6 +17,7 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 extra["springCloudVersion"] = "Greenwich.SR2"
 extra["confluentVersion"] = "5.2.3"
 extra["jacksonKotlinVersion"] = "2.9.9"
+extra["testconatinerVersion"] = "1.15.2"
 
 allprojects {
 

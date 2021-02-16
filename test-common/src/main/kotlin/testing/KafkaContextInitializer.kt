@@ -13,7 +13,7 @@ class KafkaContextInitializer : ApplicationContextInitializer<ConfigurableApplic
     override fun initialize(context: ConfigurableApplicationContext) {
         instance.start()
         TestPropertyValues.of(
-                "broker-url=${instance.getServiceHost("broker", 9092)}"
+            "broker-url=${instance.getServiceHost("broker", 9092)}"
         ).applyTo(context.environment)
     }
 
@@ -21,9 +21,11 @@ class KafkaContextInitializer : ApplicationContextInitializer<ConfigurableApplic
     companion object {
         private val instance: KDockerComposeContainer by lazy {
             defineDockerCompose()
-                    .waitingFor("registry",
-                            Wait.forHttp("/")
-                                    .withStartupTimeout(Duration.ofMinutes(5)))
+                .waitingFor(
+                    "registry",
+                    Wait.forHttp("/")
+                        .withStartupTimeout(Duration.ofMinutes(15))
+                )
         }
 
         class KDockerComposeContainer(file: File) : DockerComposeContainer<KDockerComposeContainer>(file)
